@@ -1,31 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Login</title>
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-logo">
-            <img src="img/InDigital logo.png" alt="logo" class="logo">
-            <h1>Login</h1>
-        </div>
-        <form class="login-form">
-            <label for="email">E-mail:</label>
-            <input type="email" placeholder="E-mail" required>
+{% extends "base.html" %}
+{% load static %}
 
-            <label for="senha">Senha:</label>
-            <input type="password" placeholder="Senha" required>
-
-            <a href="esqueceuasenha.html" class="forgot-password">Esqueceu a senha?</a>
-            <button type="button" class="btn-login" onclick="window.location.href='index.html';">Entrar</button>
-        </form>
-        <div class="cadastre-se">
-            <span>Ainda não tem conta?</span>
-            <a href="cadastroestudante.html" class="btn-register">Cadastre-se</a>
-        </div>
+{% block content %}
+<div class="login-container">
+    <div class="login-logo">
+        <img src="{% static 'assets/img/InDigital logo.png' %}" alt="logo" class="logo">
+        <h1>Login</h1>
     </div>
-</body>
-</html>
+    <form class="login-form">
+        <label for="email">E-mail:</label>
+        <input type="email" placeholder="E-mail" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" placeholder="Senha" required>
+
+        <a href="esqueceuasenha.html" class="forgot-password">Esqueceu a senha?</a>
+        <button type="button" class="btn-login">Entrar</button>
+    </form>
+    <div class="cadastre-se">
+        <span>Ainda não tem conta?</span>
+        <a href="cadastroestudante.html" class="btn-register">Cadastre-se</a>
+    </div>
+</div>
+{% endblock content %}

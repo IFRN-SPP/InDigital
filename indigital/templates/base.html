@@ -8,28 +8,32 @@
         {% block title %}InDigital{% endblock title %}
     </title>
     <!-- favicon -->
-    <link rel="icon" type="image/png" href="{% static 'assets/favicon.ico' %}" />
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.ico' %}"/>
     <!-- css -->
     <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    <!-- font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 </head>
 <body>
-    <!-- navegação -->
-    <nav>
-        <div class="logo">
-            <a href="{% url 'index' %}">InDigital</a>
-        </div> 
-    <ul>
-        <li> <a href="{% url 'index' %}">Home</a> </li>
-        <li> <a href="#">Reserva</a> </li>
-        <li> <a href="#">Perfil</a> </li>
-    </ul>
+{% block header %}
+<header>
+    <a href="{% url 'index' %}" class="logo">InDigital</a>
+
+    <nav class="navbar">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'reserva' %}">Reserva</a>
     </nav>
-    {% block content %}
-    {% endblock content%}
-        <footer class="footer">
-            <div class="container">
-                <p>Copyright © 2024</p>
-            </div>
-        </footer>
+    <div class="icon">
+        <a href="{% url 'login' %}" class="fas fa-user"></a>
+    </div>
+</header>
+{% endblock header %}
+{% block content %}
+{% endblock content %}
+<footer class="footer">
+    <div class="container">
+        <p>Copyright © {% now 'Y' %}</p>
+    </div>
+</footer>
 </body>
 </html>

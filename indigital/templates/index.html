@@ -1,31 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        InDigital
-    </title>
-    <!-- favicon -->
-    <link rel="icon" type="image/png" href="{% static 'assets/favicon.ico' %}" />
-    <!-- css -->
-    <link href="style.css" rel="stylesheet" />
-    <!-- font -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-</head>
-<body>
-<header>
-    <a href="#" class="logo">InDigital</a>
+{% extends "base.html" %}
+{% load static %}
 
-    <nav class="navbar">
-        <a href="#">Home</a>
-        <a href="#">Reserva</a>
-    </nav>
-    <div class="icon">
-        <a href="#" class="fas fa-user"></a>
-    </div>
-
-</header>
+{% block content %}
 <section class="home" id="home">
     <div class="content">
         <h3>Bem vindo(a) ao InDigital!</h3>
@@ -43,14 +19,8 @@
             </p>
         </div> 
         <div class="sobre-img">
-            <img src="img/indigitallogotipo.png" alt="">
+            <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="">
         </div>
     </div> 
 </section>
-<footer class="footer">
-    <div class="container">
-        <p>Copyright © 2024</p>
-    </div>
-</footer>
-</body>
-</html>
+{% endblock content %}

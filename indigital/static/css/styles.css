@@ -1,24 +1,128 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* login */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    outline: none;
+    border: none;
+    text-decoration: none;
+    transition: .2s linear;
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    width: 100%;
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    min-height: 100vh;
 }
 
+section{
+    padding:2rem 9%;
+}
+
+/* header */
+header {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    right: 0;
+    background: #55B0B4;
+    padding: 2rem 9%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+header .logo {
+    font-size: 3rem;
+    color: white;
+    font-weight: bolder;
+    display: flex;
+    align-items: center;
+}
+
+header .navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+header .navbar a:hover {
+    background-color: white;
+    color: #55B0B4;
+}
+
+header .icon a {
+    font-size: 2rem;
+    margin-left: 1.5rem;
+    color: white;
+}
+
+header .icon a:hover {
+    color: #BAE0E1;
+}
+
+/* home */
+.home{
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    background: url(../assets/img/capa.jpg) no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.home .content h3{
+    font-size: 5rem;
+    color: white;
+}
+
+.sobre .container{
+    display: flex;
+    align-items: center;
+}
+
+.sobre .sobre-text{
+    width: 50%;
+    padding: 0 40px;
+    font-size: 20px;
+    color: #9F9999;
+}
+
+.sobre .sobre-text h3{
+    font-size: 56px;
+    color: #55B0B4;
+}
+
+.sobre .sobre-img{
+    width: 50%;
+}
+
+.sobre .sobre-img img{
+    width: 60%;
+    border-radius: 80px ;
+}
+
+/* para não ocorrer erro na altura do cabeçalho */
+body {
+    margin-top: 8rem;
+}
+
+/* login */
 .login-container {
+    margin: auto; 
     width: 350px;
     background-color: white;
     border-radius: 15px;
@@ -109,207 +213,19 @@ body {
     text-decoration: none;
 }
 
-input:focus{
+input:focus {
     outline: none;
 }
 
-/* esqueceu a senha */
-.container {
-display: flex;
-gap: 2rem;
-}
-
-.card {
-background-color: #55B0B4;
-border-radius: 35px;
-padding: 2rem;
-width: 500px;
-text-align: center;
-color: white;
-}
-
-.card h2 {
-font-size: 28px;
-margin-bottom: 0.5rem;
-}
-
-.card p {
-font-size: 20px;
-margin-bottom: 1.5rem;
-}
-#emailForm {
-display: flex;
-flex-direction: column;
-gap: 1rem;
-}
-form input {
-padding: 0.5rem;
-border: none;
-border-bottom: 2px solid #ffffff;
-background: transparent;
-color: black;
-font-size: 1rem;
-}
-form button,
-.card button {
-padding: 0.7rem;
-border: none;
-border-radius: 5px;
-background-color: white;
-color: #55b0b4;
-font-size: 1rem;
-cursor: pointer;
-}
-    
-form button:hover,
-.card button:hover {
-background-color: white;
-}
-
-.success-icon {
-font-size: 2rem;
-color: white;
-margin-bottom: 1rem;
-}
-
-/* cadastre-se */
-
-.form-header h1 {
-    font-size: 32px;
-    font-weight: bold;
+/* footer */
+.footer {
+    margin-top: auto; /* deixar rodapé no final */
     text-align: center;
-    margin-bottom: 10px;
-    color: #55B0B4;
-}
-
-.form-header p {
-    font-size: 16px;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #666;
-}
-
-.form-group {
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #55B0B4;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #55B0B4;
-    border-radius: 5px;
-    font-size: 16px;
-    background-color: #F7F7F7
-}
-
-.form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #55B0B4;
-    border-radius: 5px;
-    font-size: 16px;
-    background-color: #F7F7F7;
-}
-
-.cadastrar-button {
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-}
-
-.cadastrar-button .submit {
-    background: #55B0B4;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* excluir conta */
-.box.excluir-conta {
+    padding: 30px;
     background-color: #BAE0E1;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-h2.excluir-conta {
+.footer p {
+    font-size: 10px;
     color: #0D5355;
-    font-size: 24px;
-    margin-bottom: 20px;
 }
-
-p.excluir-conta {
-    color: #55B0B4;
-    font-size: 15px;
-    margin-bottom: 30px;
-}
-
-.buttons.excluir-conta {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-
-.button.excluir-conta {
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    display: inline-block;
-}
-
-.sim.excluir-conta {
-    background-color: #0D5355;
-}
-
-.nao.excluir-conta {
-    background-color: #55B0B4;
-}
-
-.button.excluir-conta:hover {
-    opacity: 0.9;
-}
-
-/* conta excluida */
-.box.conta-excluida {
-    background-color: #BAE0E1;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-h2.conta-excluida {
-    color: #0D5355;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-/* salvar alteracoes */
-.box.alteracao {
-    background-color: #BAE0E1;
-    color: #0D5355;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* perfil admin */
