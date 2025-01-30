@@ -8,3 +8,15 @@ def reserva(request):
 
 def login(request):
     return render(request, "login.html")
+
+def esqueceuasenha(request):
+    return render(request, "esqueceuasenha.html")
+
+def cadastro(request):
+    return render(request, "cadastro.html")
+
+def perfil(request):
+    return render(request, "perfil.html")
+
+def confirmacaodasenha(request):
+    return render(request, "confirmacaodasenha.html")

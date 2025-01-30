@@ -229,3 +229,163 @@ input:focus {
     font-size: 10px;
     color: #0D5355;
 }
+
+/* esqueceu a senha */
+.reset-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 2rem;
+    margin-top: 10rem; 
+}
+
+.reset-card {
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    padding: 2rem;
+    background-color: #55B0B4;
+    border-radius: 25px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.reset-card label {
+    font-size: 2rem;
+}
+
+.reset-card h2 {
+    font-size: 2.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.reset-card p {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+}
+
+.reset-card input {
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: none;
+    border-bottom: 2px solid #ffffff;
+    background-color: transparent;
+    color: black;
+    font-size: 1.6rem;
+}
+
+.reset-card button {
+    width: 100%;
+    padding: 1rem;
+    background-color: white;
+    color: #55b0b4;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reset-card .success-icon {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+/* confirmacao da senha */
+.res-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 2rem;
+    margin-top: 10rem; 
+}
+.res-card {
+background-color: #55B0B4;
+border-radius: 35px;
+padding: 2rem;
+width: 500px;
+text-align: center;
+color: white;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.res-success-icon {
+font-size: 3rem;
+margin-bottom: 1rem;
+}
+
+.res-card h2 {
+margin: 0;
+margin-bottom: 1rem;
+font-size: 1.5rem;
+}
+
+.res-card p {
+margin: 0;
+margin-bottom: 2rem;
+font-size: 1.3rem;
+}
+
+/* cadastro */
+.form-header h1 {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #55B0B4;
+}
+
+.form-header p {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.form-group {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #55B0B4;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #55B0B4;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #F7F7F7
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #55B0B4;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #F7F7F7;
+}
+
+.cadastrar-button {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.cadastrar-button .submit {
+    background: #55B0B4;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
