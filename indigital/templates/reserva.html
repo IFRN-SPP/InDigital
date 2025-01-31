@@ -2,5 +2,51 @@
 {% load static %}
 
 {% block content %}
-
+  <div class="container">
+    <div class="logo">
+      <div class="logo-circle">
+        <img src"{% static 'assets/img/indigitallogotipo.png' %}" alt="">
+      </div>
+      <h1>InDigital</h1>
+    </div>
+    <div class="reserva-box">
+      <h2>Reservas para o laboratório de informática</h2>
+      <form>
+        <div class="form-group">
+          <label for="time">Horário:</label>
+          <select id="time" name="time">
+            <option>8:00 a 8:45</option>
+            <option>9:00 a 9:45</option>
+            <!-- Outros horários -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="lab">Laboratório:</label>
+          <select id="lab" name="lab">
+            <option>Lab 214</option>
+            <option>Lab 215</option>
+            <!-- Outros laboratórios -->
+          </select>
+        </div>
+        <p>Escolha o horário e laboratório que deseja realizar a reserva.</p>
+      </form>
+    </div>
+      <div class="calendario-box">
+        <div class="calendario-header">
+          <button id="prevMonth">&lt;</button>
+          <span id="currentMonth">Dezembro 2024</span>
+          <button id="nextMonth">&gt;</button>
+        </div>
+        <div class="calendario-dias">
+          <div>dom</div>
+          <div>seg</div>
+          <div>ter</div>
+          <div>qua</div>
+          <div>qui</div>
+          <div>sex</div>
+          <div>sab</div>
+        </div>
+        <div class="calendario" id="calendarioGrid"></div>
+        <button class="reserva">Reservar</button>
+      </div>      
 {% endblock content %}
