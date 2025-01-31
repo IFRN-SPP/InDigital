@@ -23,10 +23,8 @@ def perfil(request):
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
 
-<<<<<<< HEAD
 def minhasreservas(request):
     return render(request, "minhasreservas.html")
-=======
 
 def criar_reserva(request):
     if request.method == "POST":
@@ -40,4 +38,4 @@ def criar_reserva(request):
         form = LaboratorioForm
     
     return render(request, "reserva.html", {'form' : form})
->>>>>>> a0eb9354b21334d5c2cda9b774a9aa8568ea5d81
+

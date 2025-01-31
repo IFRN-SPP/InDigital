@@ -6,4 +6,5 @@ class Laboratorio(models.Model):
 
 class Reserva(models.Model):
     data = models.DateField()
+    horario = models.TimeField(null=True,blank=True)
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
