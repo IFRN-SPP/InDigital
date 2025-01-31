@@ -29,12 +29,6 @@ def minhasreservas(request):
 def editarperfil(request):
     return render(request, "editarperfil.html")
 
-def salvaralteracoes(request):
-    return render(request, "salvaralteracoes.html")
-
-def contaexcluida(request):
-    return render(request, "contaexcluida.html")
-
 def criar_reserva(request):
     if request.method == "POST":
         form = LaboratorioForm(request.POST, request.FILES)
@@ -47,3 +41,9 @@ def criar_reserva(request):
         form = LaboratorioForm
     
     return render(request, "reserva.html", {'form' : form})
+
+def salvaralteracoes(request):
+    return render(request, "salvaralteracoes.html")
+
+def contaexcluida(request):
+    return render(request, "contaexcluida.html")
