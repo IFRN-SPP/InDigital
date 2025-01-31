@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excluir conta</title>
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<title>Excluir conta</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="conta-excluida">
@@ -13,5 +13,4 @@
             <h2 class="conta-excluida">Sua conta foi excluída!</h2>
         </div>
     </div>
-</body>
-</html>
+{% endblock content %}

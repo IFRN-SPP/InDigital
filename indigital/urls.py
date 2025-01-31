@@ -10,4 +10,7 @@ urlpatterns = [
     path('perfil', views.perfil, name='perfil'),
     path('confirmacaodasenha', views.confirmacaodasenha, name='confirmacaodasenha'),
     path('minhasreservas', views.minhasreservas, name='minhasreservas'),
+    path('editarperfil', views.editarperfil, name='editarperfil'),
+    path('contaexcluida', views.contaexcluida, name='contaexcluida'),
+    path('salvaralteracoes', views.salvaralteracoes, name='salvaralteracoes'),
 ]
