@@ -21,6 +21,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-family: 'Poppins', Arial, sans-serif;
 }
 
 section{
@@ -329,65 +330,72 @@ font-size: 1.3rem;
 }
 
 /* cadastro */
-.form-header h1 {
-    font-size: 32px;
-    font-weight: bold;
+.container-cadastro {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.form-header .title h1 {
+    font-size: 1.5rem;
     color: #55B0B4;
 }
 
-.form-header p {
-    font-size: 16px;
-    text-align: center;
-    margin-bottom: 20px;
+.form-header .title p {
+    font-size: 0.9rem;
     color: #666;
 }
 
 .form-group {
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
     color: #55B0B4;
 }
 
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #55B0B4;
-    border-radius: 5px;
-    font-size: 16px;
-    background-color: #F7F7F7
-}
-
+.form-group input,
 .form-group select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #55B0B4;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 16px;
-    background-color: #F7F7F7;
+    font-size: 0.9rem;
+    color: black;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #55B0B4;
+    outline: none;
 }
 
 .cadastrar-button {
-    width: 100%;
-    max-width: 600px;
     text-align: center;
+    margin-top: 1.5rem;
 }
 
 .cadastrar-button .submit {
-    background: #55B0B4;
+    background-color: #55B0B4;
     color: white;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 5px;
+    font-size: 1rem;
     cursor: pointer;
+<<<<<<< HEAD
 }
   
   .reserva-box p {
@@ -688,3 +696,285 @@ font-size: 1.3rem;
   .cancelar-button:hover {
     background-color: #b71c1c;
   }
+=======
+    transition: background-color 0.3s ease;
+}
+
+/* reserva */
+.container-reserva {
+background-color: white;
+width: 800px;
+padding: 50px;
+border-radius: 15px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+display: flex;
+gap: 30px;
+flex-direction: row;
+}
+
+.logo-reserva {
+flex: 1;
+text-align: center;
+color:#55B0B4
+}
+
+.logo-circle {
+background-color: #e0f7fa;
+width: 80px;
+height: 80px;
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 0 auto 10px;
+}
+
+.logo-circle img {
+width: 50px;
+height: 50px;
+}
+
+.logo h1 {
+font-size: 1.5rem;
+color: #0D5355;
+}
+
+.reservation-box {
+flex: 2;
+}
+
+.reservation-box h2 {
+font-size: 1.2rem;
+margin-bottom: 15px;
+color: #0D5355;
+}
+
+.form-group {
+margin-bottom: 15px;
+}
+
+label {
+display: block;
+margin-bottom: 5px;
+font-weight: bold;
+color: #555;
+}
+
+.reservation-box p {
+font-size: 0.9rem;
+color: #777;
+margin-top: 10px;
+}
+
+.calendar-box {
+flex: 2;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.calendar-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+margin-bottom: 10px;
+}
+
+.calendar-header span {
+font-weight: bold;
+font-size: 1.1rem;
+color: #333;
+}
+
+.calendar-header button {
+background-color: #0D5355;
+color: #fff;
+border: none;
+padding: 5px 10px;
+border-radius: 5px;
+cursor: pointer;
+}
+
+.calendar {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 5px;
+width: 100%;
+text-align: center;
+}
+
+.calendar div {
+padding: 10px;
+border-radius: 5px;
+background-color: #e0f7fa;
+color: #0D5355;
+font-weight: bold;
+cursor: pointer;
+}
+
+.calendar .active {
+background-color: #0D5355;
+color: white;
+}
+
+button.reserve {
+margin-top: 20px;
+background-color: #0D5355;
+color: #fff;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 1rem;
+}
+
+button.reserve:hover{
+    background-color: #55B0B4;
+}
+
+.confirmation-container {
+background-color: #0D5355;
+width: 350px;
+border-radius: 20px;
+padding: 45px;
+text-align: center;
+color: #ffffff;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-header {
+background-color: #BAE0E1;
+padding: 40px;
+border-radius: 15px 15px 0 0;
+margin: -30px -30px 20px -30px;
+}
+
+.confirmation-header h1 {
+font-size: 1.5rem;
+color: #0D5355;
+margin-bottom: 10px;
+}
+
+.confirmation-header .icon img {
+width: 40px;
+height: 40px;
+}
+
+.confirmation-details p {
+font-size: 1rem;
+margin: 5px 0;
+color: #e0f7fa;
+}
+
+.confirmation-message {
+font-size: 0.9rem;
+color: #e0f7fa;
+}
+
+/* perfil */
+.main-container {
+width: 100%;
+max-width: 800px;
+margin: 20px 0;
+}
+
+.profile-section {
+margin-bottom: 30px;
+text-align: left;
+}
+
+.profile-section, .info-section, .reservations-section h2{
+    color: #0D5355;
+}
+
+.profile-card {
+background-color: #BAE0E1;
+border-radius: 10px;
+padding: 30px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+}
+
+.profile-photo img {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+}
+
+.profile-info p {
+margin: 5px 0;
+font-size: 1rem;
+}
+
+.edit-button {
+background-color: #0D5355;
+color: white;
+border: none;
+border-radius: 5px;
+padding: 10px 15px;
+cursor: pointer;
+font-size: 0.9rem;
+}
+
+.edit-button:hover {
+background-color: #55B0B4;
+}
+
+.info-section {
+margin-bottom: 20px;
+}
+
+.info-card {
+background-color: #BAE0E1;
+border-radius: 10px;
+padding: 30px;
+}
+
+.info-row {
+display: flex;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+
+.info-row p {
+font-size: 1rem;
+}
+
+.reservations-section {
+margin-bottom: 20px;
+}
+
+.reservation-card {
+background-color: #BAE0E1;
+border-radius: 10px;
+padding: 30px;
+text-align: center;
+}
+
+.reservation-card h3 {
+font-size: 1.2rem;
+margin-bottom: 10px;
+color: #0D5355;
+}
+
+.reservation-card p{
+    color: #0D5355;
+}
+
+.cancel-button {
+background-color: #0D5355;
+color: #ffffff;
+border: none;
+border-radius: 5px;
+padding: 10px 15px;
+cursor: pointer;
+font-size: 0.9rem;
+}
+
+.cancel-button:hover {
+background-color: #55B0B4;
+}
+>>>>>>> efd2f9af86302c3c3439a945bc283f0c92da2f3d
