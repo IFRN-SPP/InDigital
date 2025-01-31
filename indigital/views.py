@@ -26,6 +26,9 @@ def confirmacaodasenha(request):
 def minhasreservas(request):
     return render(request, "minhasreservas.html")
 
+def editarperfil(request):
+    return render(request, "editarperfil.html")
+
 def criar_reserva(request):
     if request.method == "POST":
         form = LaboratorioForm(request.POST, request.FILES)
@@ -39,3 +42,8 @@ def criar_reserva(request):
     
     return render(request, "reserva.html", {'form' : form})
 
+def salvaralteracoes(request):
+    return render(request, "salvaralteracoes.html")
+
+def contaexcluida(request):
+    return render(request, "contaexcluida.html")
