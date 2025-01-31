@@ -2,89 +2,47 @@
 {% load static %}
 
 {% block content %}
-<<<<<<< HEAD
-  <main class="main-container">
-    <!-- Seção de Perfil -->
-    <section class="perfil-section">
+
+<main class="main-container">
+  <!-- Seção de Perfil -->
+  <section class="profile-section">
       <h2>Perfil</h2>
-      <div class="perfil-card">
-        <div class="perfil-foto">
-          <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="">
-        </div>
-        <div class="perfil-info">
+      <div class="profile-card">
+      <div class="profile-photo">
+          <img src="{% static 'assets/img/InDigital logo.png' %}" alt="Foto do perfil">
+      </div>
+      <div class="profile-info">
           <p>Nome sobrenome</p>
           <p>Matrícula</p>
-        </div>
-        <button class="editar-button">Editar perfil</button>
       </div>
-    </section>
-    <!-- Informações Cadastradas -->
-    <section class="info-section">
+      <button class="edit-button">Editar perfil</button>
+      </div>
+  </section>
+
+  <!-- Informações Cadastradas -->
+  <section class="info-section">
       <h2>Informações cadastradas</h2>
-      <div class="infor-card">
-        <div class="infor-row">
+      <div class="info-card">
+      <div class="info-row">
           <p>Nome:</p>
           <p>E-mail:</p>
-        </div>
-        <div class="infor-row">
+      </div>
+      <div class="info-row">
           <p>Série:</p>
           <p>Turno:</p>
-        </div>
       </div>
-    </section>
-    <!-- Minhas Reservas -->
-    <section class="reservas-section">
+      </div>
+  </section>
+
+  <!-- Minhas Reservas -->
+  <section class="reservations-section">
       <h2>Minhas Reservas</h2>
-      <div class="reservas-card">
-        <h3>Lab 214</h3>
-        <p>8:00 - 8:45</p>
-        <p>20/08/2024</p>
-        <button class="cancelar-button">Cancelar</button>
+      <div class="reservation-card">
+      <h3>Lab 214</h3>
+      <p>8:00 - 8:45</p>
+      <p>20/08/2024</p>
+      <button class="cancel-button">Cancelar</button>
       </div>      
-    </section>
-  </main>
-=======
-<main class="main-container">
-<!-- Seção de Perfil -->
-<section class="profile-section">
-    <h2>Perfil</h2>
-    <div class="profile-card">
-    <div class="profile-photo">
-        <img src="{% static 'assets/img/InDigital logo.png' %}" alt="Foto do perfil">
-    </div>
-    <div class="profile-info">
-        <p>Nome sobrenome</p>
-        <p>Matrícula</p>
-    </div>
-    <button class="edit-button">Editar perfil</button>
-    </div>
-</section>
-
-<!-- Informações Cadastradas -->
-<section class="info-section">
-    <h2>Informações cadastradas</h2>
-    <div class="info-card">
-    <div class="info-row">
-        <p>Nome:</p>
-        <p>E-mail:</p>
-    </div>
-    <div class="info-row">
-        <p>Série:</p>
-        <p>Turno:</p>
-    </div>
-    </div>
-</section>
-
-<!-- Minhas Reservas -->
-<section class="reservations-section">
-    <h2>Minhas Reservas</h2>
-    <div class="reservation-card">
-    <h3>Lab 214</h3>
-    <p>8:00 - 8:45</p>
-    <p>20/08/2024</p>
-    <button class="cancel-button">Cancelar</button>
-    </div>      
-</section>
+  </section>
 </main>
->>>>>>> efd2f9af86302c3c3439a945bc283f0c92da2f3d
 {% endblock content %}
