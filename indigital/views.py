@@ -20,3 +20,6 @@ def perfil(request):
 
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
+
+def minhasreservas(request):
+    return render(request, "minhasreservas.html")
