@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_user.html" %}
 {% load static %}
 
 {% block content %}
@@ -7,7 +7,8 @@
         <img src="{% static 'assets/img/InDigital logo.png' %}" alt="logo" class="logo">
         <h1>Login</h1>
     </div>
-    <form class="login-form">
+    <form class="login-form" method="post">
+        {% csrf_token %}
         <label for="email">E-mail:</label>
         <input type="email" placeholder="E-mail" required>
 
@@ -15,9 +16,7 @@
         <input type="password" placeholder="Senha" required>
 
         <a href="{% url 'esqueceuasenha' %}" class="forgot-password">Esqueceu a senha?</a>
-        <a href="{% url 'index' %}">
         <button type="submit" class="btn-login">Entrar</button>
-        </a>
     </form>
     <div class="cadastre-se">
         <span>Ainda não tem conta?</span>

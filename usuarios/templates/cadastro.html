@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_user.html" %}
 {% load static %}
 
 {% block content %}
@@ -11,6 +11,7 @@
                     <p>Venha fazer parte do indigital e realize suas atividades acadêmicas!</p>
                 </div>
             </div>
+            {% csrf_token %}
             <div class="form-group">
                 <label for="nome">Nome completo</label>
                 <input type="text" id="nome" name="nome" placeholder="Nome" required>
