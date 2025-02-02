@@ -727,24 +727,10 @@ button:hover {
 }
 
 
-/* excluir conta */
-.box.excluir-conta {
-    background-color: #BAE0E1;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* cancelar reserva */
 
-h2.excluir-conta {
+p.cancelar-reserva {
     color: #0D5355;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-p.excluir-conta {
-    color: #55B0B4;
     font-size: 15px;
     margin-bottom: 30px;
 }
@@ -755,7 +741,7 @@ p.excluir-conta {
     width: 100%;
 }
 
-.button.excluir-conta {
+.button.cancelar-reserva {
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 5px;
@@ -765,41 +751,30 @@ p.excluir-conta {
     display: inline-block;
 }
 
-.sim.excluir-conta {
-    background-color: #0D5355;
-}
-
-.nao.excluir-conta {
+.sim{
     background-color: #55B0B4;
 }
 
-.button.excluir-conta:hover {
+.nao {
+    background-color: #55B0B4;
+}
+
+.button.cancelar-reserva:hover {
     opacity: 0.9;
 }
 
-/* conta excluida */
-.box.conta-excluida {
+.box-cancelar-reserva{
     background-color: #BAE0E1;
     border-radius: 25px;
     padding: 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
-h2.conta-excluida {
+h2.deseja-cancelar {
     color: #0D5355;
     font-size: 24px;
     margin-bottom: 20px;
 }
 
-/* salvar alteracoes */
-.box.alteracao {
-    background-color: #BAE0E1;
-    color: #0D5355;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}

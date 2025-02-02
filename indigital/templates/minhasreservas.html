@@ -14,11 +14,16 @@
             <span>Lab 215</span>
         </div>
         <div class="buttons">
-            <button>Editar</button>
-            <button>Cancelar</button>
+            <div>
+        <a href="{% url 'editarreserva' %}">
+          <button type="submit" class="btn-login">Editar</button>
+        </div>
+            <a href="{% url 'cancelarreserva' %}">
+                <button type="submit" class="btn-login">Cancelar</button>
         </div>
         <div class="new-button">
-            <button>Nova</button>
+            <a href="{% url 'reserva' %}">
+                <button type="submit" class="btn-login">Nova</button>
         </div>
     </div>
 {% endblock content %}

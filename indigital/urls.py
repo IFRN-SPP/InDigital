@@ -11,4 +11,7 @@ urlpatterns = [
     path('editarperfil', views.editarperfil, name='editarperfil'),
     path('contaexcluida', views.contaexcluida, name='contaexcluida'),
     path('salvaralteracoes', views.salvaralteracoes, name='salvaralteracoes'),
+    path('editarreserva', views.editarreserva, name='editarreserva'),
+    path('cancelarreserva', views.cancelarreserva, name='cancelarreserva'),
+    path('reservaexcluida', views.reservaexcluida, name='reservaexcluida'),
 ]
