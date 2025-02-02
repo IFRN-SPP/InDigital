@@ -41,3 +41,12 @@ def salvaralteracoes(request):
 
 def contaexcluida(request):
     return render(request, "contaexcluida.html")
+
+def editarreserva(request):
+    return render(request, "editarreserva.html")
+
+def cancelarreserva(request):
+    return render(request, "cancelarreserva.html")
+
+def reservaexcluida(request):
+    return render(request, "reservaexcluida.html")
