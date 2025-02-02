@@ -17,13 +17,13 @@
 <body>
 {% block header %}
 <header>
-    <a href="{% url 'index' %}" class="logo">InDigital</a>
 
     <nav class="navbar">
         <a href="{% url 'index' %}">Home</a>
         <a href="{% url 'reserva' %}">Reserva</a>
         <a href="{% url 'minhasreservas' %}">Minhas Reservas</a>
     </nav>
+    
     {% if request.user.is_authenticated %}
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}

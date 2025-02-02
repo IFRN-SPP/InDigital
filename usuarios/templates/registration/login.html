@@ -16,7 +16,10 @@
         <input type="password" placeholder="Senha" required>
 
         <a href="{% url 'esqueceuasenha' %}" class="forgot-password">Esqueceu a senha?</a>
-        <button type="submit" class="btn-login">Entrar</button>
+        <div> 
+        <a href="{% url 'index' %}">
+                <button type="submit" class="btn-login">Entrar</button>
+        </div>
     </form>
     <div class="cadastre-se">
         <span>Ainda não tem conta?</span>

@@ -76,7 +76,7 @@ header .icon a:hover {
     display: flex;
     align-items: center;
     min-height: 100vh;
-    background: url(../assets/img/capa.jpg) no-repeat;
+    background: url(../assets/img/capahome.png) no-repeat;
     background-size: cover;
     background-position: center;
 }
@@ -84,6 +84,7 @@ header .icon a:hover {
 .home .content h3{
     font-size: 5rem;
     color: white;
+    
 }
 
 .sobre .container{
@@ -335,7 +336,7 @@ font-size: 1.3rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-}
+}	
 
 .form-header {
     text-align: center;
@@ -568,7 +569,7 @@ color: #e0f7fa;
 }
 
 /* perfil */
-.main-container {
+.perfil-container {
 width: 100%;
 max-width: 800px;
 margin: 20px auto;
@@ -604,6 +605,16 @@ border-radius: 50%;
 .profile-info p {
 margin: 5px 0;
 font-size: 1rem;
+}
+
+.container-editar-perfil {
+    background-color: white;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
 }
 
 .edit-button {
@@ -726,7 +737,6 @@ button:hover {
     margin-top: 25px;
 }
 
-
 /* cancelar reserva */
 
 p.cancelar-reserva {
@@ -778,3 +788,22 @@ h2.deseja-cancelar {
     margin-bottom: 20px;
 }
 
+.container-editar-reserva {
+    background-color: white;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.container-cancelar-reserva {
+    background-color: white;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
