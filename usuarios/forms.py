@@ -8,10 +8,11 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 class CadastroForm(BaseUserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'matricula', 'turno', 'serie', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -21,14 +22,24 @@ class CadastroForm(BaseUserCreationForm):
                 css_class='row'
             ),
             Row(
+                Column('matricula', css_class='col-md-6'),
+                Column('turno', css_class='col-md-6'),
+                css_class='row'
+            ),
+            Row(
+                Column('serie', css_class='col-md-6'),
                 Column('password1', css_class='col-md-6'),
+                css_class='row'
+            ),
+            Row(
                 Column('password2', css_class='col-md-6'),
                 css_class='row'
             ),
             Row(
                 Column(
-                    Submit('submit', 'Cadastrar', css_class='col-md-12 btn btn-primary text-uppercase'),
-                    css_class='col-md-12'),
+                    Submit('submit', 'Cadastrar', css_class='btn btn-primary w-100'),
+                    css_class='col-md-12'
+                ),
                 css_class='row'
             ),
         )
