@@ -46,6 +46,7 @@ def editar_reserva(request, reserva_id):
     
     return render(request, "editar_reserva.html", context)
 
+@permission_required('indigital.excluir_reserva', raise_exception=True)
 def excluir_reserva(request, reserva_id):
     context = {
         "reserva": get_object_or_404(Reserva, id=reserva_id)
