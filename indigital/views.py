@@ -1,9 +1,61 @@
-from django.shortcuts import render, redirect, get_list_or_404
-from .models import Laboratorio, Reserva
-from .forms import LaboratorioForm, ReservaForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Reserva
+from .forms import ReservaForm
+from django.contrib.auth.decorators import login_required, permission_required
 
 def index(request):
     return render(request, "index.html")
+
+def listar_reservas(request):
+    reserva = Reserva.objects.all()
+    return render(request, "listar_reservas.html", {'reservas' : reserva})
+
+@login_required
+@permission_required('indigital.criar_reserva', raise_exception=True)
+def criar_reserva(request):
+    if request.method == "POST":
+        form = ReservaForm(request.POST, request.FILES)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.usuario = request.user
+            reserva.save()
+            return redirect('reserva')
+        else:
+            form = ReservaForm()
+    else:
+        form = ReservaForm()
+    
+    return render(request, "criar_reserva.html", {'form' : form})
+
+@permission_required('indigital.editar_reserva', raise_exception=True)
+def editar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    context = {
+        "reserva" : reserva,
+        "form" : ReservaForm(instance=reserva),
+    }
+
+    if request.method == 'POST':
+        form = ReservaForm(request.POST, instance=reserva)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_reservas')
+        else:
+            context["form"] = form
+    
+    return render(request, "editar_reserva.html", context)
+
+def excluir_reserva(request, reserva_id):
+    context = {
+        "reserva": get_object_or_404(Reserva, id=reserva_id)
+    }
+
+    if request.method == "POST":
+        context["reserva"].delete()
+        return redirect('listar_reservas')
+    else:
+        return render(request, "excluir_reserva.html", context)
 
 def reserva(request):
     return render(request, "reserva.html")
@@ -14,39 +66,17 @@ def esqueceuasenha(request):
 def perfil(request):
     return render(request, "perfil.html")
 
+def contaexcluida(request):
+    return render(request, "contaexcluida.html")
+
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
 
 def minhasreservas(request):
     return render(request, "minhasreservas.html")
 
-def editarperfil(request):
-    return render(request, "editarperfil.html")
+def editar_perfil(request):
+    return render(request, "editar_perfil.html")
 
-def criar_reserva(request):
-    if request.method == "POST":
-        form = LaboratorioForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('reserva')
-        else:
-            form = LaboratorioForm()
-    else:
-        form = LaboratorioForm
-    
-    return render(request, "reserva.html", {'form' : form})
-
-def salvaralteracoes(request):
-    return render(request, "salvaralteracoes.html")
-
-def contaexcluida(request):
-    return render(request, "contaexcluida.html")
-
-def editarreserva(request):
-    return render(request, "editarreserva.html")
-
-def cancelarreserva(request):
+def cancelar_reserva(request):
     return render(request, "cancelarreserva.html")
-
-def reservaexcluida(request):
-    return render(request, "reservaexcluida.html")

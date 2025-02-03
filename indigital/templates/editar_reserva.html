@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-editar-reserva">
+    <div class="form">
+        <form action="{% if request.method == 'POST' %}{% url "criar_reserva" %}{% endif %}" method="POST">
+            <div class="form-header">
+                <div class="title">
+                    <h1>Editar informações</h1>
+                    <p>Altere abaixo!</p>
+                </div>
+            </div>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="numero">Número do laborátorio:</label>
+                <input type="text" id="numero" name="numero" placeholder="Número" value="{{ form.numLaboratorio.value }}">
+            </div>
+            <div class="form-group">
+                <label for="horario">Horário:</label>
+                <input type="text" id="horario" name="horario" placeholder="Horário" value="{{ form.horario.value }}">
+            </div>
+            <div class="form-group">
+                <label for="data">Data:</label>
+                <input type="date" id="data" name="data" value="{{ form.data.value|date:'Y-m-d' }}">
+            </div>
+            <div class="cadastrar-button">
+                <button type="submit" class="submit">Editar</button>
+            </div>
+        </form>
+    </div>        
+</div>
+{% endblock content %}

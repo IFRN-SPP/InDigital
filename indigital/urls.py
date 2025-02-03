@@ -3,15 +3,19 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('reserva', views.reserva, name='reserva'),
+    path('listar/reservas/', views.listar_reservas, name='listar_reservas'),
+    path('criar/reserva/', views.criar_reserva, name='criar_reserva'),
+    path('reserva/<int:reserva_id>/editar', views.editar_reserva, name='editar_reserva'),
+    path('reserva/<int:reserva_id>/excluir', views.excluir_reserva, name="excluir_reserva"),
+
+
+    path('reserva/', views.reserva, name='reserva'),
     path('esqueceuasenha', views.esqueceuasenha, name='esqueceuasenha'),
     path('perfil', views.perfil, name='perfil'),
     path('confirmacaodasenha', views.confirmacaodasenha, name='confirmacaodasenha'),
     path('minhasreservas', views.minhasreservas, name='minhasreservas'),
-    path('editarperfil', views.editarperfil, name='editarperfil'),
+    path('editar_perfil', views.editar_perfil, name='editar_perfil'),
     path('contaexcluida', views.contaexcluida, name='contaexcluida'),
-    path('salvaralteracoes', views.salvaralteracoes, name='salvaralteracoes'),
-    path('editarreserva', views.editarreserva, name='editarreserva'),
-    path('cancelarreserva', views.cancelarreserva, name='cancelarreserva'),
-    path('reservaexcluida', views.reservaexcluida, name='reservaexcluida'),
+    path('editar_reserva', views.editar_reserva, name='editar_reserva'),
+    path('cancelar_reserva', views.cancelar_reserva, name='cancelar_reserva'),
 ]

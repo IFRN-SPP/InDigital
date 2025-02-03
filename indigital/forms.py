@@ -1,12 +1,7 @@
 from django import forms
-from .models import Laboratorio, Reserva
-
-class LaboratorioForm(forms.ModelForm):
-    class Meta:
-        model = Laboratorio
-        fields = "__all__"
+from .models import Reserva
 
 class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = "__all__"
+        fields = ['numLaboratorio', 'horario', 'data']
