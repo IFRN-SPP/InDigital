@@ -5,14 +5,16 @@
 {% block content %}
 <div class="container-cadastro">
     <div class="form">
-        <form method="post" action="{% url 'cadastro' %}">
+        <form method="post" class="login-form" action="{% url 'cadastro' %}">
+            {% csrf_token %}
             <div class="form-header">
                 <div class="title">
                     <h1>Cadastre-se</h1>
                     <p>Venha fazer parte do indigital e realize suas atividades acadêmicas!</p>
                 </div>
             </div>
-            {% csrf_token %}
+    
+            
             {{ form | crispy }}
             <div class="cadastrar-button">
                 <button type="submit" class="submit">Cadastrar</button>
