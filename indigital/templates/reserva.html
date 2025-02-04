@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 {% load static %}
 
 {% block content %}
@@ -10,45 +10,31 @@
     </div>
     <div class="reservation-box">
        <h2>Reservas para o laboratório de informática</h2>
-        <form>
+        <form action="{% url 'criar_reserva' %}" method="POST">
+            {% csrf_token %}
             <div class="form-group">
-            <label for="time">Horário:</label>
-            <select id="time" name="time">
-                <option>8:00 a 8:45</option>
-                <option>9:00 a 9:45</option>
-                <!-- Outros horários -->
-            </select>
+                <label for="time">Horário:</label>
+                <select id="time" name="horario" required>
+                    {% for horario in horarios %}
+                        <option value="{{ horario }}">{{ horario }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
-            <label for="lab">Laboratório:</label>
-            <select id="lab" name="lab">
-                <option>Lab 214</option>
-                <option>Lab 215</option>
-                <!-- Outros laboratórios -->
-            </select>
+                <label for="lab">Laboratório:</label>
+                <select id="lab" name="numLaboratorio" required>
+                    {% for lab in laboratorios %}
+                        <option value="{{ lab.numLaboratorio }}">{{ lab.numLaboratorio }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <p>Escolha o horário e laboratório que deseja realizar a reserva.</p>
+            <div class="form-group">
+                <label for="data">Data:</label>
+                <input type="date" id="data" name="data" required>
+            </div>
+            <p>Escolha o horário, laboratório e data para realizar a reserva.</p>
+            <button type="submit" class="reserve">Reservar</button>
         </form>
     </div>
-    <div class="calendar-box">
-        <div class="calendar-header">
-          <button id="prevMonth">&lt;</button>
-          <span id="currentMonth">Dezembro 2024</span>
-          <button id="nextMonth">&gt;</button>
-        </div>
-
-        <div class="calendar-days">
-          <div>dom</div>
-          <div>seg</div>
-          <div>ter</div>
-          <div>qua</div>
-          <div>qui</div>
-          <div>sex</div>
-          <div>sab</div>
-        </div>
-
-        <div class="calendar" id="calendarGrid"></div>
-        <button class="reserve">Reservar</button>
-    </div>
-</div>  
+</div>
 {% endblock content %}
