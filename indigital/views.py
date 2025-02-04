@@ -84,3 +84,6 @@ def cancelar_reserva(request):
 
 def listar_reservas(request):
     return render(request, "listar_reservas.html")
+
+def criar_reserva(request):
+    return render(request, "criar_reserva.html")

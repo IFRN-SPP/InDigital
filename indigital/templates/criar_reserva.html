@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-criar-reserva">
+    <h2>Criar Nova Reserva</h2>
+    <form>
+        <label for="lab">Laboratório:</label>
+        <select id="lab" name="lab">
+            <option value="lab1">Lab 215</option>
+            <option value="lab2">Lab 214</option>
+        </select>
+        
+        <label for="horario">Horário:</label>
+        <input type="time" id="horario" name="horario">
+        
+        <label for="data">Data:</label>
+        <input type="date" id="data" name="data">
+        <button type="submit">Salvar Reserva</button>
+    </form>
+</div>
+{% endblock content %}
