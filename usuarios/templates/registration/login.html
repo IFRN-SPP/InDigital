@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% load static crispy_forms_filters %}
-
 
 {% block content %}
 <div class="login-container">
@@ -11,7 +9,10 @@
     </div>
     <form class="login-form" method="post">
         {% csrf_token %}
-        {{ form | crispy }}
+        <label for="email">E-mail:</label>
+        <input type="email" placeholder="E-mail">
+        <label for="senha">Senha:</label>
+        <input type="password" placeholder="Senha">
         <a href="{% url 'esqueceuasenha' %}" class="forgot-password">Esqueceu a senha?</a>
         <button type="submit" class="btn-login">Entrar</button>
     </form>
