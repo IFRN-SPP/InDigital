@@ -81,3 +81,9 @@ def editar_perfil(request):
 
 def cancelar_reserva(request):
     return render(request, "cancelarreserva.html")
+
+def listar_reservas(request):
+    return render(request, "listar_reservas.html")
+
+def criar_reserva(request):
+    return render(request, "criar_reserva.html")

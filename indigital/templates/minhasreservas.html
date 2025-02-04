@@ -4,26 +4,11 @@
 {% block content %}
     <div class="container-mreservas">
         <div class="table-header">
-            <span>Data</span>
-            <span>Horário</span>
-            <span>Laboratório</span>
-        </div>
-        <div class="table-row">
-            <span>25/01</span>
-            <span>8:50</span>
-            <span>Lab 215</span>
-        </div>
         <div class="buttons">
-            <div>
-        <a href="{% url 'editar_reserva' %}">
-          <button type="submit" class="btn-login">Editar</button>
-        </div>
-            <a href="{% url 'cancelar_reserva' %}">
-                <button type="submit" class="btn-login">Cancelar</button>
-        </div>
-        <div class="new-button">
-            <a href="{% url 'reserva' %}">
-                <button type="submit" class="btn-login">Nova</button>
+            <a href="{% url 'listar_reservas' %}">
+                <button type="submit" class="btn-login">Listar Reservas</button>
+            <a href="{% url 'criar_reserva' %}">
+                <button type="submit" class="btn-login">Criar Reserva</button>
         </div>
     </div>
 {% endblock content %}
