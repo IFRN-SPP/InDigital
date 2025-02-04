@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Reserva
+from .models import Laboratorio, Reserva
 from .forms import ReservaForm
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -9,7 +9,7 @@ def index(request):
 @login_required
 @permission_required('indigital.criar_reserva', raise_exception=True)
 def criar_reserva(request):
-    laboratorios = Reserva.objects.values_list('numLaboratorio', flat=True).distinct()
+    laboratorios = Laboratorio.objects.all()
     if request.method == "POST":
         form = ReservaForm(request.POST, request.FILES)
         if form.is_valid():

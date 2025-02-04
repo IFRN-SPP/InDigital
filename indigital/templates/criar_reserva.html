@@ -7,9 +7,9 @@
     <form action="{% url 'criar_reserva' %}" method="POST">
         {% csrf_token %}
         <label for="numLaboratorio">Laboratório:</label>
-        <select id="numLaboratorio" name="numLaboratorio" required>
+        <select id="numLaboratorio" name="laboratorio" required>
             {% for lab in laboratorios %}
-                <option value="{{ lab.numLaboratorio }}">{{ lab.numLaboratorio }}</option>
+                <option value="{{ lab.id }}">{{ lab.numLaboratorio }}</option>
             {% endfor %}
         </select>
         
