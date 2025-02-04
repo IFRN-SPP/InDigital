@@ -4,18 +4,20 @@
 {% block content %}
 <div class="container-criar-reserva">
     <h2>Criar Nova Reserva</h2>
-    <form>
-        <label for="lab">Laboratório:</label>
-        <select id="lab" name="lab">
-            <option value="lab1">Lab 215</option>
-            <option value="lab2">Lab 214</option>
+    <form action="{% url 'criar_reserva' %}" method="POST">
+        {% csrf_token %}
+        <label for="numLaboratorio">Laboratório:</label>
+        <select id="numLaboratorio" name="numLaboratorio" required>
+            {% for lab in laboratorios %}
+                <option value="{{ lab.numLaboratorio }}">{{ lab.numLaboratorio }}</option>
+            {% endfor %}
         </select>
         
         <label for="horario">Horário:</label>
-        <input type="time" id="horario" name="horario">
+        <input type="time" id="horario" name="horario" required>
         
         <label for="data">Data:</label>
-        <input type="date" id="data" name="data">
+        <input type="date" id="data" name="data" required>
         <button type="submit">Salvar Reserva</button>
     </form>
 </div>

@@ -4,36 +4,35 @@
 {% block content %}
 <div class="container-listar-reservas">
     <div class="h2-listar">
-    <h2>Lista de Reservas</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Horário</th>
-                <th>Laboratório</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>08:00 - 8:30</td>
-                <td>Lab 215</td>
-                <td>05/02/2025</td>
-                <td>
-                    <a href="#" class="btn edit">Editar</a>
-                    <a href="#" class="btn delete">Excluir</a>
-                </td>
-            </tr>
-            <tr>
-                <td>10:00 - 10:45</td>
-                <td>Lab 214</td>
-                <td>06/02/2025</td>
-                <td>
-                    <a href="#" class="btn edit">Editar</a>
-                    <a href="#" class="btn delete">Excluir</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <h2>Lista de Reservas</h2>
+    </div>
+
+    {% if reservas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Horário</th>
+                    <th>Laboratório</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.horario|time:"H:i" }}</td>
+                        <td>{{ reserva.numLaboratorio }}</td>
+                        <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{% url 'editar_reserva' reserva.id %}" class="btn edit">Editar</a>
+                            <a href="{% url 'excluir_reserva' reserva.id %}" class="btn delete">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma reserva encontrada.</p>
+    {% endif %}
 </div>
 {% endblock content %}

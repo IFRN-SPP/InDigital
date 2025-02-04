@@ -2,9 +2,17 @@
 {% load static %}
 
 {% block content %}
-    <div class="box reserva-excluida">
-        <div class="success-icon">✔</div>
-        <h2 class="reserva-excluida">Horário excluído!</h2>
-    </div>
+<div class="box reserva-excluida">
+    <h2>Tem certeza que deseja excluir esta reserva?</h2>
+    
+    <p><strong>Laboratório:</strong> {{ reserva.numLaboratorio }}</p>
+    <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
+    <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
+
+    <form action="{% url 'excluir_reserva' reserva.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn delete">Confirmar</button>
+        <a href="{% url 'listar_reservas' %}" class="btn cancel">Cancelar</a>
+    </form>
 </div>
 {% endblock content %}

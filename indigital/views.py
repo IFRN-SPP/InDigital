@@ -6,13 +6,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 def index(request):
     return render(request, "index.html")
 
-def listar_reservas(request):
-    reserva = Reserva.objects.all()
-    return render(request, "listar_reservas.html", {'reservas' : reserva})
-
 @login_required
 @permission_required('indigital.criar_reserva', raise_exception=True)
 def criar_reserva(request):
+    laboratorios = Reserva.objects.values_list('numLaboratorio', flat=True).distinct()
     if request.method == "POST":
         form = ReservaForm(request.POST, request.FILES)
         if form.is_valid():
@@ -20,13 +17,12 @@ def criar_reserva(request):
             reserva.usuario = request.user
             reserva.save()
             return redirect('reserva')
-        else:
-            form = ReservaForm()
     else:
         form = ReservaForm()
     
-    return render(request, "criar_reserva.html", {'form' : form})
+    return render(request, "criar_reserva.html", {'form' : form, "laboratorios": laboratorios})
 
+@login_required
 @permission_required('indigital.editar_reserva', raise_exception=True)
 def editar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
@@ -46,6 +42,12 @@ def editar_reserva(request, reserva_id):
     
     return render(request, "editar_reserva.html", context)
 
+@login_required
+def listar_reservas(request):
+    reserva = Reserva.objects.all()
+    return render(request, "listar_reservas.html", {'reservas' : reserva})
+
+@login_required
 @permission_required('indigital.excluir_reserva', raise_exception=True)
 def excluir_reserva(request, reserva_id):
     context = {
@@ -81,9 +83,3 @@ def editar_perfil(request):
 
 def cancelar_reserva(request):
     return render(request, "cancelarreserva.html")
-
-def listar_reservas(request):
-    return render(request, "listar_reservas.html")
-
-def criar_reserva(request):
-    return render(request, "criar_reserva.html")

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-editar-reserva">
     <div class="form">
-        <form action="{% if request.method == 'POST' %}{% url "criar_reserva" %}{% endif %}" method="POST">
+        <form action="{% url 'editar_reserva' reserva.id %}" method="POST">
             <div class="form-header">
                 <div class="title">
                     <h1>Editar informações</h1>
@@ -13,16 +13,16 @@
             </div>
             {% csrf_token %}
             <div class="form-group">
-                <label for="numero">Número do laborátorio:</label>
-                <input type="text" id="numero" name="numero" placeholder="Número" value="{{ form.numLaboratorio.value }}">
+                <label for="numLaboratorio">Número do laboratório:</label>
+                <input type="text" id="numLaboratorio" name="numLaboratorio" value="{{ reserva.numLaboratorio }}">
             </div>
             <div class="form-group">
                 <label for="horario">Horário:</label>
-                <input type="text" id="horario" name="horario" placeholder="Horário" value="{{ form.horario.value }}">
+                <input type="time" id="horario" name="horario" value="{{ reserva.horario|time:'H:i' }}">
             </div>
             <div class="form-group">
                 <label for="data">Data:</label>
-                <input type="date" id="data" name="data" value="{{ form.data.value|date:'Y-m-d' }}">
+                <input type="date" id="data" name="data" value="{{ reserva.data|date:'Y-m-d' }}">
             </div>
             <div class="cadastrar-button">
                 <button type="submit" class="submit">Editar</button>
