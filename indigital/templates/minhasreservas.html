@@ -14,16 +14,9 @@
             <span>Lab 215</span>
         </div>
         <div class="buttons">
-            <div>
-        <a href="{% url 'editar_reserva' %}">
-          <button type="submit" class="btn-login">Editar</button>
-        </div>
-            <a href="{% url 'cancelar_reserva' %}">
-                <button type="submit" class="btn-login">Cancelar</button>
-        </div>
         <div class="new-button">
-            <a href="{% url 'reserva' %}">
-                <button type="submit" class="btn-login">Nova</button>
+            <a href="{% url 'listar_reservas' %}">
+                <button type="submit" class="btn-login">Listar Reservas</button>
         </div>
     </div>
 {% endblock content %}

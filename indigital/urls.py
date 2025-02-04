@@ -18,4 +18,5 @@ urlpatterns = [
     path('contaexcluida', views.contaexcluida, name='contaexcluida'),
     path('editar_reserva', views.editar_reserva, name='editar_reserva'),
     path('cancelar_reserva', views.cancelar_reserva, name='cancelar_reserva'),
+    path('listar_reservas', views.listar_reservas, name='listar_reservas'),
 ]

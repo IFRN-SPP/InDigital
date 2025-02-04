@@ -807,3 +807,44 @@ h2.deseja-cancelar {
     width: 100%;
     max-width: 400px;
 }
+
+/*listar reservas */
+
+.container-listar-reservas {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #4a8c8f;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #55b0b4;
+    color: white;
+}
+.btn {
+    padding: 5px 10px;
+    text-decoration: none;
+    color: white;
+    border-radius: 4px;
+}
+.edit {
+    background-color: #0D5355;
+}
+.delete {
+    background-color: #dc3545;
+}
+
+.h2-listar{
+    color: #0D5355;
+}
