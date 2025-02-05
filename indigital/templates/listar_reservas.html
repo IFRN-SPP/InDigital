@@ -21,7 +21,7 @@
                 {% for reserva in reservas %}
                     <tr>
                         <td>{{ reserva.horario|time:"H:i" }}</td>
-                        <td>{{ reserva.numLaboratorio }}</td>
+                        <td>{{ reserva.laboratorio }}</td>
                         <td>{{ reserva.data|date:"d/m/Y" }}</td>
                         <td>
                             <a href="{% url 'editar_reserva' reserva.id %}" class="btn edit">Editar</a>

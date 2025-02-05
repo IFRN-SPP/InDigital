@@ -8,9 +8,9 @@ class Laboratorio(models.Model):
         return self.numLaboratorio
     
 class Reserva(models.Model):
-    laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE, null=True)
-    horario = models.TimeField(blank=True, null=True)
-    data = models.DateField(blank=True, null=True)
+    laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
+    horario = models.TimeField()
+    data = models.DateField()
 
     def __str__(self):
         return self.laboratorio
