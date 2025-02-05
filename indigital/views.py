@@ -30,14 +30,17 @@ def editar_reserva(request, reserva_id):
     context = {
         "reserva" : reserva,
         "form" : ReservaForm(instance=reserva),
+        "laboratorios": Laboratorio.objects.all()
     }
 
     if request.method == 'POST':
         form = ReservaForm(request.POST, instance=reserva)
+        print(form)
         if form.is_valid():
             form.save()
             return redirect('listar_reservas')
         else:
+            print("ola")
             context["form"] = form
     
     return render(request, "editar_reserva.html", context)

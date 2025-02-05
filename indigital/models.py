@@ -13,4 +13,4 @@ class Reserva(models.Model):
     data = models.DateField()
 
     def __str__(self):
-        return self.laboratorio
+        return self.laboratorio.numLaboratorio

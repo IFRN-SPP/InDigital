@@ -5,16 +5,26 @@
 <div class="container-editar-reserva">
     <div class="form">
         <form action="{% url 'editar_reserva' reserva.id %}" method="POST">
+            {% csrf_token %}
             <div class="form-header">
                 <div class="title">
                     <h1>Editar informações</h1>
                     <p>Altere abaixo!</p>
                 </div>
             </div>
-            {% csrf_token %}
             <div class="form-group">
                 <label for="numLaboratorio">Número do laboratório:</label>
-                <input type="text" id="numLaboratorio" name="numLaboratorio" value="{{ reserva.laboratorio }}">
+                
+                <select name="laboratorio" id="numLaboratorio">
+                    {% for laboratorio in laboratorios %}
+                        {% if laboratorio.id == reserva.laboratorio.id %}
+                        <option value="{{ laboratorio.id }}" selected>{{ laboratorio }}</option>
+                        {% else %}
+                        <option value="{{ laboratorio.id }}">{{ laboratorio }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+
             </div>
             <div class="form-group">
                 <label for="horario">Horário:</label>
