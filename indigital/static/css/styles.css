@@ -888,3 +888,7 @@ button-criar-reserva{
 button:hover {
     background-color: #4a8c8f;
 }
+
+.btn.cancel {
+    background-color: #55B0B4;
+}
