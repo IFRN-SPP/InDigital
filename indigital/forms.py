@@ -4,4 +4,4 @@ from .models import Reserva
 class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = ['laboratorio', 'horario', 'data']
+        fields = "__all__"

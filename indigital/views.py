@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Laboratorio, Reserva
 from .forms import ReservaForm
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
 def index(request):
@@ -11,12 +12,13 @@ def index(request):
 def criar_reserva(request):
     laboratorios = Laboratorio.objects.all()
     if request.method == "POST":
-        form = ReservaForm(request.POST, request.FILES)
+        form = ReservaForm(request.POST)
         if form.is_valid():
-            reserva = form.save(commit=False)
-            reserva.usuario = request.user
-            reserva.save()
+            form.save()
+            messages.success(request, 'Reserva cadastrada com sucesso!')
             return redirect('reserva')
+        else:
+            messages.error(request, 'Erro ao cadastrar reserva!')
     else:
         form = ReservaForm()
     
@@ -35,12 +37,10 @@ def editar_reserva(request, reserva_id):
 
     if request.method == 'POST':
         form = ReservaForm(request.POST, instance=reserva)
-        print(form)
         if form.is_valid():
             form.save()
             return redirect('listar_reservas')
         else:
-            print("ola")
             context["form"] = form
     
     return render(request, "editar_reserva.html", context)
