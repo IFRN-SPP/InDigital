@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="box reserva-excluida">
     <h2>Tem certeza que deseja excluir esta reserva?</h2>
     
-    <p><strong>Laboratório:</strong> {{ reserva.numLaboratorio }}</p>
+    <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
     <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
     <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
 

@@ -11,21 +11,30 @@
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Horário</th>
                     <th>Laboratório</th>
                     <th>Data</th>
+                    {% if request.user.is_authenticated %}
                     <th>Ações</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for reserva in reservas %}
                     <tr>
+                        <th scope="row">{{ reserva.id }}</th>
                         <td>{{ reserva.horario|time:"H:i" }}</td>
                         <td>{{ reserva.laboratorio }}</td>
                         <td>{{ reserva.data|date:"d/m/Y" }}</td>
+    
                         <td>
-                            <a href="{% url 'editar_reserva' reserva.id %}" class="btn edit">Editar</a>
-                            <a href="{% url 'excluir_reserva' reserva.id %}" class="btn delete">Excluir</a>
+                            {% if perms.indigital.editar_reserva %}
+                                <a href="{% url 'editar_reserva' reserva.id %}" class="btn edit">Editar</a>
+                            {% endif %}
+                            {% if perms.indigital.excluir_reserva %}
+                                <a href="{% url 'excluir_reserva' reserva.id %}" class="btn delete">Excluir</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
