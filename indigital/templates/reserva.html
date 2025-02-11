@@ -9,32 +9,40 @@
         </div>
     </div>
     <div class="reservation-box">
-       <h2>Reservas para o laboratório de informática</h2>
-        <form action="{% url 'criar_reserva' %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="time">Horário:</label>
-                <select id="time" name="horario" required>
-                    {% for horario in horarios %}
-                        <option value="{{ horario }}">{{ horario }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="lab">Laboratório:</label>
-                <select id="lab" name="numLaboratorio" required>
-                    {% for lab in laboratorios %}
-                        <option value="{{ lab.numLaboratorio }}">{{ lab.numLaboratorio }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="data">Data:</label>
-                <input type="date" id="data" name="data" required>
-            </div>
-            <p>Escolha o horário, laboratório e data para realizar a reserva.</p>
-            <button type="submit" class="reserve">Reservar</button>
-        </form>
-    </div>
+        <h2>Reservas para o laboratório de informática</h2>
+    {% if reservas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Horário</th>
+                    <th>Laboratório</th>
+                    <th>Data</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.horario|time:"H:i" }}</td>
+                        <td>{{ reserva.laboratorio }}</td>
+                        <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if not reserva.usuario %} 
+                                <a href="{% url 'reservar_laboratorio' reserva.id %}" class="btn reserve">Reservar</a>
+                            {% else %}
+                                <span class="reserved-text">Reservado</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma reserva disponível.</p>
+    {% endif %}
+
+        <p>Escolha o horário, laboratório e data para realizar a reserva.</p>
+        <button type="submit" class="reserve">Reservar</button>
+
 </div>
 {% endblock content %}

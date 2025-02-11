@@ -63,8 +63,44 @@ def excluir_reserva(request, reserva_id):
     else:
         return render(request, "excluir_reserva.html", context)
 
+# aqui começa a parte do usuário comum
+@login_required
 def reserva(request):
-    return render(request, "reserva.html")
+    reservas = Reserva.objects.all()
+    return render(request, "reserva.html", {'reservas': reservas})
+
+@login_required
+def reservar_laboratorio(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    if reserva.usuario is not None:
+        messages.error(request, "Essa reserva já foi realizada por outro usuário.")
+        return redirect('reserva')
+
+    reserva.usuario = request.user
+    reserva.save()
+    
+    messages.success(request, "Reserva realizada com sucesso!")
+    return redirect('minhas_reservas')
+
+@login_required
+def minhas_reservas(request):
+    reservas = Reserva.objects.filter(usuario=request.user)  # Filtra apenas as reservas do usuário logado
+    return render(request, "minhas_reservas.html", {'reservas': reservas})
+
+@login_required
+def cancelar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    if reserva.usuario == request.user:
+        reserva.usuario = None  # Remove a reserva do usuário
+        reserva.save()
+        messages.success(request, "Reserva cancelada com sucesso!")
+    else:
+        messages.error(request, "Você não tem permissão para cancelar esta reserva.")
+
+    return redirect('minhas_reservas')
+
 
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
@@ -83,6 +119,3 @@ def minhasreservas(request):
 
 def editar_perfil(request):
     return render(request, "editar_perfil.html")
-
-def cancelar_reserva(request):
-    return render(request, "cancelarreserva.html")

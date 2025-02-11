@@ -11,6 +11,7 @@ class Reserva(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
     horario = models.TimeField()
     data = models.DateField()
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.laboratorio.numLaboratorio

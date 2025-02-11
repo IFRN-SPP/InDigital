@@ -10,6 +10,10 @@ urlpatterns = [
 
 
     path('reserva/', views.reserva, name='reserva'),
+    path('reservar/<int:reserva_id>/', views.reservar_laboratorio, name='reservar_laboratorio'),
+    path('minhas_reservas/', views.minhas_reservas, name='minhas_reservas'),
+    path('cancelar_reserva/<int:reserva_id>/', views.cancelar_reserva, name='cancelar_reserva'),
+
     path('esqueceuasenha', views.esqueceuasenha, name='esqueceuasenha'),
     path('perfil', views.perfil, name='perfil'),
     path('confirmacaodasenha', views.confirmacaodasenha, name='confirmacaodasenha'),
