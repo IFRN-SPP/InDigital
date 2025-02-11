@@ -3,7 +3,6 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     font-family: Arial, sans-serif;
     outline: none;
     border: none;
@@ -31,7 +30,7 @@ section{
 /* header */
 header {
     background: #55B0B4;
-    padding: 2rem 9%;
+    padding: 1.5rem 9%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -72,15 +71,6 @@ header .icon a:hover {
 }
 
 /* home */
-.home{
-    display: flex;
-    align-items: center;
-    min-height: 100vh;
-    background: url(../assets/img/capahome.png) no-repeat;
-    background-size: cover;
-    background-position: center;
-}
-
 .home .content h3{
     font-size: 5rem;
     color: white;
@@ -101,6 +91,7 @@ header .icon a:hover {
 
 .sobre .sobre-text h3{
     font-size: 56px;
+    padding: 20px 0;
     color: #55B0B4;
 }
 
@@ -109,7 +100,7 @@ header .icon a:hover {
 }
 
 .sobre .sobre-img img{
-    width: 60%;
+    width: 80%;
     border-radius: 80px ;
 }
 
@@ -270,7 +261,7 @@ input:focus {
     border: none;
     border-bottom: 2px solid #ffffff;
     background-color: transparent;
-    color: black;
+    color: #0f2d2e;
     font-size: 1.6rem;
 }
 
@@ -462,58 +453,6 @@ color: #777;
 margin-top: 10px;
 }
 
-.calendar-box {
-flex: 2;
-display: flex;
-flex-direction: column;
-align-items: center;
-}
-
-.calendar-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-width: 100%;
-margin-bottom: 10px;
-}
-
-.calendar-header span {
-font-weight: bold;
-font-size: 1.1rem;
-color: #333;
-}
-
-.calendar-header button {
-background-color: #0D5355;
-color: #fff;
-border: none;
-padding: 5px 10px;
-border-radius: 5px;
-cursor: pointer;
-}
-
-.calendar {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-gap: 5px;
-width: 100%;
-text-align: center;
-}
-
-.calendar div {
-padding: 10px;
-border-radius: 5px;
-background-color: #e0f7fa;
-color: #0D5355;
-font-weight: bold;
-cursor: pointer;
-}
-
-.calendar .active {
-background-color: #0D5355;
-color: white;
-}
-
 button.reserve {
 margin-top: 20px;
 background-color: #0D5355;
@@ -570,85 +509,45 @@ color: #e0f7fa;
 
 /* perfil */
 .perfil-container {
-width: 100%;
-max-width: 800px;
-margin: 20px auto;
-}
-
-.profile-section {
-margin-bottom: 50px;
-;
-}
-
-.profile-section, .info-section, .reservations-section h2{
-    color: #0D5355;
-    text-align: center
-    ;
-}
-
-.profile-card {
-background-color: #BAE0E1;
-border-radius: 10px;
-padding: 30px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 10px;
-}
-
-.profile-photo img {
-width: 60px;
-height: 60px;
-border-radius: 50%;
-}
-
-.profile-info p {
-margin: 5px 0;
-font-size: 1rem;
-}
-
-.container-editar-perfil {
-    background-color: white;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px #55B0B4;
+    width: 400px;
+    text-align: center;
+    transition: 0.3s;
     margin: auto;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
 }
-
+.perfil-container:hover {
+    box-shadow: 0 6px 15px #0f2d2e;
+}
+.perfil-container h2 {
+    margin-bottom: 15px;
+    color: #0f2d2e;
+}
+.perfil-info {
+    text-align: left;
+    margin: 20px 20;
+    font-size: 15px;
+    color: #0f2d2e;
+    padding: 15px 15px;
+}
+.perfil-info p {
+    margin: 8px 0;
+}
 .edit-button {
-background-color: #0D5355;
-color: white;
-border: none;
-border-radius: 5px;
-padding: 10px 15px;
-cursor: pointer;
-font-size: 0.9rem;
+    background:#55B0B4;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 50%;
+    font-size: 16px;
+    transition: background 0.3s;
 }
-
 .edit-button:hover {
-background-color: #55B0B4;
-}
-
-.info-section {
-margin-bottom: 20px;
-}
-
-.info-card {
-background-color: #BAE0E1;
-border-radius: 10px;
-padding: 30px;
-}
-
-.info-row {
-display: flex;
-justify-content: space-between;
-margin-bottom: 10px;
-}
-
-.info-row p {
-font-size: 1rem;
+    background: #55B0B4;
 }
 
 .reservations-section {
@@ -693,10 +592,10 @@ background-color: #55B0B4;
     padding: 80px;
     border-radius: 15px;
 }
-.table-header {
+.table-reservas {
     display: flex;
     justify-content: space-between;
-    padding: 25px;
+    padding: 50px;
     font-weight: bold;
     color: white;
     background-color: #2a4d4f;
@@ -705,18 +604,19 @@ background-color: #55B0B4;
 .table-row {
     display: flex;
     justify-content: space-between;
-    padding: 12px;
+    padding: 50px;
     background-color: #0f2d2e;
     color: white;
     border-radius: 5px;
     margin-top: 10px;
     font-size: 16px;
 }
-.buttons {
-    margin-top: 15px;
+.buttons-reservas {
+    margin-top: 10px;
     display: flex;
     gap: 10px;
     justify-content: center;
+    margin: auto;
 }
 button {
     background-color: #5fa7aa;
@@ -891,4 +791,9 @@ button:hover {
 
 .btn.cancel {
     background-color: #55B0B4;
+}
+
+.container-editar-perfil{
+    margin: auto;
+    width: 400px;
 }

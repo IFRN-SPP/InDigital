@@ -2,37 +2,15 @@
 {% load static %}
 
 {% block content %}
-
-<main class="perfil-container">
-  <!-- Seção de Perfil -->
-  <section class="profile-section">
-      <h2>Perfil</h2>
-      <div class="profile-card">
-      <div class="profile-photo">
-          <img src="{% static 'assets/img/InDigital logo.png' %}" alt="Foto do perfil">
-      </div>
-      <div class="profile-info">
-          <p>Nome sobrenome</p>
-          <p>Matrícula</p>
-      </div>
-      <a href="{% url 'editar_perfil' %}">
-        <button type="submit" class="btn-login">Editar perfil</button>
-      </div>
-  </section>
-
-  <!-- Informações Cadastradas -->
-  <section class="info-section">
-      <h2>Informações cadastradas</h2>
-      <div class="info-card">
-      <div class="info-row">
-          <p>Nome:</p>
-          <p>E-mail:</p>
-      </div>
-      <div class="info-row">
-          <p>Série:</p>
-          <p>Turno:</p>
-      </div>
-      </div>
-  </section>
-</main>
+<div class="perfil-container">
+    <h2>Perfil</h2>
+    <div class="perfil-info">
+        <p><strong>Usuário:</strong> Ana Maria</p>
+        <p><strong>Matrícula:</strong> 20221234560015 </p>
+        <p><strong>Email:</strong> anamaria@gmail.com</p>
+    </div>
+    <div class="botao">
+        <a href="{% url 'editar_perfil' %}">
+    <button class="editar-button">Editar Perfil</button>
+</div>
 {% endblock content %}

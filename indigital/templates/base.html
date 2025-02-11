@@ -22,7 +22,7 @@
             <a href="{% url 'index' %}">Home</a>
             <a href="{% url 'reserva' %}">Reserva</a>
             <a href="{% url 'minhasreservas' %}">Minhas Reservas</a>
-            <div class="icon">
+            <div class="icon-x">
                 <span>Bem-vindo (a), <strong>{{ request.user }}</strong>!</span>
                 <a href="{% url 'perfil' %}" class="fas fa-user"></a>
             </div>
@@ -39,10 +39,5 @@
 {% endblock header %}
 {% block content %}
 {% endblock content %}
-<footer class="footer">
-    <div class="container">
-        <p>Copyright © {% now 'Y' %}</p>
-    </div>
-</footer>
 </body>
 </html>
