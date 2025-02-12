@@ -29,45 +29,48 @@ section{
 
 /* header */
 header {
-    background: #55B0B4;
-    padding: 1.5rem 9%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    z-index: 1000;
-}
-
-header .logo {
-    font-size: 3rem;
-    color: white;
-    font-weight: bolder;
-    display: flex;
     align-items: center;
+    background: #55B0B4;
+    padding: 15px 30px;
+    color: white;
 }
 
-header .navbar a {
-    text-decoration: none;
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    gap: 30px;
+}
+
+.nav-links a {
     color: white;
-    font-size: 18px;
-    font-weight: 500;
-    padding: 8px 15px;
-    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1.5rem;
     transition: 0.3s;
 }
 
-header .navbar a:hover {
-    background-color: white;
-    color: #55B0B4;
+.nav-links a:hover {
+    color: #2a4d4f;
 }
 
-header .icon a {
-    font-size: 2rem;
-    margin-left: 1.5rem;
+.icon-x {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.5rem ;
+}
+
+.icon-x a {
     color: white;
-}
-
-header .icon a:hover {
-    color: #BAE0E1;
+    font-size: 2.3rem;
 }
 
 /* home */
@@ -586,57 +589,63 @@ background-color: #55B0B4;
 }
 
 .container-mreservas {
-    background-color: #bcdedf;
-    width: 45%;
-    margin: 60px auto;
-    padding: 80px;
-    border-radius: 15px;
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.titulo {
+    font-size: 20px;
+    color: #2C3E50;
+    margin-bottom: 10px;
+}
+
+.descricao {
+    font-size: 16px;
+    color: #7D7D7D;
+    margin-bottom: 20px;
+}
+
 .table-reservas {
     display: flex;
-    justify-content: space-between;
-    padding: 50px;
-    font-weight: bold;
-    color: white;
-    background-color: #2a4d4f;
-    border-radius: 5px;
-}
-.table-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 50px;
-    background-color: #0f2d2e;
-    color: white;
-    border-radius: 5px;
-    margin-top: 10px;
-    font-size: 16px;
-}
-.buttons-reservas {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
     justify-content: center;
     margin: auto;
 }
-button {
-    background-color: #5fa7aa;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 5px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-button:hover {
-    background-color: #4a8c8f;
-}
-.new-button {
+
+.buttons-mreservas {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 25px;
+    gap: 20px;
 }
 
+.botao-mreserva {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #4a8c8f;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+}
+
+.botao-criar {
+    background: #4a8c8f;
+}
+
+.botao-criar:hover {
+    background: #55B0B4;
+}
+
+.botao-mreserva i {
+    font-size: 15px;
+}
 /* cancelar reserva */
 
 p.cancelar-reserva {
