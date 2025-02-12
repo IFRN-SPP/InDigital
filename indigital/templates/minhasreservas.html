@@ -3,12 +3,18 @@
 
 {% block content %}
     <div class="container-mreservas">
+        <h2 class="titulo">Gerenciamento de Reservas</h2>
+        <p class="descricao">Aqui você pode listar ou criar novas reservas de forma rápida e eficiente.</p>
+        
         <div class="table-reservas">
-        <div class="buttons-reservas">
-            <a href="{% url 'listar_reservas' %}">
-                <button type="submit" class="btn-login">Listar Reservas</button>
-            <a href="{% url 'criar_reserva' %}">
-                <button type="submit" class="btn-login">Criar Reserva</button>
+            <div class="buttons-mreservas">
+                <a href="{% url 'listar_reservas' %}" class="botao-mreserva">
+                    <i class="fas fa-list"></i> Listar Reservas
+                </a>
+                <a href="{% url 'criar_reserva' %}" class="botao-mreserva botao-criar">
+                    <i class="fas fa-plus-circle"></i> Criar Reserva
+                </a>
+            </div>
         </div>
     </div>
 {% endblock content %}

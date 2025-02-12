@@ -26,10 +26,10 @@
         <a href="{% url 'index' %}"></i> Home</a>
         <a href="{% url 'reserva' %}"></i> Reserva</a>
         <a href="{% url 'minhasreservas' %}"></i> Minhas Reservas</a>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Sair</button>
-            </form>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Sair</button>
+        </form>
         {% else %}
             <a href="{% url 'cadastro' %}">Cadastre-se</a>
             <a href="{% url 'login' %}">Login</a>
