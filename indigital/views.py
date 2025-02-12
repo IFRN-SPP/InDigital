@@ -63,7 +63,6 @@ def excluir_reserva(request, reserva_id):
     else:
         return render(request, "excluir_reserva.html", context)
 
-# aqui começa a parte do usuário comum
 @login_required
 def reserva(request):
     reservas = Reserva.objects.all()
@@ -83,10 +82,13 @@ def reservar_laboratorio(request, reserva_id):
     messages.success(request, "Reserva realizada com sucesso!")
     return redirect('minhas_reservas')
 
-@login_required
 def minhas_reservas(request):
-    reservas = Reserva.objects.filter(usuario=request.user)  # Filtra apenas as reservas do usuário logado
-    return render(request, "minhas_reservas.html", {'reservas': reservas})
+    if request.user.is_staff:  # Se for admin, renderiza o template de admin_reservas
+        return render(request, "admin_reservas.html")
+    
+    # Se for usuário comum, busca suas reservas no banco de dados
+    reservas = request.user.reserva_set.all()  
+    return render(request, "user_reservas.html", {"reservas": reservas})
 
 @login_required
 def cancelar_reserva(request, reserva_id):
@@ -113,9 +115,6 @@ def contaexcluida(request):
 
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
-
-def minhasreservas(request):
-    return render(request, "minhasreservas.html")
 
 def editar_perfil(request):
     return render(request, "editar_perfil.html")
