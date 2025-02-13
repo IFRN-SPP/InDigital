@@ -17,35 +17,19 @@
 <body>
 {% block header %}
 <header>
-<<<<<<< HEAD
     <nav class="nav-links">
         {% if request.user.is_authenticated%}
         <div class="icon-x">
             <span>Bem-vindo (a), <strong>{{ request.user }}</strong>!</span>
             <a href="{% url 'perfil' %}" class="fas fa-user"></a>
         </div>
-        <a href="{% url 'index' %}"></i> Home</a>
-        <a href="{% url 'reserva' %}"></i> Reserva</a>
-        <a href="{% url 'minhasreservas' %}"></i> Minhas Reservas</a>
+        <a href="{% url 'index' %}"> Home</a>
+        <a href="{% url 'reserva' %}"> Reserva</a>
+        <a href="{% url 'minhas_reservas' %}"> Minhas Reservas</a>
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Sair</button>
         </form>
-=======
-    <nav class="navbar">
-        {% if request.user.is_authenticated %}
-            <a href="{% url 'index' %}">Home</a>
-            <a href="{% url 'reserva' %}">Reserva</a>
-            <a href="{% url 'minhas_reservas' %}">Minhas Reservas</a>
-            <div class="icon-x">
-                <span>Bem-vindo (a), <strong>{{ request.user }}</strong>!</span>
-                <a href="{% url 'perfil' %}" class="fas fa-user"></a>
-            </div>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Sair</button>
-            </form>
->>>>>>> 3e10e2f19d25ccbf6bdfec28d1777a0cf7a1ee68
         {% else %}
             <a href="{% url 'cadastro' %}">Cadastre-se</a>
             <a href="{% url 'login' %}">Login</a>

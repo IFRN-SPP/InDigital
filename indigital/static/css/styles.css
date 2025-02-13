@@ -806,3 +806,7 @@ button:hover {
     margin: auto;
     width: 400px;
 }
+
+a.btn.reserve {
+    background-color: #55B0B4;
+}

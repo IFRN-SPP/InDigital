@@ -1,15 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-cancelar-reserva">
-    <div class="box-cancelar-reserva">
-        <h2 class="deseja-cancelar">Deseja cancelar sua reserva?</h2>
-        <p class="cancelar-reserva">A reserva não pode ser recuperada quando cancelada.</p>
-        <div class="buttons cancelar-reserva">
-            <a href="reservaexcluida.html" class="button sim sim cancelar-reserva">Sim</a>
-            <a href="minhasreservas.html" class="button nao nao cancelar-reserva">Não</a>
-        </div>
-    </div>
+<div class="box cancelar-reserva">
+    <h2>Deseja cancelar sua reserva?</h2>
+    
+    <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
+    <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
+    <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
+    
+    <p class="aviso">A reserva não poderá ser recuperada após o cancelamento.</p>
+    
+    <form action="{% url 'cancelar_reserva' reserva.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn delete">Confirmar</button>
+        <a href="{% url 'minhas_reservas' %}" class="btn cancel">Cancelar</a>
+    </form>
 </div>
 {% endblock content %}
