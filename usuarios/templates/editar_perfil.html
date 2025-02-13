@@ -3,16 +3,18 @@
 
 {% block content %}
 <div class="container-editar-perfil">
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data"> {# Permite envio de arquivos #}
         {% csrf_token %}
         <div class="form-header">
             <div class="title">
                 <h1>Editar perfil</h1>
             </div>
         </div>
+
         <div class="form-group">
-            {{ form.as_p }}  {# Renderiza os campos do formulário automaticamente #}
+            {{ form.as_p }}
         </div>
+
         <div class="cadastrar-button">
             <button type="submit" class="btn btn-primary">Salvar</button>
         </div>

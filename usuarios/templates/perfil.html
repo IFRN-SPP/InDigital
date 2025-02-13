@@ -4,16 +4,26 @@
 {% block content %}
 <div class="perfil-container">
     <h2>Perfil</h2>
+    
+    <div class="perfil-foto">
+        {% if usuario.foto_perfil %}
+            <img src="{{ usuario.foto_perfil.url }}" alt="Foto de {{ usuario.username }}" class="foto-perfil">
+        {% else %}
+            <img src="{% static 'img/default-avatar.png' %}" alt="Foto padrão" class="foto-perfil">
+        {% endif %}
+    </div>
+
     <div class="perfil-info">
-        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
+        <p><strong>Vínculo:</strong> {{ usuario.vinculo }}</p>        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
         <p><strong>Matrícula:</strong> {{ usuario.matricula }}</p>
         <p><strong>Email:</strong> {{ usuario.email }}</p>
-        
-        {% if not usuario.is_staff %}  {# Só mostra Turno e Série para alunos normais #}
+
+        {% if usuario.vinculo == "aluno" %}
             <p><strong>Turno:</strong> {{ usuario.get_turno_display }}</p>
             <p><strong>Série:</strong> {{ usuario.serie }}</p>
         {% endif %}
     </div>
+
     <div class="botao">
         <a href="{% url 'editar_perfil' %}">
             <button class="editar-button">Editar Perfil</button>

@@ -6,9 +6,18 @@ from .models import User
 class CadastroForm(BaseUserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'matricula', 'turno', 'serie', 'password1', 'password2']
+        fields = ['username', 'email', 'matricula', 'turno', 'serie', 'foto_perfil', 'password1', 'password2']
 
 class EditarPerfilForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'matricula', 'turno', 'serie']
+        fields = ['username', 'email', 'matricula', 'foto_perfil']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.is_staff:
+            self.fields['turno'] = forms.ChoiceField(
+                choices=User._meta.get_field('turno').choices,
+                required=False
+            )
+            self.fields['serie'] = forms.CharField(required=False)

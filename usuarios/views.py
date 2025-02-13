@@ -17,17 +17,15 @@ def cadastro(request):
 
 @login_required
 def perfil(request):
-    usuario = request.user  # Obtém os dados do usuário autenticado
-    contexto = {
-        'usuario': usuario,
-    }
+    usuario = request.user  
+    contexto = {'usuario': usuario}
     return render(request, "perfil.html", contexto)
 
 @login_required
 def editar_perfil(request):
     usuario = request.user
     if request.method == "POST":
-        form = EditarPerfilForm(request.POST, instance=usuario)
+        form = EditarPerfilForm(request.POST, request.FILES, instance=usuario)  # Captura arquivos enviados
         if form.is_valid():
             form.save()
             messages.success(request, "Perfil atualizado com sucesso!")
