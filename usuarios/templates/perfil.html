@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="perfil-container">
+    <h2>Perfil</h2>
+    <div class="perfil-info">
+        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
+        <p><strong>Matrícula:</strong> {{ usuario.matricula }}</p>
+        <p><strong>Email:</strong> {{ usuario.email }}</p>
+        
+        {% if not usuario.is_staff %}  {# Só mostra Turno e Série para alunos normais #}
+            <p><strong>Turno:</strong> {{ usuario.get_turno_display }}</p>
+            <p><strong>Série:</strong> {{ usuario.serie }}</p>
+        {% endif %}
+    </div>
+    <div class="botao">
+        <a href="{% url 'editar_perfil' %}">
+            <button class="editar-button">Editar Perfil</button>
+        </a>
+    </div>
+</div>
+{% endblock content %}

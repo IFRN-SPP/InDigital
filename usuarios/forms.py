@@ -8,4 +8,7 @@ class CadastroForm(BaseUserCreationForm):
         model = User
         fields = ['username', 'email', 'matricula', 'turno', 'serie', 'password1', 'password2']
 
-    
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'matricula', 'turno', 'serie']

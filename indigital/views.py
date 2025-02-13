@@ -107,14 +107,8 @@ def cancelar_reserva(request, reserva_id):
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
 
-def perfil(request):
-    return render(request, "perfil.html")
-
 def contaexcluida(request):
     return render(request, "contaexcluida.html")
 
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
-
-def editar_perfil(request):
-    return render(request, "editar_perfil.html")
