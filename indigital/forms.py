@@ -1,7 +1,12 @@
 from django import forms
-from .models import Reserva
+from .models import Disponibilidade, Laboratorio
 
-class ReservaForm(forms.ModelForm):
+class DisponibilidadeForm(forms.ModelForm):
     class Meta:
-        model = Reserva
+        model = Disponibilidade
+        fields = "__all__"
+
+class LaboratorioForm(forms.ModelForm):
+    class Meta:
+        model = Laboratorio
         fields = "__all__"

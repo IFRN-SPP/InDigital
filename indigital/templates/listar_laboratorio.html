@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>Lista de Laboratórios</h2>
+<table>
+    <tr>
+        <th>Número</th>
+        <th>Vagas</th>
+        <th>Ações</th>
+    </tr>
+    {% for laboratorio in laboratorios %}
+    <tr>
+        <td>{{ laboratorio.num_laboratorio }}</td>
+        <td>{{ laboratorio.vagas }}</td>
+        <td>
+            <a href="{% url 'editar_laboratorio' laboratorio.id %}">Editar</a> |
+            <a href="{% url 'excluir_laboratorio' laboratorio.id %}">Excluir</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

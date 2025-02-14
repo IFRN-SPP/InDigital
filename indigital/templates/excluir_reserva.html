@@ -3,17 +3,14 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="box reserva-excluida">
-    <h2>Tem certeza que deseja excluir esta reserva?</h2>
-    
+<h2>Excluir Reserva</h2>
+<p>Tem certeza que deseja excluir essa reserva?</p>
     <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
     <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
     <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
-
-    <form action="{% url 'excluir_reserva' reserva.id %}" method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn delete">Confirmar</button>
-        <a href="{% url 'listar_reservas' %}" class="btn cancel">Cancelar</a>
-    </form>
-</div>
-{% endblock content %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'listar_reservas' %}">Cancelar</a>
+{% endblock %}

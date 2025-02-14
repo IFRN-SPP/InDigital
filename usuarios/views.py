@@ -6,7 +6,7 @@ from .models import User
 
 def cadastro(request):
     if request.method == 'POST':
-        form = CadastroForm(request.POST)
+        form = CadastroForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, 'Usuário cadastrado com sucesso!')

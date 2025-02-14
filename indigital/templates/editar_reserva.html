@@ -1,43 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-editar-reserva">
-    <div class="form">
-        <form action="{% url 'editar_reserva' reserva.id %}" method="POST">
-            {% csrf_token %}
-            <div class="form-header">
-                <div class="title">
-                    <h1>Editar informações</h1>
-                    <p>Altere abaixo!</p>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="numLaboratorio">Número do laboratório:</label>
-                
-                <select name="laboratorio" id="numLaboratorio">
-                    {% for laboratorio in laboratorios %}
-                        {% if laboratorio.id == reserva.laboratorio.id %}
-                        <option value="{{ laboratorio.id }}" selected>{{ laboratorio }}</option>
-                        {% else %}
-                        <option value="{{ laboratorio.id }}">{{ laboratorio }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-
-            </div>
-            <div class="form-group">
-                <label for="horario">Horário:</label>
-                <input type="time" id="horario" name="horario" value="{{ reserva.horario|time:'H:i' }}">
-            </div>
-            <div class="form-group">
-                <label for="data">Data:</label>
-                <input type="date" id="data" name="data" value="{{ reserva.data|date:'Y-m-d' }}">
-            </div>
-            <div class="cadastrar-button">
-                <button type="submit" class="submit">Editar</button>
-            </div>
-        </form>
-    </div>        
-</div>
-{% endblock content %}
+<h2>Editar Reserva</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+</form>
+<a href="{% url 'listar_reservas' %}">Voltar</a>
+{% endblock %}

@@ -810,3 +810,7 @@ button:hover {
 a.btn.reserve {
     background-color: #55B0B4;
 }
+
+a.btn.btn-primary {
+    background-color: #55B0B4;
+}

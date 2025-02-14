@@ -24,8 +24,8 @@
             <a href="{% url 'perfil' %}" class="fas fa-user"></a>
         </div>
         <a href="{% url 'index' %}"> Home</a>
-        <a href="{% url 'reserva' %}"> Reserva</a>
-        <a href="{% url 'minhas_reservas' %}"> Minhas Reservas</a>
+        <a href="{% url 'horarios' %}"> Horários</a>
+        <a href="{% url 'reservas' %}"> Reservas</a>
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Sair</button>

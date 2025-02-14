@@ -3,11 +3,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h2>Cadastrar Reserva</h2>
+<h2>Editar Laboratório</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Salvar</button>
 </form>
-<a href="{% url 'reservas' %}">Voltar</a>
+<a href="{% url 'listar_laboratorio' %}">Voltar</a>
 {% endblock %}

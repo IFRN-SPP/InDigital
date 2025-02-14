@@ -1,42 +1,44 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Laboratorio, Reserva
-from .forms import ReservaForm
+from .models import Laboratorio, Reserva, Disponibilidade
+from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
 def index(request):
     return render(request, "index.html")
 
+# crud de disponibilidade
+
 @login_required
 @permission_required('indigital.criar_reserva', raise_exception=True)
 def criar_reserva(request):
     laboratorios = Laboratorio.objects.all()
     if request.method == "POST":
-        form = ReservaForm(request.POST)
+        form = DisponibilidadeForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Reserva cadastrada com sucesso!')
-            return redirect('reserva')
+            return redirect('horarios')
         else:
             messages.error(request, 'Erro ao cadastrar reserva!')
     else:
-        form = ReservaForm()
+        form = DisponibilidadeForm()
     
     return render(request, "criar_reserva.html", {'form' : form, "laboratorios": laboratorios})
 
 @login_required
 @permission_required('indigital.editar_reserva', raise_exception=True)
 def editar_reserva(request, reserva_id):
-    reserva = get_object_or_404(Reserva, id=reserva_id)
+    reserva = get_object_or_404(Disponibilidade, id=reserva_id)
 
     context = {
         "reserva" : reserva,
-        "form" : ReservaForm(instance=reserva),
+        "form" : DisponibilidadeForm(instance=reserva),
         "laboratorios": Laboratorio.objects.all()
     }
 
     if request.method == 'POST':
-        form = ReservaForm(request.POST, instance=reserva)
+        form = DisponibilidadeForm(request.POST, instance=reserva)
         if form.is_valid():
             form.save()
             return redirect('listar_reservas')
@@ -47,14 +49,14 @@ def editar_reserva(request, reserva_id):
 
 @login_required
 def listar_reservas(request):
-    reserva = Reserva.objects.all()
+    reserva = Disponibilidade.objects.all()
     return render(request, "listar_reservas.html", {'reservas' : reserva})
 
 @login_required
 @permission_required('indigital.excluir_reserva', raise_exception=True)
 def excluir_reserva(request, reserva_id):
     context = {
-        "reserva": get_object_or_404(Reserva, id=reserva_id)
+        "reserva": get_object_or_404(Disponibilidade, id=reserva_id)
     }
 
     if request.method == "POST":
@@ -63,10 +65,57 @@ def excluir_reserva(request, reserva_id):
     else:
         return render(request, "excluir_reserva.html", context)
 
+# crud laboratorio
+
 @login_required
-def reserva(request):
-    reservas = Reserva.objects.all()
-    return render(request, "reserva.html", {'reservas': reservas})
+@permission_required('indigital.criar_laboratorio', raise_exception=True)
+def criar_laboratorio(request):
+    if request.method == "POST":
+        form = LaboratorioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Laboratório cadastrado com sucesso!')
+            return redirect('listar_laboratorios')
+        else:
+            messages.error(request, 'Erro ao cadastrar laboratório!')
+    else:
+        form = LaboratorioForm()
+    
+    return render(request, "criar_laboratorio.html", {'form' : form})
+
+@login_required
+@permission_required('indigital.editar_laboratorio', raise_exception=True)
+def editar_laboratorio(request, laboratorio_id):
+    laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    if request.method == 'POST':
+        form = LaboratorioForm(request.POST, instance=laboratorio)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_laboratorio')
+        else:
+            form = LaboratorioForm(instance=laboratorio)
+    return render(request, "editar_laboratorio.html", {'form': form})
+
+@login_required
+def listar_laboratorio(request):
+    laboratorios = Laboratorio.objects.all()
+    return render(request, "listar_laboratorio.html", {'laboratorios': laboratorios})
+
+@login_required
+@permission_required('indigital.excluir_laboratorio', raise_exception=True)
+def excluir_laboratorio(request, laboratorio_id):
+    laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    if request.method == "POST":
+        laboratorio.delete()
+        return redirect('listar_laboratorio')
+    else:
+        return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+    
+# horarios e reservas
+@login_required
+def horarios(request):
+    horarios = Disponibilidade.objects.all()
+    return render(request, "horarios.html", {'horarios' : horarios})
 
 @login_required
 def reservar_laboratorio(request, reserva_id):
@@ -82,7 +131,7 @@ def reservar_laboratorio(request, reserva_id):
     messages.success(request, "Reserva realizada com sucesso!")
     return redirect('minhas_reservas')
 
-def minhas_reservas(request):
+def reservas(request):
     if request.user.is_staff:  # Se for admin, renderiza o template de admin_reservas
         return render(request, "admin_reservas.html")
     
@@ -102,7 +151,6 @@ def cancelar_reserva(request, reserva_id):
         messages.error(request, "Você não tem permissão para cancelar esta reserva.")
 
     return redirect('minhas_reservas')
-
 
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
