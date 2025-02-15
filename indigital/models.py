@@ -6,7 +6,7 @@ class Laboratorio(models.Model):
     vagas = models.IntegerField(default=30)
 
     def __str__(self):
-        return f"{self.num_laboratorio} ({self.vagas})"
+        return self.num_laboratorio
     
 class Disponibilidade(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)

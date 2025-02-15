@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Laboratorio, Reserva, Disponibilidade
-from .forms import DisponibilidadeForm, LaboratorioForm
+from .forms import DisponibilidadeForm, LaboratorioForm, ReservaForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -124,18 +124,27 @@ def horarios(request):
     return render(request, "horarios.html", {'horarios' : horarios})
 
 @login_required
-def reservar_laboratorio(request, reserva_id):
-    reserva = get_object_or_404(Reserva, id=reserva_id)
+def reservar_laboratorio(request, disponibilidade_id):
+    disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    if reserva.usuario is not None:
+    if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
         messages.error(request, "Essa reserva já foi realizada por outro usuário.")
-        return redirect('reserva')
+        return redirect('horarioa')
 
-    reserva.usuario = request.user
-    reserva.save()
-    
+    if request.method == "POST":
+        form = ReservaForm(request.POST)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.usuario = request.user
+            reserva.disponibilidade = disponibilidade
+            reserva.save()
+            return redirect("horarios")
+    else:
+        form = ReservaForm()
+        
     messages.success(request, "Reserva realizada com sucesso!")
-    return redirect('minhas_reservas')
+    return render(request, "horarios.html", {"form": form, "disponibilidade": disponibilidade})
+    
 
 def reservas(request):
     if request.user.is_staff:  # Se for admin, renderiza o template de admin_reservas

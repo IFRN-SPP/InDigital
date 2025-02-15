@@ -11,6 +11,7 @@ urlpatterns = [
     path('criar/laboratorio/', views.criar_laboratorio, name='criar_laboratorio'),
     path('laboratorio/<int:laboratorio_id>/editar', views.editar_laboratorio, name='editar_laboratorio'),
     path('laboratorio/<int:laboratorio_id>/excluir', views.excluir_laboratorio, name="excluir_laboratorio"),
+    
     path('horarios/', views.horarios, name='horarios'),
     path('reservar/<int:reserva_id>/', views.reservar_laboratorio, name='reservar_laboratorio'),
     path('reservas/', views.reservas, name='reservas'),
