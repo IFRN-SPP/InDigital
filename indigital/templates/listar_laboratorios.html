@@ -14,8 +14,12 @@
         <td>{{ laboratorio.num_laboratorio }}</td>
         <td>{{ laboratorio.vagas }}</td>
         <td>
-            <a href="{% url 'editar_laboratorio' laboratorio.id %}">Editar</a> |
-            <a href="{% url 'excluir_laboratorio' laboratorio.id %}">Excluir</a>
+            {% if perms.indigital.editar_laboratorio %}
+                <a href="{% url 'editar_laboratorio' laboratorio.id %}" class="btn edit">Editar</a>
+            {% endif %}
+            {% if perms.indigital.excluir_laboratorio %}
+                <a href="{% url 'excluir_laboratorio' laboratorio.id %}" class="btn delete">Excluir</a>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}

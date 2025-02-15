@@ -15,6 +15,7 @@
                     <th>#</th>
                     <th>Horário</th>
                     <th>Laboratório</th>
+                    <th>vagas</th>
                     <th>Data</th>
                     {% if request.user.is_authenticated %}
                     <th>Ações</th>
@@ -27,6 +28,7 @@
                         <th scope="row">{{ reserva.id }}</th>
                         <td>{{ reserva.horario|time:"H:i" }}</td>
                         <td>{{ reserva.laboratorio }}</td>
+                        <td>{{ reserva.vagas }}</td>
                         <td>{{ reserva.data|date:"d/m/Y" }}</td>
     
                         <td>
