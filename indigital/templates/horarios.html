@@ -16,8 +16,8 @@
                     <tr>
                         <th>Horário</th>
                         <th>Laboratório</th>
-                        <th>Data</th>
                         <th>Vagas</th>
+                        <th>Data</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -26,13 +26,16 @@
                         <tr>
                             <td>{{ reserva.horario|time:"H:i" }}</td>
                             <td>{{ reserva.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.data|date:"d/m/Y" }}</td>
                             <td>{{ reserva.laboratorio.vagas }}</td>
+                            <td>{{ reserva.data|date:"d/m/Y" }}</td>
                             <td>
-                                {% if reserva.reserva_set.exists %} 
-                                    <span class="reserved-text">Reservado</span>
+                                {% if reserva.laboratorio.vagas > 0 %}
+                                    <form method="post" action="{% url 'reservar_laboratorio' reserva.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn reserve">Reservar</button>
+                                    </form>
                                 {% else %}
-                                    <a href="{% url 'reservar_laboratorio' reserva.id %}" class="btn reserve">Reservar</a>
+                                    <span class="no-vacancy">Esgotado</span>
                                 {% endif %}
                             </td>
                         </tr>

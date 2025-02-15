@@ -120,52 +120,76 @@ def excluir_laboratorio(request, laboratorio_id):
 # horarios e reservas
 @login_required
 def horarios(request):
-    horarios = Disponibilidade.objects.all()
-    return render(request, "horarios.html", {'horarios' : horarios})
+    reservas = Disponibilidade.objects.all()
+    return render(request, "horarios.html", {'reservas': reservas})
 
 @login_required
 def reservar_laboratorio(request, disponibilidade_id):
+    print(f"Disponibilidade ID recebido: {disponibilidade_id}")  # Depuração
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
+    print(f"Vagas disponíveis: {disponibilidade.laboratorio.vagas}")  # Depuração
+
+    if disponibilidade.laboratorio.vagas <= 0:
+        print("Não há vagas disponíveis.")  # Depuração
+        messages.error(request, "Não há vagas disponíveis para este horário.")
+        return redirect('horarios')
+
     if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
-        messages.error(request, "Essa reserva já foi realizada por outro usuário.")
-        return redirect('horarioa')
+        print("Usuário já possui reserva para este horário.")  # Depuração
+        messages.error(request, "Você já possui uma reserva para este horário.")
+        return redirect('horarios')
 
     if request.method == "POST":
+        print("Formulário enviado.")  # Depuração
         form = ReservaForm(request.POST)
         if form.is_valid():
+            print("Formulário válido.")  # Depuração
             reserva = form.save(commit=False)
-            reserva.usuario = request.user
+            reserva.usuario = request.user  # Associa o usuário logado à reserva
+            print(f"Usuário associado à reserva: {reserva.usuario.username}")
             reserva.disponibilidade = disponibilidade
             reserva.save()
-            return redirect("horarios")
-    else:
-        form = ReservaForm()
-        
-    messages.success(request, "Reserva realizada com sucesso!")
-    return render(request, "horarios.html", {"form": form, "disponibilidade": disponibilidade})
-    
+            print("Reserva salva com sucesso.")  # Depuração
 
+            # Atualiza o número de vagas
+            disponibilidade.laboratorio.vagas -= 1
+            disponibilidade.laboratorio.save()
+            print(f"Vagas atualizadas: {disponibilidade.laboratorio.vagas}")  # Depuração
+
+            messages.success(request, "Reserva realizada com sucesso!")
+            return redirect("reservas")
+        else:
+            print("Formulário inválido:", form.errors)  # Depuração
+    else:
+        print("Método da requisição não é POST.")  # Depuração
+        form = ReservaForm()
+
+    return render(request, "horarios.html", {"form": form, "disponibilidade": disponibilidade})
+@login_required
 def reservas(request):
-    if request.user.is_staff:  # Se for admin, renderiza o template de admin_reservas
+    print("Acessando a view 'reservas'.")  # Depuração
+    if request.user.is_staff:
+        print("Usuário é staff. Renderizando admin_reservas.html.")  # Depuração
         return render(request, "admin_reservas.html")
     
-    # Se for usuário comum, busca suas reservas no banco de dados
-    reservas = request.user.reserva_set.all()  
+    reservas = Reserva.objects.filter(usuario=request.user)
+    print(f"Reservas encontradas: {reservas.count()}")  # Depuração
     return render(request, "user_reservas.html", {"reservas": reservas})
-
 @login_required
 def cancelar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
 
     if reserva.usuario == request.user:
-        reserva.usuario = None  # Remove a reserva do usuário
-        reserva.save()
+        disponibilidade = reserva.disponibilidade
+        reserva.delete()  
+        disponibilidade.laboratorio.vagas += 1 
+        disponibilidade.save()
         messages.success(request, "Reserva cancelada com sucesso!")
     else:
         messages.error(request, "Você não tem permissão para cancelar esta reserva.")
 
-    return redirect('minhas_reservas')
+    return redirect('reservas')
 
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
