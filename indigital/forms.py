@@ -1,5 +1,5 @@
 from django import forms
-from .models import Disponibilidade, Laboratorio, Reserva
+from .models import Disponibilidade, Laboratorio
 
 class DisponibilidadeForm(forms.ModelForm):
     class Meta:
@@ -9,9 +9,4 @@ class DisponibilidadeForm(forms.ModelForm):
 class LaboratorioForm(forms.ModelForm):
     class Meta:
         model = Laboratorio
-        fields = "__all__"
-
-class ReservaForm(forms.ModelForm):
-    class Meta:
-        model = Reserva
         fields = "__all__"

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Laboratorio, Reserva, Disponibilidade
-from .forms import DisponibilidadeForm, LaboratorioForm, ReservaForm
+from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -125,71 +125,43 @@ def horarios(request):
 
 @login_required
 def reservar_laboratorio(request, disponibilidade_id):
-    print(f"Disponibilidade ID recebido: {disponibilidade_id}")  # Depuração
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    print(f"Vagas disponíveis: {disponibilidade.laboratorio.vagas}")  # Depuração
-
     if disponibilidade.laboratorio.vagas <= 0:
-        print("Não há vagas disponíveis.")  # Depuração
         messages.error(request, "Não há vagas disponíveis para este horário.")
         return redirect('horarios')
 
     if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
-        print("Usuário já possui reserva para este horário.")  # Depuração
         messages.error(request, "Você já possui uma reserva para este horário.")
         return redirect('horarios')
 
-    if request.method == "POST":
-        print("Formulário enviado.")  # Depuração
-        form = ReservaForm(request.POST)
-        if form.is_valid():
-            print("Formulário válido.")  # Depuração
-            reserva = form.save(commit=False)
-            reserva.usuario = request.user  # Associa o usuário logado à reserva
-            print(f"Usuário associado à reserva: {reserva.usuario.username}")
-            reserva.disponibilidade = disponibilidade
-            reserva.save()
-            print("Reserva salva com sucesso.")  # Depuração
+    reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
 
-            # Atualiza o número de vagas
-            disponibilidade.laboratorio.vagas -= 1
-            disponibilidade.laboratorio.save()
-            print(f"Vagas atualizadas: {disponibilidade.laboratorio.vagas}")  # Depuração
+    disponibilidade.laboratorio.vagas -= 1
+    disponibilidade.laboratorio.save()
 
-            messages.success(request, "Reserva realizada com sucesso!")
-            return redirect("reservas")
-        else:
-            print("Formulário inválido:", form.errors)  # Depuração
-    else:
-        print("Método da requisição não é POST.")  # Depuração
-        form = ReservaForm()
+    messages.success(request, "Reserva realizada com sucesso!")
+    return redirect("reservas")
 
-    return render(request, "horarios.html", {"form": form, "disponibilidade": disponibilidade})
 @login_required
 def reservas(request):
-    print("Acessando a view 'reservas'.")  # Depuração
     if request.user.is_staff:
-        print("Usuário é staff. Renderizando admin_reservas.html.")  # Depuração
         return render(request, "admin_reservas.html")
     
     reservas = Reserva.objects.filter(usuario=request.user)
-    print(f"Reservas encontradas: {reservas.count()}")  # Depuração
     return render(request, "user_reservas.html", {"reservas": reservas})
+
 @login_required
 def cancelar_reserva(request, reserva_id):
-    reserva = get_object_or_404(Reserva, id=reserva_id)
+    reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
 
-    if reserva.usuario == request.user:
-        disponibilidade = reserva.disponibilidade
-        reserva.delete()  
-        disponibilidade.laboratorio.vagas += 1 
-        disponibilidade.save()
-        messages.success(request, "Reserva cancelada com sucesso!")
-    else:
-        messages.error(request, "Você não tem permissão para cancelar esta reserva.")
+    reserva.disponibilidade.laboratorio.vagas += 1
+    reserva.disponibilidade.laboratorio.save()
 
-    return redirect('reservas')
+    reserva.delete()
+
+    messages.success(request, "Reserva cancelada com sucesso.")
+    return redirect("reservas")
 
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
