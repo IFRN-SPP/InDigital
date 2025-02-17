@@ -433,7 +433,7 @@ color: #0D5355;
 flex: 2;
 }
 
-.reservation-box h2 {
+.reservation-box h3 {
 font-size: 1.2rem;
 margin-bottom: 15px;
 color: #0D5355;
@@ -813,4 +813,129 @@ a.btn.reserve {
 
 a.btn.btn-primary {
     background-color: #55B0B4;
+}
+
+div.nao-possui-reservas{
+    color: #0D5355;
+    font-size: 15px;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Cartão do formulário */
+.form-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+    margin: auto;
+}
+
+/* Título */
+h2 {
+    margin-bottom: 20px;
+    color: #0f2d2e;
+}
+
+/* Botões */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #55B0B4;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0D5355;
+}
+
+.btn-secondary {
+    background-color: #55B0B4;
+    color: white;
+    font-size: 13px;
+}
+
+.btn-secondary:hover {
+    background-color: #0D5355;
+}
+
+form.lab-form{
+    margin: auto;
+}
+
+/* Título */
+h2 {
+    color: #0D5355;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+/* Formulário estilizado */
+.styled-form {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+/* Botões */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Botão de salvar */
+.btn.save {
+    background-color: #55B0B4;
+    color: white;
+    border: 1px solid #28a745;
+}
+
+.btn.save:hover {
+    background-color: #0D5355;
+}
+
+/* Botão de voltar */
+.btn.cancel {
+    background-color: #55B0B4;
+    color: white;
+    border: 1px solid #55B0B4;
+}
+
+.btn.cancel:hover {
+    background-color: #0D5355;
 }

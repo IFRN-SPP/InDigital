@@ -3,11 +3,21 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h2>Editar Laboratório</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
-<a href="{% url 'listar_laboratorios' %}">Voltar</a>
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<div class="container">
+    <h2>Editar Laboratório</h2>
+
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form|crispy }}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn save">Salvar</button>
+            <a href="{% url 'listar_laboratorios' %}" class="btn cancel">Voltar</a>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
