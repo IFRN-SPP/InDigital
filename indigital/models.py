@@ -10,11 +10,12 @@ class Laboratorio(models.Model):
     
 class Disponibilidade(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
-    horario = models.TimeField()
+    horario_inicio = models.TimeField()
+    horario_fim = models.TimeField()
     data = models.DateField()
 
     class Meta:
-        unique_together = ('laboratorio', 'data', 'horario')
+        unique_together = ('laboratorio', 'data', 'horario_inicio', 'horario_fim')
 
     def __str__(self):
         return self.laboratorio.num_laboratorio

@@ -24,7 +24,7 @@
                 <tbody>
                     {% for reserva in reservas %}
                         <tr>
-                            <td>{{ reserva.horario|time:"H:i" }}</td>
+                            <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
                             <td>{{ reserva.laboratorio.num_laboratorio }}</td>
                             <td>{{ reserva.laboratorio.vagas }}</td>
                             <td>{{ reserva.data|date:"d/m/Y" }}</td>

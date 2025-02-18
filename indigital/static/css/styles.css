@@ -1270,3 +1270,18 @@ h2 {
     .btn-primary:hover {
         background-color: #0D5355;
     }
+
+/*perfil*/
+.foto-perfil {
+    width: 150px;  /* Define a largura */
+    height: 150px; /* Define a altura */
+    object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+    border-radius: 50%; /* Deixa a imagem redonda */
+    border: 2px solid black; /* Opcional: Adiciona uma borda sutil */
+}
+
+.perfil-foto {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

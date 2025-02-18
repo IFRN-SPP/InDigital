@@ -20,4 +20,4 @@ class EditarPerfilForm(forms.ModelForm):
                 choices=User._meta.get_field('turno').choices,
                 required=False
             )
-            self.fields['serie'] = forms.CharField(required=False)
+            self.fields['serie'] = forms.CharField(required=True, initial=self.instance.serie)
