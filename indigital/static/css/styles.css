@@ -50,6 +50,14 @@ header {
     gap: 30px;
 }
 
+.nav-links button{
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+;
+
+}
 .nav-links a {
     color: white;
     text-decoration: none;
@@ -538,7 +546,7 @@ color: #e0f7fa;
 .perfil-info p {
     margin: 8px 0;
 }
-.edit-button {
+.editar-botao {
     background:#55B0B4;
     color: white;
     border: none;
@@ -549,7 +557,7 @@ color: #e0f7fa;
     font-size: 16px;
     transition: background 0.3s;
 }
-.edit-button:hover {
+.editar-botao:hover {
     background: #55B0B4;
 }
 
@@ -938,4 +946,433 @@ h2 {
 
 .btn.cancel:hover {
     background-color: #0D5355;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.botao-salvar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.botao-salvar:hover {
+    background: #0D5355;
+}
+
+.botao-voltar {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #0D5355;
+    font-size: 16px;
+}
+
+.botao-voltar:hover {
+    text-decoration: underline;
+}
+
+.container-criar-reserva {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+.container-editar-reserva {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.botao-salvar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.botao-salvar:hover {
+    background: #0D5355;
+}
+
+.botao-voltar {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #0f2d2e;
+    font-size: 16px;
+}
+
+.botao-voltar:hover {
+    text-decoration: underline;
+}
+
+
+.excluir-reserva-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    margin: auto;
+}
+
+h2 {
+    color:#0f2d2e;
+    margin-bottom: 15px;
+}
+
+.excluir-reserva-mensagem {
+    color: #0f2d2e;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.excluir-reserva-detalhes {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.excluir-reserva-detalhes p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.excluir-reserva-botao-confirmar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 50%;
+    margin-bottom: 10px;
+    
+}
+
+.excluir-reserva-botao-confirmar:hover {
+    background: #0f2d2e;
+}
+
+.excluir-reserva-botao-cancelar {
+    
+    text-decoration: none;
+    color: #55B0B4;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 44%;
+    border: 1px solid #55B0B4;
+    text-align: center;
+    display: block;
+}
+
+.excluir-reserva-botao-cancelar:hover {
+    background: #0D5355;
+    color: white;
+}
+
+.laboratorios-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.laboratorio-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.laboratorio-info {
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.laboratorio-info label {
+    font-weight: bold;
+    color: #0f2d2e;
+}
+
+.laboratorio-info input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #e9ecef;
+    color: #0f2d2e;
+}
+
+.laboratorio-acoes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.laboratorio-botao-editar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.laboratorio-botao-editar:hover {
+    background: #0D5355;
+}
+
+.laboratorio-botao-excluir {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.laboratorio-botao-excluir:hover {
+    background: #0D5355;
+}
+
+.editar-laboratorio-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.editar-laboratorio-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.editar-laboratorio-campos {
+    margin-bottom: 15px;
+}
+
+.editar-laboratorio-acoes {
+    display: flex;
+    justify-content: space-between;
+}
+
+.editar-laboratorio-botao-salvar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.editar-laboratorio-botao-salvar:hover {
+    background: #0D5355;
+}
+
+.editar-laboratorio-botao-voltar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.editar-laboratorio-botao-voltar:hover {
+    background: #0D5355;
+}
+
+.excluir-laboratorio-container {
+    background: #fff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    margin: auto;
+
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.excluir-laboratorio-mensagem {
+    color: #0f2d2e;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.excluir-laboratorio-botao-confirmar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.excluir-laboratorio-botao-confirmar:hover {
+    background: #0D5355;
+}
+
+.excluir-laboratorio-botao-cancelar {
+    display: inline-block;
+    text-decoration: none;
+    color: #55B0B4;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid #55B0B4;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+}
+
+.excluir-laboratorio-botao-cancelar:hover {
+    background: #0D5355;
+    color: white;
+}
+
+.reservas-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 700px;
+    margin: auto;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.reservas-tabela table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.reservas-tabela th, .reservas-tabela td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.reservas-tabela th {
+    background-color: #55B0B4;
+    color: white;
+}
+
+.reservas-tabela tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.reservas-botao-cancelar {
+    background: #0D5355;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.reservas-botao-cancelar:hover {
+    background: #dc3545;
+}
+
+.reservas-nao-encontradas {
+    color: #777;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
 }
