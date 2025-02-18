@@ -13,6 +13,9 @@ class Disponibilidade(models.Model):
     horario = models.TimeField()
     data = models.DateField()
 
+    class Meta:
+        unique_together = ('laboratorio', 'data', 'horario')
+
     def __str__(self):
         return self.laboratorio.num_laboratorio
     
