@@ -163,6 +163,11 @@ def cancelar_reserva(request, reserva_id):
     messages.success(request, "Reserva cancelada com sucesso.")
     return redirect("reservas")
 
+@login_required
+def admin_minhas_reservas(request):
+    reservas = Reserva.objects.filter(usuario=request.user)
+    return render(request, 'admin_minhas_reservas.html', {'reservas': reservas})
+
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")
 

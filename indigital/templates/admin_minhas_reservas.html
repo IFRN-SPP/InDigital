@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="reservas-container">
+    <h2>Minhas Reservas (Admin)</h2>
+
+    {% if reservas %}
+        <div class="reservas-tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th>Laboratório</th>
+                        <th>Vagas</th>   
+                        <th>Data</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                        <tr>
+                            <td>{{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}</td>
+                            <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
+                            <td>{{ reserva.disponibilidade.laboratorio.vagas }}</td>
+                            <td>{{ reserva.disponibilidade.data|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'cancelar_reserva' reserva.id %}" class="reservas-botao-cancelar">Cancelar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="reservas-nao-encontradas">
+            <p>Você não possui reservas.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
