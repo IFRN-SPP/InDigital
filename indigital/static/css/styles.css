@@ -50,6 +50,14 @@ header {
     gap: 30px;
 }
 
+.nav-links button{
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+;
+
+}
 .nav-links a {
     color: white;
     text-decoration: none;
@@ -221,104 +229,6 @@ input:focus {
 .footer p {
     font-size: 10px;
     color: #0D5355;
-}
-
-/* esqueceu a senha */
-.reset-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5rem 2rem;
-    margin-top: 10rem; 
-}
-
-.reset-card {
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    padding: 2rem;
-    background-color: #55B0B4;
-    border-radius: 25px;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.reset-card label {
-    font-size: 2rem;
-}
-
-.reset-card h2 {
-    font-size: 2.8rem;
-    margin-bottom: 1.5rem;
-}
-
-.reset-card p {
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
-}
-
-.reset-card input {
-    width: 100%;
-    padding: 1rem;
-    margin: 1rem 0;
-    border: none;
-    border-bottom: 2px solid #ffffff;
-    background-color: transparent;
-    color: #0f2d2e;
-    font-size: 1.6rem;
-}
-
-.reset-card button {
-    width: 100%;
-    padding: 1rem;
-    background-color: white;
-    color: #55b0b4;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.6rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.reset-card .success-icon {
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-/* confirmacao da senha */
-.res-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5rem 2rem;
-    margin-top: 10rem; 
-}
-.res-card {
-background-color: #55B0B4;
-border-radius: 35px;
-padding: 2rem;
-width: 500px;
-text-align: center;
-color: white;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.res-success-icon {
-font-size: 3rem;
-margin-bottom: 1rem;
-}
-
-.res-card h2 {
-margin: 0;
-margin-bottom: 1rem;
-font-size: 1.5rem;
-}
-
-.res-card p {
-margin: 0;
-margin-bottom: 2rem;
-font-size: 1.3rem;
 }
 
 /* cadastro */
@@ -538,7 +448,8 @@ color: #e0f7fa;
 .perfil-info p {
     margin: 8px 0;
 }
-.edit-button {
+
+.editar-botao {
     background:#55B0B4;
     color: white;
     border: none;
@@ -549,9 +460,11 @@ color: #e0f7fa;
     font-size: 16px;
     transition: background 0.3s;
 }
-.edit-button:hover {
-    background: #55B0B4;
+.editar-botao:hover {
+    background: #0D5355;
 }
+
+/*gerenciamento de reservas*/
 
 .reservations-section {
 margin-bottom: 20px;
@@ -646,57 +559,8 @@ background-color: #55B0B4;
 .botao-mreserva i {
     font-size: 15px;
 }
-/* cancelar reserva */
 
-p.cancelar-reserva {
-    color: #0D5355;
-    font-size: 15px;
-    margin-bottom: 30px;
-}
-
-.buttons.excluir-conta {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-
-.button.cancelar-reserva {
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    display: inline-block;
-}
-
-.sim{
-    background-color: #55B0B4;
-}
-
-.nao {
-    background-color: #55B0B4;
-}
-
-.button.cancelar-reserva:hover {
-    opacity: 0.9;
-}
-
-.box-cancelar-reserva{
-    background-color: #BAE0E1;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-}
-
-h2.deseja-cancelar {
-    color: #0D5355;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
+/*editar reservas*/
 .container-editar-reserva {
     background-color: white;
     margin: auto;
@@ -756,70 +620,6 @@ th {
 
 .h2-listar{
     color: #0D5355;
-}
-
-/* criar reserva */
-
-.container-criar-reserva {
-    max-width: 500px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px #55B0B4;
-}
-h2 {
-    text-align: center;
-    color: #0D5355;
-}
-label {
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
-}
-input, select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-button-criar-reserva{
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    background-color: #55b0b4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: #4a8c8f;
-}
-
-.btn.cancel {
-    background-color: #55B0B4;
-}
-
-.container-editar-perfil{
-    margin: auto;
-    width: 400px;
-}
-
-a.btn.reserve {
-    background-color: #55B0B4;
-}
-
-a.btn.btn-primary {
-    background-color: #55B0B4;
-}
-
-div.nao-possui-reservas{
-    color: #0D5355;
-    font-size: 15px;
-    text-align: center;
-    padding: 10px;
 }
 
 /* Cartão do formulário */
@@ -939,3 +739,534 @@ h2 {
 .btn.cancel:hover {
     background-color: #0D5355;
 }
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.botao-salvar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.botao-salvar:hover {
+    background: #0D5355;
+}
+
+.botao-voltar {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #0D5355;
+    font-size: 16px;
+}
+
+.botao-voltar:hover {
+    text-decoration: underline;
+}
+
+.container-criar-reserva {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    margin: auto;
+}
+
+.container-editar-reserva {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.botao-salvar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.botao-salvar:hover {
+    background: #0D5355;
+}
+
+.botao-voltar {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #0f2d2e;
+    font-size: 16px;
+}
+
+.botao-voltar:hover {
+    text-decoration: underline;
+}
+
+
+.excluir-reserva-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    margin: auto;
+}
+
+h2 {
+    color:#0f2d2e;
+    margin-bottom: 15px;
+}
+
+.excluir-reserva-mensagem {
+    color: #0f2d2e;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.excluir-reserva-detalhes {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.excluir-reserva-detalhes p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.excluir-reserva-botao-confirmar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 50%;
+    margin-bottom: 10px;
+    
+}
+
+.excluir-reserva-botao-confirmar:hover {
+    background: #0f2d2e;
+}
+
+.excluir-reserva-botao-cancelar {
+    
+    text-decoration: none;
+    color: #55B0B4;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 44%;
+    border: 1px solid #55B0B4;
+    text-align: center;
+    display: block;
+}
+
+.excluir-reserva-botao-cancelar:hover {
+    background: #0D5355;
+    color: white;
+}
+
+.laboratorios-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+.laboratorio-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.laboratorio-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.laboratorio-info {
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.laboratorio-info label {
+    font-weight: bold;
+    color: #0f2d2e;
+}
+
+.laboratorio-info input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #e9ecef;
+    color: #0f2d2e;
+}
+
+.laboratorio-acoes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.laboratorio-botao-editar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.laboratorio-botao-editar:hover {
+    background: #0D5355;
+}
+
+.laboratorio-botao-excluir {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.laboratorio-botao-excluir:hover {
+    background: #0D5355;
+}
+
+.editar-laboratorio-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.editar-laboratorio-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.editar-laboratorio-campos {
+    margin-bottom: 15px;
+}
+
+.editar-laboratorio-acoes {
+    display: flex;
+    justify-content: space-between;
+}
+
+.editar-laboratorio-botao-salvar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.editar-laboratorio-botao-salvar:hover {
+    background: #0D5355;
+}
+
+.editar-laboratorio-botao-voltar {
+    background: #55B0B4;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.editar-laboratorio-botao-voltar:hover {
+    background: #0D5355;
+}
+
+.excluir-laboratorio-container {
+    background: #fff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    margin: auto;
+
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.excluir-laboratorio-mensagem {
+    color: #0f2d2e;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.excluir-laboratorio-botao-confirmar {
+    background: #55B0B4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.excluir-laboratorio-botao-confirmar:hover {
+    background: #0D5355;
+}
+
+.excluir-laboratorio-botao-cancelar {
+    display: inline-block;
+    text-decoration: none;
+    color: #55B0B4;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid #55B0B4;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+}
+
+.excluir-laboratorio-botao-cancelar:hover {
+    background: #0D5355;
+    color: white;
+}
+
+.reservas-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 700px;
+    margin: auto;
+}
+
+h2 {
+    color: #0f2d2e;
+    margin-bottom: 15px;
+}
+
+.reservas-tabela table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.reservas-tabela th, .reservas-tabela td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.reservas-tabela th {
+    background-color: #55B0B4;
+    color: white;
+}
+
+.reservas-tabela tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.reservas-botao-cancelar {
+    background: #0D5355;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.reservas-botao-cancelar:hover {
+    background: #dc3545;
+}
+
+.reservas-nao-encontradas {
+    color: #777;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.reset-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 2rem;
+    margin-top: 10rem; 
+}
+.reset-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+.reset-card h2 {
+    margin-bottom: 10px;
+    color: #0D5355;
+}
+.reset-card p {
+    color: #666;
+    margin-bottom: 20px;
+}
+.reset-card input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.reset-card button {
+    width: 100%;
+    padding: 10px;
+    background: #55B0B4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.reset-card button:hover {
+    background: #0D5355;
+}
+
+/*editar perfil*/
+
+.container-editar-perfil {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .form-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+    .form-group p {
+        margin-bottom: 15px;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .cadastrar-button {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .btn-primary {
+        padding: 10px 20px;
+        background-color: #55B0B4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btn-primary:hover {
+        background-color: #0D5355;
+    }

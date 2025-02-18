@@ -3,14 +3,21 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h2>Excluir Reserva</h2>
-<p>Tem certeza que deseja excluir essa reserva?</p>
-    <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
-    <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
-    <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirmar</button>
-</form>
-<a href="{% url 'listar_reservas' %}">Cancelar</a>
+<div class="excluir-reserva-container">
+    <h2>Excluir Reserva</h2>
+    <p class="excluir-reserva-mensagem">Tem certeza que deseja excluir essa reserva?</p>
+    
+    <div class="excluir-reserva-detalhes">
+        <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
+        <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
+        <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="excluir-reserva-botao-confirmar">Confirmar</button>
+    </form>
+    <a href="{% url 'listar_reservas' %}" class="excluir-reserva-botao-cancelar">Cancelar</a>
+</div>
+
 {% endblock %}

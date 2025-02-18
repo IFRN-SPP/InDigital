@@ -5,17 +5,17 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
-<div class="container">
+<div class="editar-laboratorio-container">
     <h2>Editar Laboratório</h2>
 
-    <form method="post" class="styled-form">
+    <form method="post" class="editar-laboratorio-form">
         {% csrf_token %}
-        <div class="form-group">
+        <div class="editar-laboratorio-campos">
             {{ form|crispy }}
         </div>
-        <div class="form-actions">
-            <button type="submit" class="btn save">Salvar</button>
-            <a href="{% url 'listar_laboratorios' %}" class="btn cancel">Voltar</a>
+        <div class="editar-laboratorio-acoes">
+            <button type="submit" class="editar-laboratorio-botao-salvar">Salvar</button>
+            <a href="{% url 'listar_laboratorios' %}" class="editar-laboratorio-botao-voltar">Voltar</a>
         </div>
     </form>
 </div>

@@ -2,11 +2,14 @@
 {% load static %}
 
 {% block content %}
-<h2>Excluir Laboratório</h2>
-<p>Tem certeza que deseja excluir o laboratório "{{ laboratorio.num_laboratorio }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirmar</button>
-</form>
-<a href="{% url 'listar_laboratorios' %}">Cancelar</a>
+<div class="excluir-laboratorio-container">
+    <h2>Excluir Laboratório</h2>
+    <p class="excluir-laboratorio-mensagem">Tem certeza que deseja excluir o laboratório "{{ laboratorio.num_laboratorio }}"?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="excluir-laboratorio-botao-confirmar">Confirmar</button>
+    </form>
+    <a href="{% url 'listar_laboratorios' %}" class="excluir-laboratorio-botao-cancelar">Cancelar</a>
+</div>
 {% endblock %}
