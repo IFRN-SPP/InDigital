@@ -231,104 +231,6 @@ input:focus {
     color: #0D5355;
 }
 
-/* esqueceu a senha */
-.reset-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5rem 2rem;
-    margin-top: 10rem; 
-}
-
-.reset-card {
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    padding: 2rem;
-    background-color: #55B0B4;
-    border-radius: 25px;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.reset-card label {
-    font-size: 2rem;
-}
-
-.reset-card h2 {
-    font-size: 2.8rem;
-    margin-bottom: 1.5rem;
-}
-
-.reset-card p {
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
-}
-
-.reset-card input {
-    width: 100%;
-    padding: 1rem;
-    margin: 1rem 0;
-    border: none;
-    border-bottom: 2px solid #ffffff;
-    background-color: transparent;
-    color: #0f2d2e;
-    font-size: 1.6rem;
-}
-
-.reset-card button {
-    width: 100%;
-    padding: 1rem;
-    background-color: white;
-    color: #55b0b4;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.6rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.reset-card .success-icon {
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-/* confirmacao da senha */
-.res-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5rem 2rem;
-    margin-top: 10rem; 
-}
-.res-card {
-background-color: #55B0B4;
-border-radius: 35px;
-padding: 2rem;
-width: 500px;
-text-align: center;
-color: white;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.res-success-icon {
-font-size: 3rem;
-margin-bottom: 1rem;
-}
-
-.res-card h2 {
-margin: 0;
-margin-bottom: 1rem;
-font-size: 1.5rem;
-}
-
-.res-card p {
-margin: 0;
-margin-bottom: 2rem;
-font-size: 1.3rem;
-}
-
 /* cadastro */
 .container-cadastro {
     background-color: white;
@@ -546,6 +448,7 @@ color: #e0f7fa;
 .perfil-info p {
     margin: 8px 0;
 }
+
 .editar-botao {
     background:#55B0B4;
     color: white;
@@ -558,8 +461,10 @@ color: #e0f7fa;
     transition: background 0.3s;
 }
 .editar-botao:hover {
-    background: #55B0B4;
+    background: #0D5355;
 }
+
+/*gerenciamento de reservas*/
 
 .reservations-section {
 margin-bottom: 20px;
@@ -654,57 +559,8 @@ background-color: #55B0B4;
 .botao-mreserva i {
     font-size: 15px;
 }
-/* cancelar reserva */
 
-p.cancelar-reserva {
-    color: #0D5355;
-    font-size: 15px;
-    margin-bottom: 30px;
-}
-
-.buttons.excluir-conta {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-
-.button.cancelar-reserva {
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    display: inline-block;
-}
-
-.sim{
-    background-color: #55B0B4;
-}
-
-.nao {
-    background-color: #55B0B4;
-}
-
-.button.cancelar-reserva:hover {
-    opacity: 0.9;
-}
-
-.box-cancelar-reserva{
-    background-color: #BAE0E1;
-    border-radius: 25px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-}
-
-h2.deseja-cancelar {
-    color: #0D5355;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
+/*editar reservas*/
 .container-editar-reserva {
     background-color: white;
     margin: auto;
@@ -764,70 +620,6 @@ th {
 
 .h2-listar{
     color: #0D5355;
-}
-
-/* criar reserva */
-
-.container-criar-reserva {
-    max-width: 500px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px #55B0B4;
-}
-h2 {
-    text-align: center;
-    color: #0D5355;
-}
-label {
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
-}
-input, select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-button-criar-reserva{
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    background-color: #55b0b4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: #4a8c8f;
-}
-
-.btn.cancel {
-    background-color: #55B0B4;
-}
-
-.container-editar-perfil{
-    margin: auto;
-    width: 400px;
-}
-
-a.btn.reserve {
-    background-color: #55B0B4;
-}
-
-a.btn.btn-primary {
-    background-color: #55B0B4;
-}
-
-div.nao-possui-reservas{
-    color: #0D5355;
-    font-size: 15px;
-    text-align: center;
-    padding: 10px;
 }
 
 /* Cartão do formulário */
@@ -1001,6 +793,7 @@ input, select, textarea {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 350px;
+    margin: auto;
 }
 
 .container-editar-reserva {
@@ -1129,6 +922,16 @@ h2 {
 }
 
 .laboratorios-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+}
+
+.laboratorio-container {
     background: #fff;
     padding: 30px;
     border-radius: 10px;
@@ -1376,3 +1179,94 @@ h2 {
     font-weight: bold;
     margin-top: 20px;
 }
+
+.reset-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 2rem;
+    margin-top: 10rem; 
+}
+.reset-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+.reset-card h2 {
+    margin-bottom: 10px;
+    color: #0D5355;
+}
+.reset-card p {
+    color: #666;
+    margin-bottom: 20px;
+}
+.reset-card input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.reset-card button {
+    width: 100%;
+    padding: 10px;
+    background: #55B0B4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.reset-card button:hover {
+    background: #0D5355;
+}
+
+/*editar perfil*/
+
+.container-editar-perfil {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .form-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-header h1 {
+        color: #333;
+        font-size: 24px;
+    }
+    .form-group p {
+        margin-bottom: 15px;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .cadastrar-button {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .btn-primary {
+        padding: 10px 20px;
+        background-color: #55B0B4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btn-primary:hover {
+        background-color: #0D5355;
+    }
