@@ -55,9 +55,12 @@ header {
     border: none;
     color: white;
     font-size: 1.5rem;
-;
-
 }
+
+.nav-links button:hover {
+    color: #2a4d4f;
+}
+
 .nav-links a {
     color: white;
     text-decoration: none;
@@ -556,6 +559,14 @@ background-color: #55B0B4;
     background: #55B0B4;
 }
 
+a.botao-mreserva {
+    background: #4a8c8f;
+}
+
+a.botao-mreserva:hover {
+    background: #55B0B4;
+}
+
 .botao-mreserva i {
     font-size: 15px;
 }
@@ -570,6 +581,8 @@ background-color: #55B0B4;
     width: 100%;
     max-width: 400px;
 }
+
+
 
 .container-cancelar-reserva {
     background-color: white;
@@ -611,10 +624,19 @@ th {
     color: white;
     border-radius: 4px;
 }
-.edit {
+a.btn.edit {
     background-color: #0D5355;
 }
-.delete {
+
+a.btn.edit:hover{
+    background-color: #55B0B4;
+}
+
+a.btn.delete {
+    background-color: #0D5355;
+}
+
+a.btn.delete:hover{
     background-color: #dc3545;
 }
 
@@ -722,7 +744,6 @@ h2 {
 .btn.save {
     background-color: #55B0B4;
     color: white;
-    border: 1px solid #28a745;
 }
 
 .btn.save:hover {
