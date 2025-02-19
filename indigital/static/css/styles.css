@@ -378,49 +378,11 @@ border: none;
 border-radius: 5px;
 cursor: pointer;
 font-size: 1rem;
+margin: auto;
 }
 
 button.reserve:hover{
     background-color: #55B0B4;
-}
-
-.confirmation-container {
-background-color: #0D5355;
-width: 350px;
-border-radius: 20px;
-padding: 45px;
-text-align: center;
-color: #ffffff;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.confirmation-header {
-background-color: #BAE0E1;
-padding: 40px;
-border-radius: 15px 15px 0 0;
-margin: -30px -30px 20px -30px;
-}
-
-.confirmation-header h1 {
-font-size: 1.5rem;
-color: #0D5355;
-margin-bottom: 10px;
-}
-
-.confirmation-header .icon img {
-width: 40px;
-height: 40px;
-}
-
-.confirmation-details p {
-font-size: 1rem;
-margin: 5px 0;
-color: #e0f7fa;
-}
-
-.confirmation-message {
-font-size: 0.9rem;
-color: #e0f7fa;
 }
 
 /* perfil */
@@ -581,8 +543,6 @@ a.botao-mreserva:hover {
     width: 100%;
     max-width: 400px;
 }
-
-
 
 .container-cancelar-reserva {
     background-color: white;
@@ -872,7 +832,6 @@ input, select, textarea {
     text-decoration: underline;
 }
 
-
 .excluir-reserva-container {
     background: #fff;
     padding: 30px;
@@ -907,7 +866,7 @@ h2 {
     color: #555;
 }
 
-.excluir-reserva-botao-confirmar {
+button.excluir-reserva-botao-confirmar {
     background: #55B0B4;
     color: white;
     border: none;
@@ -916,7 +875,7 @@ h2 {
     cursor: pointer;
     font-size: 16px;
     width: 50%;
-    margin-bottom: 10px;
+    margin: auto;
     
 }
 
@@ -924,8 +883,7 @@ h2 {
     background: #0f2d2e;
 }
 
-.excluir-reserva-botao-cancelar {
-    
+a.excluir-reserva-botao-cancelar {
     text-decoration: none;
     color: #55B0B4;
     font-size: 16px;
@@ -933,23 +891,15 @@ h2 {
     border-radius: 5px;
     width: 44%;
     border: 1px solid #55B0B4;
-    text-align: center;
+    
     display: block;
+    margin: auto;
+    margin-top: 15px;
 }
 
 .excluir-reserva-botao-cancelar:hover {
     background: #0D5355;
     color: white;
-}
-
-.laboratorios-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 400px;
-    margin: auto;
 }
 
 .laboratorio-container {
@@ -962,51 +912,93 @@ h2 {
     margin: auto;
 }
 
-h2 {
-    color: #0f2d2e;
-    margin-bottom: 15px;
+.laboratorios-container {
+    background: #fff;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    text-align: center;
+    width: 90%;
+    max-width: 450px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Título */
+h2 {
+    color: #0D5355;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+/* Formulário */
 .laboratorio-form {
     background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
+/* Informações do laboratório */
 .laboratorio-info {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     text-align: left;
+    width: 100%;
 }
 
 .laboratorio-info label {
     font-weight: bold;
-    color: #0f2d2e;
+    color: #0D5355;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .laboratorio-info input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 16px;
     background: #e9ecef;
-    color: #0f2d2e;
+    color: #0D5355;
+    transition: border-color 0.3s;
+}
+
+.laboratorio-info input:focus {
+    border-color: #55B0B4;
+    outline: none;
+    background: #ffffff;
+    box-shadow: 0 0 5px rgba(85, 176, 180, 0.5);
 }
 
 .laboratorio-acoes {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    gap: 10px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.laboratorio-botao-editar,
+.laboratorio-botao-excluir {
+    width: 100%;
+    max-width: 150px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .laboratorio-botao-editar {
     background: #55B0B4;
-    color: white;
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    transition: background 0.3s;
 }
 
 .laboratorio-botao-editar:hover {
@@ -1014,16 +1006,11 @@ h2 {
 }
 
 .laboratorio-botao-excluir {
-    background: #55B0B4;
-    color: white;
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    transition: background 0.3s;
+    background: #dc3545;
 }
 
 .laboratorio-botao-excluir:hover {
-    background: #0D5355;
+    background: #a71d2a;
 }
 
 .editar-laboratorio-container {
@@ -1089,54 +1076,62 @@ h2 {
 
 .excluir-laboratorio-container {
     background: #fff;
-    padding: 50px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     text-align: center;
-    width: 350px;
+    width: 90%;
+    max-width: 400px;
     margin: auto;
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 h2 {
-    color: #0f2d2e;
-    margin-bottom: 15px;
+    color: #0D5355;
+    margin-bottom: 20px;
+    font-size: 22px;
 }
 
 .excluir-laboratorio-mensagem {
-    color: #0f2d2e;
-    font-weight: bold;
-    margin-bottom: 15px;
+    color: #0D5355;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.excluir-laboratorio-botao-confirmar,
+.excluir-laboratorio-botao-cancelar {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .excluir-laboratorio-botao-confirmar {
     background: #55B0B4;
     color: white;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s;
-    width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .excluir-laboratorio-botao-confirmar:hover {
     background: #0D5355;
+    
 }
 
 .excluir-laboratorio-botao-cancelar {
-    display: inline-block;
-    text-decoration: none;
+    background: white;
     color: #55B0B4;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 5px;
-    width: 100%;
-    border: 1px solid #55B0B4;
-    text-align: center;
-    transition: background 0.3s, color 0.3s;
+    border: 2px solid #55B0B4;
 }
 
 .excluir-laboratorio-botao-cancelar:hover {
@@ -1257,28 +1252,34 @@ h2 {
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    .form-header {
+
+.form-header {
         text-align: center;
         margin-bottom: 20px;
     }
-    .form-header h1 {
+
+.form-header h1 {
         color: #333;
         font-size: 24px;
     }
-    .form-group p {
+
+.form-group p {
         margin-bottom: 15px;
     }
-    .form-group input, .form-group textarea, .form-group select {
+
+.form-group input, .form-group textarea, .form-group select {
         width: 100%;
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
     }
-    .cadastrar-button {
+
+.cadastrar-button {
         text-align: center;
         margin-top: 20px;
     }
-    .btn-primary {
+
+.btn-primary {
         padding: 10px 20px;
         background-color: #55B0B4;
         color: white;
@@ -1288,17 +1289,18 @@ h2 {
         cursor: pointer;
         transition: background 0.3s;
     }
-    .btn-primary:hover {
+
+.btn-primary:hover {
         background-color: #0D5355;
     }
 
 /*perfil*/
 .foto-perfil {
-    width: 150px;  /* Define a largura */
-    height: 150px; /* Define a altura */
-    object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
-    border-radius: 50%; /* Deixa a imagem redonda */
-    border: 2px solid black; /* Opcional: Adiciona uma borda sutil */
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid black;
 }
 
 .perfil-foto {
