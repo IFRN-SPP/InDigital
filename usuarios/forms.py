@@ -15,7 +15,7 @@ class EditarPerfilForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not self.instance.is_staff:
+        if self.instance and not (self.instance.is_staff or self.instance.is_superuser):            
             self.fields['turno'] = forms.ChoiceField(
                 choices=User._meta.get_field('turno').choices,
                 required=False

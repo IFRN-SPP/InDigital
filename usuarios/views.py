@@ -25,7 +25,7 @@ def perfil(request):
 def editar_perfil(request):
     usuario = request.user
     if request.method == "POST":
-        form = EditarPerfilForm(request.POST, request.FILES, instance=usuario)  # Captura arquivos enviados
+        form = EditarPerfilForm(request.POST, request.FILES, instance=usuario)
         if form.is_valid():
             form.save()
             messages.success(request, "Perfil atualizado com sucesso!")

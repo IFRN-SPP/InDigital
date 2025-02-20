@@ -26,17 +26,17 @@
                 {% for reserva in reservas %}
                     <tr>
                         <th scope="row">{{ reserva.id }}</th>
-                        <td>{{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}</td>
+                        <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
                         <td>{{ reserva.laboratorio }}</td>
                         <td>{{ reserva.laboratorio.vagas }}</td>
                         <td>{{ reserva.data|date:"d/m/Y" }}</td>
     
                         <td>
                             {% if perms.indigital.editar_reserva %}
-                                <a href="{% url 'editar_reserva' reserva.id %}" class="btn edit">Editar</a>
+                                <a href="{% url 'editar_disponibilidade' reserva.id %}" class="btn edit">Editar</a>
                             {% endif %}
                             {% if perms.indigital.excluir_reserva %}
-                                <a href="{% url 'excluir_reserva' reserva.id %}" class="btn delete">Excluir</a>
+                                <a href="{% url 'excluir_disponibilidade' reserva.id %}" class="btn delete">Excluir</a>
                             {% endif %}
                         </td>
                     </tr>

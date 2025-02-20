@@ -10,25 +10,25 @@ def index(request):
 # crud de disponibilidade
 
 @login_required
-@permission_required('indigital.criar_reserva', raise_exception=True)
-def criar_reserva(request):
+@permission_required('indigital.criar_disponibilidade', raise_exception=True)
+def criar_disponibilidade(request):
     laboratorios = Laboratorio.objects.all()
     if request.method == "POST":
         form = DisponibilidadeForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Reserva cadastrada com sucesso!')
+            messages.success(request, 'Disponibilidade cadastrada com sucesso!')
             return redirect('horarios')
         else:
-            messages.error(request, 'Erro ao cadastrar reserva!')
+            messages.error(request, 'Erro ao cadastrar nova disponibilidade!')
     else:
         form = DisponibilidadeForm()
     
-    return render(request, "criar_reserva.html", {'form' : form, "laboratorios": laboratorios})
+    return render(request, "criar_disponibilidade.html", {'form' : form, "laboratorios": laboratorios})
 
 @login_required
 @permission_required('indigital.editar_reserva', raise_exception=True)
-def editar_reserva(request, reserva_id):
+def editar_disponibilidade(request, reserva_id):
     reserva = get_object_or_404(Disponibilidade, id=reserva_id)
 
     context = {
@@ -41,29 +41,29 @@ def editar_reserva(request, reserva_id):
         form = DisponibilidadeForm(request.POST, instance=reserva)
         if form.is_valid():
             form.save()
-            return redirect('listar_reservas')
+            return redirect('listar_disponibilidades')
         else:
             context["form"] = form
     
-    return render(request, "editar_reserva.html", context)
+    return render(request, "editar_disponibilidade.html", context)
 
 @login_required
-def listar_reservas(request):
+def listar_disponibilidades(request):
     reserva = Disponibilidade.objects.all()
-    return render(request, "listar_reservas.html", {'reservas' : reserva})
+    return render(request, "listar_disponibilidades.html", {'reservas' : reserva})
 
 @login_required
-@permission_required('indigital.excluir_reserva', raise_exception=True)
-def excluir_reserva(request, reserva_id):
+@permission_required('indigital.excluir_disponibilidade', raise_exception=True)
+def excluir_disponibilidade(request, reserva_id):
     context = {
         "reserva": get_object_or_404(Disponibilidade, id=reserva_id)
     }
 
     if request.method == "POST":
         context["reserva"].delete()
-        return redirect('listar_reservas')
+        return redirect('listar_disponibilidade')
     else:
-        return render(request, "excluir_reserva.html", context)
+        return render(request, "excluir_disponibilidade.html", context)
 
 # crud laboratorio
 
@@ -145,7 +145,7 @@ def reservar_laboratorio(request, disponibilidade_id):
 
 @login_required
 def reservas(request):
-    if request.user.is_staff:
+    if request.user.is_superuser:
         return render(request, "admin_reservas.html")
     
     reservas = Reserva.objects.filter(usuario=request.user)

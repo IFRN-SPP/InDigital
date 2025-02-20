@@ -3,10 +3,10 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('listar/reservas/', views.listar_reservas, name='listar_reservas'),
-    path('criar/reserva/', views.criar_reserva, name='criar_reserva'),
-    path('reserva/<int:reserva_id>/editar', views.editar_reserva, name='editar_reserva'),
-    path('reserva/<int:reserva_id>/excluir', views.excluir_reserva, name="excluir_reserva"),
+    path('listar/disponibilidades/', views.listar_disponibilidades, name='listar_disponibilidades'),
+    path('criar/disponibilidade/', views.criar_disponibilidade, name='criar_disponibilidade'),
+    path('reserva/<int:reserva_id>/editar', views.editar_disponibilidade, name='editar_disponibilidade'),
+    path('reserva/<int:reserva_id>/excluir', views.excluir_disponibilidade, name="excluir_disponibilidade"),
     path('listar/laboratorios/', views.listar_laboratorios, name='listar_laboratorios'),
     path('criar/laboratorio/', views.criar_laboratorio, name='criar_laboratorio'),
     path('laboratorio/<int:laboratorio_id>/editar', views.editar_laboratorio, name='editar_laboratorio'),
