@@ -20,7 +20,7 @@
     <nav class="nav-links">
         {% if request.user.is_authenticated%}
         <div class="icon-x">
-            <span>Bem-vindo (a), <strong>{{ request.user }}</strong>!</span>
+            <span>Bem-vindo (a), <a href="{% url 'perfil' %}"><strong>{{ request.user }}</strong></a>!</span>
             <a href="{% url 'perfil' %}" class="fas fa-user"></a>
         </div>
         <a href="{% url 'index' %}"> Home</a>
