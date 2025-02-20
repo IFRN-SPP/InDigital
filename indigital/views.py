@@ -41,9 +41,11 @@ def editar_disponibilidade(request, reserva_id):
         form = DisponibilidadeForm(request.POST, instance=reserva)
         if form.is_valid():
             form.save()
+            messages.success(request, "Disponibilidade editada com sucesso!")
             return redirect('listar_disponibilidades')
         else:
             context["form"] = form
+            messages.error(request, "Erro ao editar disponibilidade!")
     
     return render(request, "editar_disponibilidade.html", context)
 
@@ -61,6 +63,7 @@ def excluir_disponibilidade(request, reserva_id):
 
     if request.method == "POST":
         context["reserva"].delete()
+        messages.success(request, "Disponibilidade excluída com sucesso!")
         return redirect('listar_disponibilidade')
     else:
         return render(request, "excluir_disponibilidade.html", context)
@@ -97,9 +100,12 @@ def editar_laboratorio(request, laboratorio_id):
         form = LaboratorioForm(request.POST, instance=laboratorio)
         if form.is_valid():
             form.save()
+            messages.success(request, "Laboratório editado com sucesso!")
             return redirect('listar_laboratorios')
         else:
             context["form"] = form
+            messages.error(request, "Erro ao editar laboratório!")
+
     return render(request, "editar_laboratorio.html", context)
 
 @login_required
@@ -113,6 +119,7 @@ def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
     if request.method == "POST":
         laboratorio.delete()
+        messages.success(request, "Laboratório excluído com sucesso!")
         return redirect('listar_laboratorios')
     else:
         return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
@@ -160,7 +167,7 @@ def cancelar_reserva(request, reserva_id):
 
     reserva.delete()
 
-    messages.success(request, "Reserva cancelada com sucesso.")
+    messages.success(request, "Sua reserva foi cancelada com sucesso!")
     return redirect("reservas")
 
 @login_required
