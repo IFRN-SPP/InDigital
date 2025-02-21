@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+<a href="javascript:history.back()" class="btn-voltar">
+    <i class="fas fa-arrow-left"></i>    Voltar
+</a>
 <div class="reservas-container">
     <h2>Minhas Reservas</h2>
 
@@ -33,6 +36,7 @@
             </table>
         </div>
     {% else %}
+    
         <div class="reservas-nao-encontradas">
             <p>Você não possui reservas.</p>
         </div>

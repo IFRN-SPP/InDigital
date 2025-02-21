@@ -26,7 +26,7 @@
         </div>
         <a href="{% url 'index' %}"> Home</a>
         <a href="{% url 'horarios' %}"> Horários</a>
-        <a href="{% url 'reservas' %}"> Reservas</a>
+        <a href="{% url 'reservas' %}"> Gerenciar  Reservas</a>
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Sair</button>

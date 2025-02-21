@@ -1308,3 +1308,23 @@ h2 {
     justify-content: center;
     align-items: center;
 }
+
+.btn-voltar {
+    position: absolute;
+    top: 70px; /* Distância do topo */
+    left: 10px; /* Distância da esquerda */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #0D5355;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+
