@@ -64,7 +64,7 @@ def excluir_disponibilidade(request, reserva_id):
     if request.method == "POST":
         context["reserva"].delete()
         messages.success(request, "Disponibilidade excluída com sucesso!")
-        return redirect('listar_disponibilidade')
+        return redirect('listar_disponibilidades')
     else:
         return render(request, "excluir_disponibilidade.html", context)
 
