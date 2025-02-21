@@ -9,7 +9,7 @@ def cadastro(request):
         form = CadastroForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Usuário cadastrado com sucesso!')
+            messages.success(request, 'Usuário cadastrado com sucesso! Faça login para acessar o sistema.')
             return redirect('login')
     else:
         form = CadastroForm()
@@ -30,6 +30,8 @@ def editar_perfil(request):
             form.save()
             messages.success(request, "Perfil atualizado com sucesso!")
             return redirect('perfil')
+        else:
+            messages.error(request, "Erro ao atualizar o perfil. Por favor, corrija os erros!")
     else:
         form = EditarPerfilForm(instance=usuario)
 
