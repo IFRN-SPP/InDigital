@@ -2,10 +2,13 @@
 {% load static %}
 
 {% block content %}
+<a href="javascript:history.back()" class="btn-voltar">
+    <i class="fas fa-arrow-left"></i>    Voltar
+</a>
 <div class="laboratorios-container">
     <h2>Lista de Laboratórios</h2>
     
-    {% for laboratorio in laboratorios %}
+    {% for laboratorio in laboratorios %}   
     <form class="laboratorio-form">
         <div class="laboratorio-info">
             <label>Número:</label>
