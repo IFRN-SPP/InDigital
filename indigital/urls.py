@@ -17,5 +17,5 @@ urlpatterns = [
     path('cancelar_reserva/<int:reserva_id>/', views.cancelar_reserva, name='cancelar_reserva'),
     path('esqueceuasenha', views.esqueceuasenha, name='esqueceuasenha'),
     path('confirmacaodasenha', views.confirmacaodasenha, name='confirmacaodasenha'),
-    path('admin/minhas/reservas/', views.admin_minhas_reservas, name='admin_minhas_reservas'),
+    path('minhas/reservas/', views.minhas_reservas, name='minhas_reservas'),
 ]

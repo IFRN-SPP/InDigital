@@ -148,15 +148,12 @@ def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade.laboratorio.save()
 
     messages.success(request, "Reserva realizada com sucesso!")
-    return redirect("reservas")
+    return redirect("minhas_reservas")
 
 @login_required
 def reservas(request):
-    if request.user.is_superuser:
-        return render(request, "admin_reservas.html")
-    
     reservas = Reserva.objects.filter(usuario=request.user)
-    return render(request, "user_reservas.html", {"reservas": reservas})
+    return render(request, "gerenciar_reservas.html", {"reservas": reservas})
 
 @login_required
 def cancelar_reserva(request, reserva_id):
@@ -168,12 +165,12 @@ def cancelar_reserva(request, reserva_id):
     reserva.delete()
 
     messages.success(request, "Sua reserva foi cancelada com sucesso!")
-    return redirect("reservas")
+    return redirect("minhas_reservas")
 
 @login_required
-def admin_minhas_reservas(request):
+def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
-    return render(request, 'admin_minhas_reservas.html', {'reservas': reservas})
+    return render(request, 'minhas_reservas.html', {'reservas': reservas})
 
 def esqueceuasenha(request):
     return render(request, "esqueceuasenha.html")

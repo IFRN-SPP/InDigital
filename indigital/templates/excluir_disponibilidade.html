@@ -9,7 +9,7 @@
     
     <div class="excluir-reserva-detalhes">
         <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
-        <p><strong>Horário:</strong> {{ reserva.horario|time:"H:i" }}</p>
+        <p><strong>Horário:</strong> {{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</p>
         <p><strong>Data:</strong> {{ reserva.data|date:"d/m/Y" }}</p>
     </div>
 
