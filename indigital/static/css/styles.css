@@ -134,7 +134,7 @@ body {
 .login-container {
     margin: auto; 
     width: 350px;
-    background-color: white;
+    background-color: #f8f9fa;
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -158,6 +158,7 @@ a.forgot-password{
     font-size: 26px;
     color: #55B0B4;
     margin-top: 10px;
+    font-weight: bold;
 }
 
 .login-form label {
@@ -249,7 +250,7 @@ input:focus {
 
 /* cadastro */
 .container-cadastro {
-    background-color: white;
+    background-color: #f8f9fa;
     margin: auto;
     padding: 30px;
     border-radius: 10px;
@@ -321,7 +322,7 @@ a.botao-voltar{
 
 /* reserva */
 .container-reserva {
-background-color: white;
+background-color: #f8f9fa;
 width: 800px;
 padding: 50px;
 margin: auto;
@@ -380,7 +381,7 @@ button.reserve:hover{
 
 /* Container principal */
 .perfil-container {
-    background-color:white;
+    background-color:#f8f9fa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 30px;
     width: 40%;
@@ -451,7 +452,7 @@ button.reserve:hover{
     background-color: #0D5355;
     color: white;
     text-decoration: none;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     border-radius: 8px;
     
 }
@@ -592,7 +593,7 @@ a.botao-mreserva:hover {
 .container-listar-reservas {
     max-width: 1200px;
     margin: auto;
-    background: white;
+    background: #f8f9fa;
     padding: 60px;  
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1)
@@ -836,7 +837,7 @@ input, select, textarea {
 }
 
 .container-criar-disponibilidade {
-    background: #fff;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -866,7 +867,7 @@ input, select, textarea {
 }
 
 .container-editar-reserva {
-    background: #fff;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -911,7 +912,7 @@ input, select, textarea {
 
 
 .botao-salvar {
-    background: #55B0B4;
+    background: #0D5355;
     color: white;
     border: none;
     padding: 10px;
@@ -922,7 +923,7 @@ input, select, textarea {
 }
 
 .botao-salvar:hover {
-    background: #0D5355;
+    background: #55B0B4;
 }
 
 .botao-voltar {
@@ -938,7 +939,7 @@ input, select, textarea {
 }
 
 .excluir-reserva-container {
-    background: #fff;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -1016,7 +1017,7 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .laboratorio-container {
-    background: #fff;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -1039,7 +1040,7 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .laboratorios-container {
-    background: white;
+    background: #f8f9fa;
     padding: 25px;
     border-radius: 10px;
     width: 90%;
@@ -1116,11 +1117,11 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .laboratorio-botao-editar {
-    background: #55B0B4;
+    background: #0D5355;
 }
 
 .laboratorio-botao-editar:hover {
-    background: #0D5355;
+    background: #55B0B4;
 }
 
 .laboratorio-botao-excluir {
@@ -1191,7 +1192,7 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .editar-laboratorio-container {
-    background: #fff;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -1261,7 +1262,7 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .excluir-laboratorio-container {
-    background: #fff;
+    background: #f8f9fa;
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
@@ -1289,7 +1290,7 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .reservas-container {
-    background: white;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -1318,6 +1319,7 @@ div.reservas-nao-encontradas p {
     border-collapse: separate;
     border-spacing: 0 0px; 
     margin-top: 15px;
+    background: #f8f9fa;
 }
 
 .reservas-tabela th {
@@ -1332,7 +1334,7 @@ div.reservas-nao-encontradas p {
     text-align: center;
     font-size: 1.7rem;
     color: #333;
-    background: white;
+    background:#f8f9fa;
 }
 
 .reservas-tabela th, 
@@ -1358,7 +1360,7 @@ div.reservas-nao-encontradas p {
     justify-content: center;
     align-items: center;
     padding: 5rem 2rem;
-    margin-top: 10rem; 
+    margin-top: 10rem;
 }
 
 .reset-container input{
@@ -1370,7 +1372,7 @@ div.reservas-nao-encontradas p {
 }
 
 .reset-card {
-    background: white;
+    background: #f8f9fa;
     padding: 30px;
     border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -1415,7 +1417,7 @@ div.reservas-nao-encontradas p {
         max-width: 500px;
         margin: 50px auto;
         padding: 20px;
-        background: white;
+        background: #f8f9fa;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
