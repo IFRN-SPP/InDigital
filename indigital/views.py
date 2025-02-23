@@ -180,3 +180,4 @@ def contaexcluida(request):
 
 def confirmacaodasenha(request):
     return render(request, "confirmacaodasenha.html")
+

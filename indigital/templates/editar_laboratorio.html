@@ -13,10 +13,9 @@
         <div class="editar-laboratorio-campos">
             {{ form|crispy }}
         </div>
-        <div class="editar-laboratorio-acoes">
-            <button type="submit" class="editar-laboratorio-botao-salvar">Salvar</button>
-            <a href="{% url 'listar_laboratorios' %}" class="editar-laboratorio-botao-voltar">Voltar</a>
-        </div>
+        <button type="submit" class="botao-salvar">Salvar</button>
+    </form>
+    <a href="{% url 'listar_laboratorios' %}" class="botao-voltar">Voltar</a>
     </form>
 </div>
 
