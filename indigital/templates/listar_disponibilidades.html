@@ -3,9 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<a href="javascript:history.back()" class="btn-voltar">
-    <i class="fas fa-arrow-left"></i>
-</a>
 <div class="container-listar-reservas">
     <div class="h2-listar">
         <h2>Lista de Disponibilidades</h2>
@@ -41,10 +38,15 @@
                         </td>
                     </tr>
                 {% endfor %}
+                
             </tbody>
         </table>
+    </form>
+    <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
+      </form>
     {% else %}
         <p>Nenhuma reserva encontrada.</p>
+        <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
     {% endif %}
 </div>
 {% endblock content %}

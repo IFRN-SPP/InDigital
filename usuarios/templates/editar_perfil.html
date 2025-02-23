@@ -2,9 +2,6 @@
 {% load static %}
 
 {% block content %}
-<a href="javascript:history.back()" class="btn-voltar">
-    <i class="fas fa-arrow-left"></i>
-</a>
 <div class="container-editar-perfil">
     <form method="POST" enctype="multipart/form-data"> {# Permite envio de arquivos #}
         {% csrf_token %}
@@ -20,6 +17,9 @@
 
         <div class="cadastrar-button">
             <button type="submit" class="btn btn-primary">Salvar</button>
+        </form>
+        <a href="{% url 'perfil' %}" class="botao-voltar-editar-perfil">Voltar</a>
+    </form>
         </div>
     </form>
 </div>
