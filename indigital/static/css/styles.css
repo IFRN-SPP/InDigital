@@ -1100,12 +1100,67 @@ a.excluir-reserva-botao-cancelar {
 }
 
 /* Botão de voltar */
-.botao-voltar-listar-lab {
+.botao-voltar-listar-lab a {
     display: block; /* Faz o botão ocupar toda a linha */
-    margin: 0 auto; /* Centraliza */
+    margin: 20px auto 0; /* Centraliza e dá espaçamento */
     color: #0D5355;
-    font-size: 16px;
+    font-size: 20px;
     text-align: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+
+/* Estilos para o container da paginação */
+/* Contêiner da paginação */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #0D5355;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.page-link a {
+    font-size: 20px;
+    color: #0D5355;
+    margin-top: 10px;
+}
+
+.page-link a:hover {
+    color: #55B0B4;
+    text-decoration: underline;
+}
+
+.page-info p{
+    font-size: 20px;
+    color: #0D5355;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.pagination-container p{
+    font-size: 20px;
+    color: #0D5355;
+    margin-top: 10px;
+    font-weight: bold;
+
+}
+
+.page-info p {
+    font-weight: bold;
+    margin: 0;
 }
 
 .editar-laboratorio-container {
@@ -1207,13 +1262,13 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .reservas-container {
-    background: #fff;
+    background: white;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 90%;
-    max-width: 700px;
+    width: 500%;
+    max-width: 800px;
     margin: auto;
 }
 
@@ -1233,23 +1288,29 @@ div.reservas-nao-encontradas p {
 
 .reservas-tabela table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 0px; 
     margin-top: 15px;
-}
-
-.reservas-tabela th, .reservas-tabela td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
 }
 
 .reservas-tabela th {
     background-color: #55B0B4;
     color: white;
+    padding: 15px;
+    text-align: center;
 }
 
-.reservas-tabela tr:nth-child(even) {
-    background-color: #f9f9f9;
+.reservas-tabela td {
+    padding: 12px;
+    text-align: center;
+    font-size: 1.7rem;
+    color: #333;
+    background: white;
+}
+
+.reservas-tabela th, 
+.reservas-tabela td {
+    border: none;
 }
 
 .reservas-botao-cancelar {
@@ -1258,7 +1319,6 @@ div.reservas-nao-encontradas p {
     padding: 8px 12px;
     border-radius: 5px;
     text-decoration: none;
-    transition: background 0.3s;
     font-size: 0.9em;
 }
 
@@ -1285,7 +1345,7 @@ div.reservas-nao-encontradas p {
 .reset-card {
     background: white;
     padding: 30px;
-    border-radius: 10px;
+    border-radius: 0px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
     max-width: 400px;
@@ -1304,8 +1364,8 @@ div.reservas-nao-encontradas p {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 0px solid #f9f9f9;
+    border-radius: 0px;
 }
 .reset-card button {
     width: 100%;

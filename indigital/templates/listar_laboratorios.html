@@ -9,7 +9,7 @@
 
 <!-- Container para os laboratórios -->
 <div class="laboratorios-container">
-    {% for laboratorio in laboratorios %}   
+    {% for laboratorio in page_obj %}
     <div class="laboratorio-item">
         <div class="laboratorio-info">
             <strong>Número:</strong> {{ laboratorio.num_laboratorio }}
@@ -30,7 +30,27 @@
     </div>
     {% endfor %}
 </div>
-<a href="{% url 'reservas' %}" class="botao-voltar-listar-lab">Voltar</a>
 
+<!-- Paginação -->
+<div class="pagination-container">
+    <span class="page-link">
+    </span>
+    <!-- Links de paginação com números -->
+    {% for num in page_obj.paginator.page_range %}
+        <span class="page-link {% if page_obj.number == num %}active{% endif %}">
+            <a href="?page={{ num }}">{{ num }}</a>
+        </span>
+    {% endfor %}
+
+    <!-- Exibe a quantidade de páginas -->
+    <div class="page-info">
+        <p>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</p>
+    </div>
+</div>
+
+<div class="botao-voltar-listar-lab">
+    <a href="{% url 'reservas' %}">Voltar</a>
+</div>
 {% endblock %}
+
 

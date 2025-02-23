@@ -3,6 +3,8 @@ from .models import Laboratorio, Reserva, Disponibilidade
 from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator
+from django.shortcuts import render
 
 def index(request):
     return render(request, "index.html")
@@ -110,8 +112,11 @@ def editar_laboratorio(request, laboratorio_id):
 
 @login_required
 def listar_laboratorios(request):
-    laboratorios = Laboratorio.objects.all()
-    return render(request, "listar_laboratorios.html", {'laboratorios': laboratorios})
+    laboratorios_list = Laboratorio.objects.all()
+    paginator = Paginator(laboratorios_list, 4)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'listar_laboratorios.html', {'page_obj': page_obj})
 
 @login_required
 @permission_required('indigital.excluir_laboratorio', raise_exception=True)
