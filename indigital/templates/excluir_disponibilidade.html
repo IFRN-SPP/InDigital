@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="excluir-reserva-container">
-    <h2>Excluir Disponibilidade</h2>
-    <p class="excluir-reserva-mensagem">Tem certeza que deseja excluir essa reserva?</p>
+    <h2>Tem certeza que deseja excluir essa reserva?</h2>
+    
     
     <div class="excluir-reserva-detalhes">
         <p><strong>Laboratório:</strong> {{ reserva.laboratorio }}</p>
@@ -15,9 +15,9 @@
 
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="excluir-reserva-botao-confirmar">Confirmar</button>
+        <button type="submit" class="botao-salvar">Confirmar</button>
     </form>
-    <a href="{% url 'listar_disponibilidades' %}" class="excluir-reserva-botao-cancelar">Cancelar</a>
+    <a href="{% url 'listar_disponibilidades' %}" class="botao-voltar">Voltar</a>
 </div>
 
 {% endblock %}

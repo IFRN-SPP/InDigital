@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+<a href="javascript:history.back()" class="btn-voltar">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <div class="container-editar-perfil">
     <form method="POST" enctype="multipart/form-data"> {# Permite envio de arquivos #}
         {% csrf_token %}

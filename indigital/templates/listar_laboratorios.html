@@ -3,11 +3,16 @@
 
 {% block content %}
 <a href="javascript:history.back()" class="btn-voltar">
-    <i class="fas fa-arrow-left"></i>    Voltar
+    <i class="fas fa-arrow-left"></i>
 </a>
-<div class="laboratorios-container">
+
+<!-- Título centralizado -->
+<div class="titulo-container">
     <h2>Lista de Laboratórios</h2>
-    
+</div>
+
+<!-- Container para os formulários de laboratório -->
+<div class="laboratorios-container">
     {% for laboratorio in laboratorios %}   
     <form class="laboratorio-form">
         <div class="laboratorio-info">
