@@ -3,10 +3,17 @@
 
 {% block content %}
 
+<!-- Container principal do perfil -->
 <div class="perfil-container">
-    <h2>Perfil</h2>
     
-    <div class="perfil-foto">
+    <!-- Cabeçalho do perfil -->
+    <div class="perfil-cabecalho">
+        <h2 class="perfil-titulo">Perfil<h2>
+        <p class="perfil-subtitulo">Aqui estão suas informações cadastradas.</p>
+    </div>
+
+    <!-- Seção Foto de Perfil -->
+    <div class="perfil-foto-container">
         {% if usuario.foto_perfil %}
             <img src="{{ usuario.foto_perfil.url }}" alt="Foto de {{ usuario.username }}" class="foto-perfil">
         {% else %}
@@ -14,25 +21,42 @@
         {% endif %}
     </div>
 
-    <div class="perfil-info">
-        <p><strong>Vínculo:</strong> {{ usuario.vinculo }}</p>        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
-        <p><strong>Matrícula:</strong> {{ usuario.matricula }}</p>
-        <p><strong>Email:</strong> {{ usuario.email }}</p>
+    <!-- Informações do Usuário -->
+    <div class="perfil-dados">
+        <div class="info-item">
+            <span class="info-label">Vínculo:</span>
+            <span class="info-text">{{ usuario.vinculo }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Matrícula:</span>
+            <span class="info-text">{{ usuario.matricula }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-text">{{ usuario.email }}</span>
+        </div>
 
         {% if usuario.vinculo == "aluno" %}
-            <p><strong>Turno:</strong> {{ usuario.get_turno_display }}</p>
-            <p><strong>Série:</strong> {{ usuario.serie }}</p>
+            <div class="info-item">
+                <span class="info-label">Turno:</span>
+                <span class="info-text">{{ usuario.get_turno_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Série:</span>
+                <span class="info-text">{{ usuario.serie }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Curso:</span>
+                <span class="info-text">{{ usuario.curso }}</span>
+            </div>
         {% endif %}
+
+    <!-- Ações do Perfil -->
+    <div class="perfil-acoes">
+        <a href="{% url 'editar_perfil' %}" class="editar-botao">Editar Perfil</a>
+        <a href="{% url 'index' %}" class="voltar-botao">Voltar</a>
     </div>
 
-    <div class="botao">
-        <a href="{% url 'editar_perfil' %}">
-            <button class="editar-botao">Editar Perfil</button>
-        </form>
-        <a href="{% url 'index' %}" class="botao-voltar-perfil">Voltar</a>
-    </form>
-        </a>
-        
-    </div>
 </div>
+
 {% endblock content %}
