@@ -337,7 +337,7 @@ flex: 2;
 }
 
 .reservation-box h3 {
-font-size: 1.7rem;
+font-size: 20px;
 margin-bottom: 15px;
 color: #0D5355;
 text-align: center;
@@ -1099,20 +1099,16 @@ a.excluir-reserva-botao-cancelar {
     background: #a71d2a;
 }
 
-/* Botão de voltar */
 .botao-voltar-listar-lab a {
-    display: block; /* Faz o botão ocupar toda a linha */
-    margin: 20px auto 0; /* Centraliza e dá espaçamento */
+    display: block;
+    margin: 20px auto 0;
     color: #0D5355;
-    font-size: 20px;
+    font-size: 15px;
     text-align: center;
     padding: 10px 20px;
     border-radius: 5px;
 }
 
-
-/* Estilos para o container da paginação */
-/* Contêiner da paginação */
 .pagination-container {
     display: flex;
     justify-content: center;
@@ -1129,11 +1125,10 @@ a.excluir-reserva-botao-cancelar {
     border: 1px solid #ddd;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
 }
 
 .page-link a {
-    font-size: 20px;
+    font-size: 15px;
     color: #0D5355;
     margin-top: 10px;
 }
@@ -1144,14 +1139,14 @@ a.excluir-reserva-botao-cancelar {
 }
 
 .page-info p{
-    font-size: 20px;
+    font-size: 15px;
     color: #0D5355;
     margin-top: 10px;
     text-align: center;
 }
 
 .pagination-container p{
-    font-size: 20px;
+    font-size: 15px;
     color: #0D5355;
     margin-top: 10px;
     font-weight: bold;
