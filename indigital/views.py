@@ -20,7 +20,7 @@ def criar_disponibilidade(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Disponibilidade cadastrada com sucesso!')
-            return redirect('horarios')
+            return redirect('listar_disponibilidades')
         else:
             messages.error(request, 'Erro ao cadastrar nova disponibilidade!')
     else:

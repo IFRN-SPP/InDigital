@@ -2,6 +2,21 @@
 {% load static %}
 
 {% block content %}
+{% if not request.user.is_authenticated %}
+<section class="py-5 text-center" style="background-image: linear-gradient(white, #55B0B4);">
+    <div>
+        <h1>InDigital</h1>
+        <p>Sistema de Reservas de Laboratórios de Informática para Estudantes - IFRN/SPP</p>
+    </div> 
+</section>
+{% else %}
+<section>
+    <div class="container">
+        <h1 class="text-center">Bem-vindo,{{ request.user }}!</h1>
+        <p class="text-center">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
+    </div>
+</section>
+{% endif %}
 <section class="home" id="home">
 </section>
 <section class="sobre">
