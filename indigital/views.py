@@ -52,6 +52,7 @@ def editar_disponibilidade(request, reserva_id):
     return render(request, "editar_disponibilidade.html", context)
 
 @login_required
+@permission_required('indigital.listar_disponibilidades', raise_exception=True)
 def listar_disponibilidades(request):
     reserva = Disponibilidade.objects.all()
     return render(request, "listar_disponibilidades.html", {'reservas' : reserva})
@@ -111,6 +112,7 @@ def editar_laboratorio(request, laboratorio_id):
     return render(request, "editar_laboratorio.html", context)
 
 @login_required
+@permission_required('indigital.listar_laboratorios', raise_exception=True)
 def listar_laboratorios(request):
     laboratorios_list = Laboratorio.objects.all()
     paginator = Paginator(laboratorios_list, 4)
@@ -156,6 +158,7 @@ def reservar_laboratorio(request, disponibilidade_id):
     return redirect("minhas_reservas")
 
 @login_required
+@permission_required('indigital.reservas', raise_exception=True)
 def reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, "gerenciar_reservas.html", {"reservas": reservas})
