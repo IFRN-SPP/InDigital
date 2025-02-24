@@ -176,13 +176,3 @@ def cancelar_reserva(request, reserva_id):
 def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, 'minhas_reservas.html', {'reservas': reservas})
-
-def esqueceuasenha(request):
-    return render(request, "esqueceuasenha.html")
-
-def contaexcluida(request):
-    return render(request, "contaexcluida.html")
-
-def confirmacaodasenha(request):
-    return render(request, "confirmacaodasenha.html")
-
