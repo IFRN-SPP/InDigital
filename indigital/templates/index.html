@@ -16,21 +16,40 @@
         <p class="texto-central">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
     </div>
 </section>
-{% endif %}
-<section class="home" id="home">
+<section class="info-section">
+    <div class="container">
+        <h2 class="info-title">Sobre o Sistema de Reservas</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Reservas Rápidas</h3>
+                <p>Reserve horários em laboratórios de informática de forma simples e eficiente.</p>
+            </div>
+            <div class="info-card">
+                <h3>Disponibilidade em Tempo Real</h3>
+                <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
+            </div>
+            <div class="info-card">
+                <h3>Gerenciamento de Reservas</h3>
+                <p>Controle total das reservas para administradores e facilidade para estudantes.</p>
+            </div>
+        </div>
+    </div>
 </section>
+{% endif %}
+
 <section class="sobre">
     <div class="container">
         <div class="sobre-text">
             <h3>InDigital</h3>
-        <p>
-            Um sistema intuitivo e eficiente para você
-            reservar horários em laboratórios de 
-            informática de forma rápida e organizada.
-        </p> 
+            <p>
+                Um sistema intuitivo e eficiente para você
+                reservar horários em laboratórios de 
+                informática de forma rápida e organizada.
+            </p>
+            <a href="{% url 'horarios' %}" class="botao-realize-reserva">Realize sua reserva!</a>
         </div>
         <div class="sobre-img-index">
-            <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="">
+            <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="Logo InDigital">
         </div>
     </div> 
 </section>
