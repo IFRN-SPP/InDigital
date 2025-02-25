@@ -1580,3 +1580,101 @@ div.alert.alert-success{
     border-radius: 5px;
     transition: 0.3s;
 }
+
+/* Estilos para a seção index-pag */
+.index-pag {
+    background-image: linear-gradient(to top, #55B0B4, white);
+    color: white; /* Cor do texto */
+    padding: 100px 20px; /* Espaçamento interno */
+    text-align: center; /* Centraliza o conteúdo */
+    min-height: 50vh; /* Cobrir toda a altura da tela */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para o conteúdo dentro da seção */
+.index-content {
+    max-width: 800px; /* Largura máxima do conteúdo */
+    margin: 0 auto; /* Centraliza o conteúdo */
+}
+
+/* Estilos para o título */
+.index-title {
+    font-size: 3.5rem; /* Tamanho grande para o título */
+    font-weight: 700; /* Negrito */
+    margin-bottom: 20px; /* Espaçamento abaixo do título */
+    color: #0D5355;
+    
+}
+
+/* Estilos para a descrição */
+.index-description {
+    font-size: 1.25rem; /* Tamanho médio para a descrição */
+    line-height: 1.6; /* Espaçamento entre linhas */
+    margin-bottom: 30px; /* Espaçamento abaixo da descrição */
+    color: #0D5355;
+}
+
+/* Estilos para botões (caso queira adicionar) */
+.index-buttons {
+    margin-top: 20px; /* Espaçamento acima dos botões */
+}
+
+.index-buttons a {
+    display: inline-block; /* Botões em linha */
+    padding: 10px 20px; /* Espaçamento interno */
+    margin: 0 10px; /* Espaçamento entre botões */
+    font-size: 1rem;
+    color: #1E3A5F; /* Cor do texto */
+    background-color: white; /* Fundo branco */
+    border-radius: 5px; /* Bordas arredondadas */
+    text-decoration: none; /* Remove sublinhado */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+}
+
+.index-buttons a:hover {
+    background-color: #1E3A5F; /* Fundo escuro ao passar o mouse */
+    color: white; /* Texto branco ao passar o mouse */
+}
+
+/* Estilos para a seção de boas-vindas */
+.welcome-section {
+    background-color: #f8f9fa; /* Fundo claro */
+    padding: 80px 20px; /* Espaçamento interno */
+    text-align: center; /* Centraliza o conteúdo */
+    border-bottom: 2px solid #55B0B4; /* Linha decorativa na parte inferior */
+}
+
+/* Estilos para o container */
+.container-pag {
+    max-width: 800px; /* Largura máxima do conteúdo */
+    margin: 0 auto; /* Centraliza o container */
+}
+
+/* Estilos para o título */
+.texto-central {
+    font-family: 'Arial', sans-serif; /* Fonte moderna */
+    color: #1E3A5F; /* Cor escura para o texto */
+}
+
+.texto-central h1 {
+    font-size: 20px; /* Tamanho grande para o título */
+    font-weight: bold; /* Negrito */
+    margin-bottom: 20px; /* Espaçamento abaixo do título */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil no texto */
+}
+
+/* Estilos para o parágrafo */
+.texto-central p {
+    font-size: 1.25rem; /* Tamanho médio para o parágrafo */
+    line-height: 1.6; /* Espaçamento entre linhas */
+    color: #555; /* Cor mais suave para o parágrafo */
+    margin-bottom: 0; /* Remove margem inferior padrão */
+}
+
+/* Efeito de hover no título (opcional) */
+.texto-central h1:hover {
+    color: #55B0B4; /* Muda a cor ao passar o mouse */
+    transition: color 0.3s ease; /* Transição suave */
+}

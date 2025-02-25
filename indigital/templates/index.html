@@ -3,17 +3,17 @@
 
 {% block content %}
 {% if not request.user.is_authenticated %}
-<section class="py-5 text-center" style="background-image: linear-gradient(white, #55B0B4);">
-    <div>
-        <h1>InDigital</h1>
-        <p>Sistema de Reservas de Laboratórios de Informática para Estudantes - IFRN/SPP</p>
+<section class="index-pag">
+    <div class="index-content">
+        <h1 class="index-title">Acesse nosso sistema e realize sua reserva!</h1>
+        <p class="index-description">Sistema de Reservas de Laboratórios de Informática para Estudantes - IFRN/SPP</p>
     </div> 
 </section>
 {% else %}
-<section>
-    <div class="container">
-        <h1 class="text-center">Bem-vindo,{{ request.user }}!</h1>
-        <p class="text-center">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
+<section class="welcome-section">
+    <div class="container-pag">
+        <h1 class="texto-central">Bem-vindo, {{ request.user }}!</h1>
+        <p class="texto-central">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
     </div>
 </section>
 {% endif %}
@@ -29,7 +29,7 @@
             informática de forma rápida e organizada.
         </p> 
         </div>
-        <div class="sobre-img">
+        <div class="sobre-img-index">
             <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="">
         </div>
     </div> 
