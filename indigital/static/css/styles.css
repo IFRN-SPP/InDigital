@@ -251,71 +251,73 @@ input:focus {
 /* cadastro */
 .container-cadastro {
     background-color: #f8f9fa;
-    margin: auto;
-    padding: 30px;
+    margin: 20px auto;
+    padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 250%;
-    max-width: 600px;
-}	
-
-.container-cadastro input{
-    font-size: 1.6rem;
+    width: 100%;
+    max-width: 500px;
 }
 
-.container-cadastro label{
-    font-size: 1.2rem;
+.container-cadastro input {
+    font-size: 1.1rem;
+}
+
+.container-cadastro label {
+    font-size: 1.1rem;
     color: #55B0B4;
 }
 
-.container-cadastro strong{
+.container-cadastro strong {
     font-size: 1.1rem;
 }
-.container-cadastro select{
-    font-size: 1.5rem;;
+
+.container-cadastro select {
+    font-size: 1.1rem;
 }
 
-.container-cadastro div{
-    font-size: 1.2rem;
-    color: #9F9999; 
+.container-cadastro div {
+    font-size: 1.1rem;
+    color: #9F9999;
 }
 
-a.botao-voltar{
+a.botao-voltar {
     text-align: center;
+    font-size: 1.4rem;
 }
 
 .form-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .form-header .title h1 {
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     color: #55B0B4;
     font-weight: bold;
 }
 
 .form-header .title p {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: #666;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .cadastrar-button {
     text-align: center;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 
 .cadastrar-button .submit {
     background-color: #55B0B4;
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -1431,6 +1433,95 @@ div.reservas-nao-encontradas p {
     margin: 0 auto;
 }
 
+.btn-alterar-senha,
+button.btn.btn-primary {
+    background-color: #0D5355; 
+    color: white;
+    padding: 10px 20px; 
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px; 
+    display: inline-block;
+    margin: 5px; 
+    border: none; 
+    cursor: pointer; 
+    text-align: center; 
+    width: auto; 
+}
+
+.btn-alterar-senha:hover,
+button.btn.btn-primary:hover {
+    background-color: #55B0B4;
+}
+
+.botao-alterar{
+    background-color: #0D5355; 
+    color: white;
+    padding: 10px 20px; 
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px; 
+    display: block;
+    margin: auto; 
+    border: none; 
+    cursor: pointer; 
+    text-align: center; 
+    width: auto; 
+}
+
+.botao-alterar:hover{
+    background-color: #55B0B4;
+}
+
+.link-alterar-senha{
+    color: #0D5355;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.link-alterar-senha:hover{
+    color: #55B0B4;
+}
+
+.card h2{
+    font-size: 16px;
+    font-weight: bold;
+    color: #0D5355;
+}
+
+.form-text ul{
+    font-size: 1.2rem;
+}
+
+div.form-text{
+    font-size: 1.2rem;
+}
+
+.s-alterada{
+    font-size: 1.5rem;
+    color: #666;
+    text-align: center;
+    font-weight: bold;
+}
+
+.bot-voltar{
+    color: #0D5355;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.bot-voltar:hover{
+    color: #55B0B4;
+}
+
 .container-editar-perfil p {
        font-size: 1.2em;
        color: #9F9999;
@@ -1469,21 +1560,6 @@ div.reservas-nao-encontradas p {
 .cadastrar-button {
         text-align: center;
         margin-top: 20px;
-    }
-
-button.btn.btn-primary {
-        padding: 10px 20px;
-        background-color: #0D5355;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-
-button.btn.btn-primary:hover {
-        background-color: #55B0B4;
     }
 
 /*perfil*/
@@ -1869,10 +1945,11 @@ body {
 .card {
     background: #fff;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 450px;
     width: 150%;
     padding: 50px;
+    margin: 20px auto;
 }
 
 /* Título */
@@ -1970,7 +2047,6 @@ body {
     font-size: 1.3rem;
     color: #555;
 }
-
 
 a.botao-cancelar-rec {
     text-align: center;
