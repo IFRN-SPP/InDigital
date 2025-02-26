@@ -1864,3 +1864,152 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Container do card */
+.card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    width: 150%;
+    padding: 50px;
+}
+
+/* Título */
+.auth-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background-color: #0D5355;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 2px;
+    display: inline-block;
+    
+}
+
+/* Formulário */
+.auth-form {
+    margin-top: 20px;
+}
+
+.auth-form .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.auth-form .form-control:focus {
+    border-color: #55B0B4;
+    box-shadow: 0 0 5px rgba(85, 176, 180, 0.5);
+}
+
+/* Botões */
+.auth-form .btn-primary {
+    background-color: #0D5355;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.auth-form .btn-primary:hover {
+    background-color: #55B0B4;
+}
+
+/* Link "Cancelar" */
+.auth-form .btn-link {
+    background-color: #0D5355;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.auth-form .btn-link:hover {
+    color: #55B0B4;
+}
+
+.text-center{
+    font-size: 1.5rem;
+}
+
+/* Mensagens de alerta */
+.alert {
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.text-central{
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0D5355;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.paragrafo p{
+    font-size: 1.3rem;
+    color: #555;
+}
+
+
+a.botao-cancelar-rec {
+    text-align: center;
+    color: #0D5355; 
+    text-decoration: none; 
+    font-weight: 600;
+    display: block; 
+    margin: 10px 0; 
+    transition: color 0.3s;
+}
+
+a.botao-cancelar-rec:hover {
+    color: #55B0B4;
+}
+
+.email-rec label{
+    font-size: 1.5rem;
+}
+
+.botao-voltar-red{
+    text-align: center;
+    color: #0D5355; 
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    margin: 10px 0;
+    transition: color 0.3s;
+}
+
+.botao-voltar-red:hover{
+    color: #55B0B4;
+}
+
+.redef-env{
+    font-weight: bold;
+    text-align: center;
+    color: #0D5355;
+}
+
+.paragrafos{
+    font-size: 1.3rem;
+}
