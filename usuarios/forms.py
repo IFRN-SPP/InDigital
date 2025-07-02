@@ -6,18 +6,37 @@ from .models import User
 class CadastroForm(BaseUserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'matricula', 'turno', 'serie', 'foto_perfil', 'password1', 'password2']
+        fields = ['matricula', 'username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super(CadastroForm, self).__init__(*args, **kwargs)
+        
+        self.fields['matricula'].label = 'Matrícula'
+        self.fields['username'].label = 'Nome'
+        self.fields['email'].label = 'Email'
+        self.fields['password1'].label = 'Senha'
+        self.fields['password2'].label = 'Confirmar Senha'
+
+        self.fields['matricula'].widget.attrs.update({'placeholder': 'Digite a sua matrícula'})
+        self.fields['username'].widget.attrs.update({'placeholder': 'Digite o seu nome'})
+        self.fields['email'].widget.attrs.update({'placeholder': 'Digite o seu e-mail institucional'})
+        self.fields['password1'].widget.attrs.update({'placeholder': 'Crie uma senha'})
+        self.fields['password2'].widget.attrs.update({'placeholder': 'Confirme a senha'})
+
+    def clean_matricula(self):
+        matricula = self.cleaned_data.get('matricula')
+        if User.objects.filter(matricula=matricula).exists():
+            raise ValidationError("Já existe um usuário com esta matrícula.")
+        return matricula
 
 class EditarPerfilForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'matricula', 'foto_perfil']
+        fields = ['username', 'email', 'foto_perfil']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and not (self.instance.is_staff or self.instance.is_superuser):            
-            self.fields['turno'] = forms.ChoiceField(
-                choices=User._meta.get_field('turno').choices,
-                required=False
-            )
-            self.fields['serie'] = forms.CharField(required=True, initial=self.instance.serie)
+        
+        self.fields['username'].label = 'Nome'
+        self.fields['email'].label = 'Email'
+        self.fields['foto_perfil'].label = 'Foto de Perfil'
