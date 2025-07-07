@@ -3,7 +3,6 @@ from usuarios.models import User
 
 class Laboratorio(models.Model):
     num_laboratorio = models.CharField(max_length=10, unique=True)
-    vagas = models.IntegerField(default=30)
 
     def __str__(self):
         return self.num_laboratorio
@@ -13,6 +12,7 @@ class Disponibilidade(models.Model):
     horario_inicio = models.TimeField()
     horario_fim = models.TimeField()
     data = models.DateField()
+    vagas = models.IntegerField(default=30)
 
     class Meta:
         unique_together = ('laboratorio', 'data', 'horario_inicio', 'horario_fim')

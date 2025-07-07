@@ -145,7 +145,7 @@ def horarios(request):
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    if disponibilidade.laboratorio.vagas <= 0:
+    if disponibilidade.vagas <= 0:
         messages.error(request, "Não há vagas disponíveis para este horário.")
         return redirect('horarios')
 
@@ -154,9 +154,8 @@ def reservar_laboratorio(request, disponibilidade_id):
         return redirect('horarios')
 
     reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
-
-    disponibilidade.laboratorio.vagas -= 1
-    disponibilidade.laboratorio.save()
+    disponibilidade.vagas -= 1
+    disponibilidade.save()
 
     messages.success(request, "Reserva realizada com sucesso!")
     return redirect("minhas_reservas")
@@ -170,9 +169,10 @@ def reservas(request):
 @login_required
 def cancelar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
+    disponibilidade = reserva.disponibilidade
 
-    reserva.disponibilidade.laboratorio.vagas += 1
-    reserva.disponibilidade.laboratorio.save()
+    disponibilidade.vagas += 1
+    disponibilidade.save()
 
     reserva.delete()
 

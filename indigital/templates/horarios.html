@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-reserva">
     <div class="logo-reserva">
-        
+        <!-- Se quiser colocar logo aqui -->
     </div>
     <div class="reservation-box">
         <h3>Horários disponíveis</h3>
@@ -24,10 +24,10 @@
                         <tr>
                             <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
                             <td>{{ reserva.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.laboratorio.vagas }}</td>
+                            <td>{{ reserva.vagas }}</td>
                             <td>{{ reserva.data|date:"d/m/Y" }}</td>
                             <td>
-                                {% if reserva.laboratorio.vagas > 0 %}
+                                {% if reserva.vagas > 0 %}
                                     <form method="post" action="{% url 'reservar_laboratorio' reserva.id %}">
                                         {% csrf_token %}
                                         <button type="submit" class="btn reserve">Reservar</button>
