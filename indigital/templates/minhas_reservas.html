@@ -11,8 +11,7 @@
                 <thead>
                     <tr>
                         <th>Horário</th>
-                        <th>Laboratório</th>
-                        <th>Vagas</th>   
+                        <th>Laboratório</th>   
                         <th>Data</th>
                         <th>Ação</th>
                     </tr>
@@ -22,7 +21,6 @@
                         <tr>
                             <td>{{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}</td>
                             <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.disponibilidade.laboratorio.vagas }}</td>
                             <td>{{ reserva.disponibilidade.data|date:"d/m/Y" }}</td>
                             <td>
                                 <a href="{% url 'cancelar_reserva' reserva.id %}" class="reservas-botao-cancelar">Cancelar</a>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Reservas do Dia</h2>
+
+  {% if reservas %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Horário</th>
+          <th>Laboratório</th>
+          <th>Usuário</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reserva in reservas %}
+          <tr>
+            <td>{{ reserva.id }}</td>
+            <td>{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}</td>
+            <td>{{ reserva.disponibilidade.laboratorio }}</td>
+            <td>{{ reserva.usuario.username }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Não há reservas registradas para hoje.</p>
+  {% endif %}
+{% endblock %}

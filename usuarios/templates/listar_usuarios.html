@@ -30,6 +30,12 @@
           <td>
             <a href="{% url 'editar_usuario' usuario.id %}">Editar</a>
             <a href="{% url 'deletar_usuario' usuario.id %}">Deletar</a>
+
+            {% if usuario.perfil != 'monitor' %}
+              <a href="{% url 'tornar_monitor' usuario.id %}">Definir como Monitor</a>
+            {% else %}
+              <a href="{% url 'remover_monitor' usuario.id %}">Remover Monitor</a>
+            {% endif %}
           </td>
         </tr>
       {% endfor %}

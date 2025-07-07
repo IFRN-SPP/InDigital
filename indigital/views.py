@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Laboratorio, Reserva, Disponibilidade
 from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
@@ -60,16 +60,20 @@ def listar_disponibilidades(request):
 @login_required
 @permission_required('indigital.excluir_disponibilidade', raise_exception=True)
 def excluir_disponibilidade(request, reserva_id):
-    context = {
-        "reserva": get_object_or_404(Disponibilidade, id=reserva_id)
-    }
+    disponibilidade = get_object_or_404(Disponibilidade, id=reserva_id)
+
+    reservas_existentes = Reserva.objects.filter(disponibilidade=disponibilidade).exists()
+
+    if reservas_existentes:
+        messages.error(request, "Não é possível excluir esta disponibilidade porque existem reservas associadas.")
+        return redirect('listar_disponibilidades')
 
     if request.method == "POST":
-        context["reserva"].delete()
+        disponibilidade.delete()
         messages.success(request, "Disponibilidade excluída com sucesso!")
         return redirect('listar_disponibilidades')
     else:
-        return render(request, "excluir_disponibilidade.html", context)
+        return render(request, "excluir_disponibilidade.html", {'reserva': disponibilidade})
 
 # crud laboratorio
 
@@ -179,3 +183,13 @@ def cancelar_reserva(request, reserva_id):
 def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, 'minhas_reservas.html', {'reservas': reservas})
+
+def is_monitor_ou_admin(user):
+    return user.perfil in ['monitor', 'admin']
+
+@login_required
+@user_passes_test(is_monitor_ou_admin)
+def reservas_do_dia(request):
+    from datetime import date
+    reservas = Reserva.objects.filter(disponibilidade__data=date.today())
+    return render(request, 'reservas_do_dia.html', {'reservas': reservas})

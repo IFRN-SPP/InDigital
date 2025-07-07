@@ -70,3 +70,21 @@ def deletar_usuario(request, usuario_id):
         return redirect('listar_usuarios')
 
     return render(request, 'deletar_usuario.html', {'usuario': usuario})
+
+@login_required
+@permission_required('usuarios.tornar_monitor', raise_exception=True)
+def tornar_monitor(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    usuario.perfil = 'monitor'
+    usuario.save()
+    messages.success(request, 'Usuário promovido a monitor com sucesso!')
+    return redirect('listar_usuarios')
+
+@login_required
+@permission_required('usuarios.remover_monitor', raise_exception=True)
+def remover_monitor(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    usuario.perfil = 'aluno'
+    usuario.save()
+    messages.success(request, 'Usuário removido de monitor com sucesso!')
+    return redirect('listar_usuarios')

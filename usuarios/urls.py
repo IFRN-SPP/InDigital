@@ -10,6 +10,8 @@ urlpatterns = [
     path('listar/usuarios/', views.listar_usuarios, name='listar_usuarios'),
     path('usuarios/<int:usuario_id>/editar/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/<int:usuario_id>/deletar/', views.deletar_usuario, name='deletar_usuario'),
+    path('usuarios/<int:usuario_id>/tornar_monitor/', views.tornar_monitor, name='tornar_monitor'),
+    path('usuarios/<int:usuario_id>/remover_monitor/', views.remover_monitor, name='remover_monitor'),
 ]
 
 if settings.DEBUG:
