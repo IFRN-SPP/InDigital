@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Lista de Monitores</h2>
+
+<a href="{% url 'adicionar_monitor' %}" class="btn btn-primary">Adicionar Monitor</a>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Matrícula</th>
+      <th>Nome</th>
+      <th>Email</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for monitor in monitores %}
+    <tr>
+      <td>{{ monitor.id }}</td>
+      <td>{{ monitor.matricula }}</td>
+      <td>{{ monitor.username }}</td>
+      <td>{{ monitor.email }}</td>
+      <td>
+        <a href="{% url 'editar_usuario' monitor.id %}">Editar</a>
+        <form action="{% url 'deletar_usuario' monitor.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este monitor?');">Excluir</button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Nenhum monitor encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

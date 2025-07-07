@@ -32,7 +32,7 @@ class CadastroForm(BaseUserCreationForm):
 class EditarPerfilForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'foto_perfil']
+        fields = ['username', 'email', 'foto_perfil', 'perfil']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
