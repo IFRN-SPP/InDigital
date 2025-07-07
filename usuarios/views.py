@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, permission_required
 from .forms import CadastroForm, EditarPerfilForm
 from django.contrib import messages
 from .models import User
@@ -39,3 +39,34 @@ def editar_perfil(request):
         form = EditarPerfilForm(instance=usuario)
 
     return render(request, "editar_perfil.html", {'form': form})
+
+@login_required
+@permission_required('usuarios.listar_usuarios', raise_exception=True)
+def listar_usuarios(request):
+    usuarios = User.objects.all()
+    return render(request, "listar_usuarios.html", {'usuarios': usuarios})
+
+@login_required
+@permission_required('usuarios.editar_usuario', raise_exception=True)
+def editar_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    form = EditarPerfilForm(request.POST or None, instance=usuario)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Usuário atualizado com sucesso!')
+        return redirect('listar_usuarios')
+
+    return render(request, 'editar_usuario.html', {'form': form})
+
+@login_required
+@permission_required('usuarios.deletar_usuario', raise_exception=True)
+def deletar_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+
+    if request.method == 'POST':
+        usuario.delete()
+        messages.success(request, 'Usuário excluído com sucesso!')
+        return redirect('listar_usuarios')
+
+    return render(request, 'deletar_usuario.html', {'usuario': usuario})
