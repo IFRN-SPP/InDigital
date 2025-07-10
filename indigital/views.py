@@ -273,3 +273,14 @@ def minha_fila_espera(request):
         })
 
     return render(request, 'minha_fila_espera.html', {'filas': dados_filas})
+
+@login_required
+@permission_required('indigital.reservas', raise_exception=True)
+def usuarios_da_reserva(request, disponibilidade_id):
+    disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+
+    return render(request, 'usuarios_da_reserva.html', {
+        'disponibilidade': disponibilidade,
+        'reservas': reservas
+    })

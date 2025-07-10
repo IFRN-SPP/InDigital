@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Usuários com reserva para: Lab{{ disponibilidade.laboratorio }} - {{ disponibilidade.data }} - {{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }}</h2>
+
+{% if reservas %}
+    <ul>
+        {% for reserva in reservas %}
+            <li>{{ reserva.usuario.username }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum usuário reservou esse horário ainda.</p>
+{% endif %}
+
+<a href="{% url 'listar_disponibilidades' %}">← Voltar para Disponibilidades</a>
+{% endblock %}

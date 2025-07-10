@@ -37,6 +37,9 @@
                             {% if perms.indigital.excluir_reserva %}
                                 <a href="{% url 'excluir_disponibilidade' reserva.id %}" class="btn delete">Excluir</a>
                             {% endif %}
+                            <form method="get" action="{% url 'usuarios_da_reserva' reserva.id %}">
+                                <button type="submit" class="btn reserve">Ver usuários</button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
