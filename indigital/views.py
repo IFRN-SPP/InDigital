@@ -279,8 +279,10 @@ def minha_fila_espera(request):
 def usuarios_da_reserva(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    fila_espera = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
 
     return render(request, 'usuarios_da_reserva.html', {
         'disponibilidade': disponibilidade,
-        'reservas': reservas
+        'reservas': reservas,
+        'fila_espera': fila_espera
     })
