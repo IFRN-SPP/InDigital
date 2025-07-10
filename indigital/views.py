@@ -148,8 +148,14 @@ def horarios(request):
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
-        messages.error(request, "Você já possui uma reserva para este horário.")
+    conflito = Reserva.objects.filter(
+        usuario=request.user,
+        disponibilidade__data=disponibilidade.data,
+        disponibilidade__horario_inicio=disponibilidade.horario_inicio,
+    ).exists()
+
+    if conflito:
+        messages.error(request, "Você já possui uma reserva para este dia e horário.")
         return redirect('horarios')
     
     if disponibilidade.vagas > 0:
