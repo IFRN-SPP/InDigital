@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Fila de Espera</h2>
+
+{% if filas %}
+<table>
+    <thead>
+        <tr>
+            <th>Posição</th>
+            <th>Usuário</th>
+            <th>Laboratório</th>
+            <th>Horário</th>
+            <th>Data da Solicitação</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fila in filas %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ fila.usuario.username }}</td>
+            <td>{{ fila.disponibilidade.laboratorio.num_laboratorio }}</td>
+            <td>{{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</td>
+            <td>{{ fila.data_solicitacao|date:"d/m/Y H:i" }}</td>
+            <td>
+                <form method="post" action="{% url 'promover_fila' fila.id %}">
+                {% csrf_token %}
+                <button type="submit">Promover para Reserva</button>
+                </form>
+                <form method="post" action="{% url 'remover_fila' fila.id %}">
+                {% csrf_token %}
+                <button type="submit">Remover da Fila</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Nenhum usuário na fila de espera.</p>
+{% endif %}
+{% endblock %}

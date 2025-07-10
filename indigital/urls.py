@@ -17,4 +17,11 @@ urlpatterns = [
     path('cancelar_reserva/<int:reserva_id>/', views.cancelar_reserva, name='cancelar_reserva'),
     path('minhas/reservas/', views.minhas_reservas, name='minhas_reservas'),
     path('reservas/dia/', views.reservas_do_dia, name='reservas_do_dia'),
+    path('fila/espera/', views.fila_espera, name='fila_espera'),
+    path('fila/espera/promover/<int:fila_id>/', views.promover_fila, name='promover_fila'),
+    path('fila/espera/remover/<int:fila_id>/', views.remover_fila, name='remover_fila'),
+    path('entrar/fila/<int:disponibilidade_id>/', views.entrar_fila_espera, name='entrar_fila_espera'),
+    path('sair/fila/<int:fila_id>/', views.sair_fila_espera, name='sair_fila_espera'),
+    path('minha/fila/espera/', views.minha_fila_espera, name='minha_fila_espera'),
+
 ]

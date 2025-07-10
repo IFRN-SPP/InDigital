@@ -33,7 +33,17 @@
                                         <button type="submit" class="btn reserve">Reservar</button>
                                     </form>
                                 {% else %}
-                                    <span class="no-vacancy">Esgotado</span>
+                                {% if reserva.id in reservas_em_fila %}
+                                        <form method="post" action="{% url 'sair_fila_espera' reserva.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Sair da fila</button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post" action="{% url 'entrar_fila_espera' reserva.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn reserve">Entrar na fila</button>
+                                        </form>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                         </tr>

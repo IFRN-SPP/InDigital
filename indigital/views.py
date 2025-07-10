@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Laboratorio, Reserva, Disponibilidade
+from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
 from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -139,26 +139,32 @@ def excluir_laboratorio(request, laboratorio_id):
 @login_required
 def horarios(request):
     reservas = Disponibilidade.objects.all()
-    return render(request, "horarios.html", {'reservas': reservas})
+
+    reservas_em_fila = FilaEspera.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
+
+    return render(request, "horarios.html", {'reservas': reservas, 'reservas_em_fila': reservas_em_fila})
 
 @login_required
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    if disponibilidade.vagas <= 0:
-        messages.error(request, "Não há vagas disponíveis para este horário.")
-        return redirect('horarios')
-
     if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
         messages.error(request, "Você já possui uma reserva para este horário.")
         return redirect('horarios')
-
-    reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
-    disponibilidade.vagas -= 1
-    disponibilidade.save()
-
-    messages.success(request, "Reserva realizada com sucesso!")
-    return redirect("minhas_reservas")
+    
+    if disponibilidade.vagas > 0:
+        reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
+        disponibilidade.vagas -= 1
+        disponibilidade.save()
+        messages.success(request, "Reserva realizada com sucesso!")
+    else:
+        fila_espera = FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists()
+        if fila_espera:
+            messages.error(request, "Você já está na fila de espera para este horário.")
+        else:
+            FilaEspera.objects.create(usuario=request.user, disponibilidade=disponibilidade)
+            messages.info(request, "Sem vagas disponíveis, você foi adicionado à fila de espera para este horário.")
+    return redirect('horarios')
 
 @login_required
 @permission_required('indigital.reservas', raise_exception=True)
@@ -193,3 +199,55 @@ def reservas_do_dia(request):
     from datetime import date
     reservas = Reserva.objects.filter(disponibilidade__data=date.today())
     return render(request, 'reservas_do_dia.html', {'reservas': reservas})
+
+@login_required
+def fila_espera(request):
+    filas = FilaEspera.objects.select_related('usuario', 'disponibilidade').all()
+    return render(request, 'fila_espera.html', {'filas': filas})
+
+@login_required
+def promover_fila(request, fila_id):
+    fila = get_object_or_404(FilaEspera, id=fila_id)
+    disponibilidade = fila.disponibilidade
+
+    if disponibilidade.vagas > 0:
+        reserva = Reserva.objects.create(usuario=fila.usuario, disponibilidade=disponibilidade)
+        disponibilidade.vagas -= 1
+        disponibilidade.save()
+        fila.delete()
+        messages.success(request, f"Usuário {fila.usuario.username} promovido da fila de espera para reserva.")
+    else:
+        messages.error(request, "Não há vagas disponíveis para promover o usuário da fila de espera.")
+
+    return redirect('fila_espera')
+
+@login_required
+def remover_fila(request, fila_id):
+    fila = get_object_or_404(FilaEspera, id=fila_id)
+    fila.delete()
+    messages.success(request, f"Usuário {fila.usuario.username} removido da fila de espera.")
+    return redirect('fila_espera')
+
+@login_required
+def entrar_fila_espera(request, disponibilidade_id):
+    disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+
+    if FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
+        messages.error(request, "Você já está na fila de espera para este horário.")
+    else:
+        FilaEspera.objects.create(usuario=request.user, disponibilidade=disponibilidade)
+        messages.success(request, "Você foi adicionado à fila de espera.")
+
+    return redirect('horarios')
+
+@login_required
+def sair_fila_espera(request, fila_id):
+    fila = get_object_or_404(FilaEspera, id=fila_id, usuario=request.user)
+    fila.delete()
+    messages.success(request, "Você saiu da fila de espera.")
+    return redirect('horarios')
+
+@login_required
+def minha_fila_espera(request):
+    filas = FilaEspera.objects.filter(usuario=request.user).order_by('data_solicitacao')
+    return render(request, 'minha_fila_espera.html', {'filas': filas})

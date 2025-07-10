@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Minha Fila de Espera</h2>
+
+{% if filas %}
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Horário</th>
+            <th>Laboratório</th>
+            <th>Posição</th>
+            <th>Data de Solicitação</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fila in filas %}
+        <tr>
+            <td>{{ fila.id }}</td>
+            <td>{{ fila.horario_inicio|time:"H:i" }} às {{ fila.horario_fim|time:"H:i" }}</td>
+            <td>{{ fila.laboratorio }}</td>
+            <td>{{ fila.posicao }}</td>
+            <td>{{ fila.data_inscricao|date:"d/m/Y H:i" }}</td>
+            <td>{{ fila.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Você não está em nenhuma fila de espera no momento.</p>
+{% endif %}
+
+{% endblock %}

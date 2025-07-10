@@ -26,3 +26,12 @@ class Reserva(models.Model):
 
     def __str__(self):
         return self.usuario.username
+    
+class FilaEspera(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    disponibilidade = models.ForeignKey(Disponibilidade, on_delete=models.CASCADE)
+    data_solicitacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'disponibilidade')
+        ordering = ['data_solicitacao']
