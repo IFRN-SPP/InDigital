@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
 from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
@@ -190,11 +190,7 @@ def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, 'minhas_reservas.html', {'reservas': reservas})
 
-def is_monitor_ou_admin(user):
-    return user.perfil in ['monitor', 'admin']
-
 @login_required
-@user_passes_test(is_monitor_ou_admin)
 def reservas_do_dia(request):
     from datetime import date
     reservas = Reserva.objects.filter(disponibilidade__data=date.today())
@@ -231,12 +227,17 @@ def remover_fila(request, fila_id):
 @login_required
 def entrar_fila_espera(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    
+    if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
+        messages.error(request, "Você já tem uma reserva para esse horário.")
+        return redirect('horarios')
 
     if FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
-        messages.error(request, "Você já está na fila de espera para este horário.")
-    else:
-        FilaEspera.objects.create(usuario=request.user, disponibilidade=disponibilidade)
-        messages.success(request, "Você foi adicionado à fila de espera.")
+        messages.info(request, "Você já está na fila de espera para esse horário.")
+        return redirect('horarios')
+
+    FilaEspera.objects.create(usuario=request.user, disponibilidade=disponibilidade)
+    messages.success(request, "Você foi adicionado à fila de espera.")
 
     return redirect('horarios')
 
@@ -245,9 +246,24 @@ def sair_fila_espera(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id, usuario=request.user)
     fila.delete()
     messages.success(request, "Você saiu da fila de espera.")
-    return redirect('horarios')
+    return redirect('minha_fila_espera')
 
 @login_required
 def minha_fila_espera(request):
-    filas = FilaEspera.objects.filter(usuario=request.user).order_by('data_solicitacao')
-    return render(request, 'minha_fila_espera.html', {'filas': filas})
+    minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio')
+    
+    dados_filas = []
+    for fila in minhas_filas:
+        fila_geral = FilaEspera.objects.filter(disponibilidade=fila.disponibilidade).order_by('data_solicitacao')
+        usuarios_em_ordem = list(fila_geral.values_list('usuario_id', flat=True))
+        posicao = usuarios_em_ordem.index(request.user.id) + 1
+
+        dados_filas.append({
+            'id': fila.id,
+            'disponibilidade': fila.disponibilidade,
+            'data_solicitacao': fila.data_solicitacao,
+            'posicao': posicao,
+            'status': "Você é o próximo" if posicao == 1 else f"Posição {posicao}",
+        })
+
+    return render(request, 'minha_fila_espera.html', {'filas': dados_filas})

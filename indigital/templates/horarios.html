@@ -33,16 +33,13 @@
                                         <button type="submit" class="btn reserve">Reservar</button>
                                     </form>
                                 {% else %}
-                                {% if reserva.id in reservas_em_fila %}
-                                        <form method="post" action="{% url 'sair_fila_espera' reserva.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">Sair da fila</button>
-                                        </form>
-                                    {% else %}
+                                    {% if reserva.id not in reservas_em_fila %}
                                         <form method="post" action="{% url 'entrar_fila_espera' reserva.id %}">
                                             {% csrf_token %}
                                             <button type="submit" class="btn reserve">Entrar na fila</button>
                                         </form>
+                                    {% else %}
+                                        <span class="btn disabled">Você já está na fila</span>
                                     {% endif %}
                                 {% endif %}
                             </td>
