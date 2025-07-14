@@ -40,10 +40,10 @@
                             <form method="get" action="{% url 'usuarios_da_reserva' reserva.id %}">
                                 <button type="submit" class="btn reserve">Ver usuários</button>
                             </form>
+                            <a href="{% url 'registrar_frequencias' reserva.id %}" class="btn edit">Registrar Frequência</a>
                         </td>
                     </tr>
                 {% endfor %}
-                
             </tbody>
         </table>
     </form>

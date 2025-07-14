@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Registrar Frequência</h1>
+
+<p>
+    <strong>Horário:</strong> {{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }} |
+    <strong>Laboratório:</strong> {{ disponibilidade.laboratorio }} |
+    <strong>Data:</strong> {{ disponibilidade.data }}
+</p>
+
+<table>
+    <tr>
+        <th>#</th>
+        <th>Usuário</th>
+        <th>Presença</th>
+    </tr>
+    {% for reserva in reservas %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ reserva.usuario.username }}</td>
+        <td>
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="reserva_id" value="{{ reserva.id }}">
+                <button name="status" value="P" class="btn">✅ Presente</button>
+                <button name="status" value="F" class="btn">❌ Faltou</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'listar_disponibilidades' %}" class="btn">← Voltar para Disponibilidades</a>
+{% endblock %}

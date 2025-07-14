@@ -24,6 +24,10 @@ class Reserva(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     disponibilidade = models.ForeignKey(Disponibilidade, on_delete=models.CASCADE)
 
+    frequencia = (
+        ('P', 'Presente'),
+        ('F', 'Faltou')
+    )
     def __str__(self):
         return self.usuario.username
     

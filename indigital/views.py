@@ -281,8 +281,23 @@ def usuarios_da_reserva(request, disponibilidade_id):
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
     fila_espera = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
 
-    return render(request, 'usuarios_da_reserva.html', {
-        'disponibilidade': disponibilidade,
-        'reservas': reservas,
-        'fila_espera': fila_espera
-    })
+    return render(request, 'usuarios_da_reserva.html', {'disponibilidade': disponibilidade, 'reservas': reservas, 'fila_espera': fila_espera})
+
+@login_required
+def registrar_frequencias(request, disponibilidade_id):
+    disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+
+    if request.method == "POST":
+        reserva_id = request.POST.get("reserva_id")
+        status = request.POST.get("status")
+
+        reserva = get_object_or_404(Reserva, id=reserva_id, disponibilidade=disponibilidade)
+
+        if status in ['P', 'F']:
+            reserva.status_frequencia = status
+            reserva.save()
+            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {'Presente' if status == 'P' else 'Faltou'}.")
+        return redirect('registrar_frequencias', disponibilidade_id=disponibilidade.id)
+
+    return render(request, "registrar_frequencias.html", {"disponibilidade": disponibilidade, "reservas": reservas})
