@@ -13,7 +13,6 @@ urlpatterns = [
     path('usuarios/<int:usuario_id>/tornar_monitor/', views.tornar_monitor, name='tornar_monitor'),
     path('usuarios/<int:usuario_id>/remover_monitor/', views.remover_monitor, name='remover_monitor'),
     path('listar/monitores/', views.listar_monitores, name='listar_monitores'),
-    path('adicionar/monitor/', views.adicionar_monitor, name='adicionar_monitor'),
 ]
 
 if settings.DEBUG:

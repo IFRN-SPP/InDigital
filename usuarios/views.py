@@ -94,20 +94,3 @@ def remover_monitor(request, usuario_id):
 def listar_monitores(request):
     monitores = User.objects.filter(perfil='monitor')
     return render(request, "listar_monitores.html", {'monitores': monitores})
-
-@login_required
-@permission_required('usuarios.criar_usuario', raise_exception=True) 
-def adicionar_monitor(request):
-    if request.method == 'POST':
-        form = CadastroForm(request.POST, request.FILES)
-        if form.is_valid():
-            usuario = form.save(commit=False)
-            usuario.perfil = 'monitor'
-            usuario.save()
-            messages.success(request, 'Monitor adicionado com sucesso!')
-            return redirect('listar_monitores')
-        else:
-            messages.error(request, 'Erro ao adicionar monitor. Corrija os erros abaixo.')
-    else:
-        form = CadastroForm()
-    return render(request, 'adicionar_monitor.html', {'form': form})
