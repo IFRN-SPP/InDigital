@@ -24,5 +24,6 @@ urlpatterns = [
     path('sair/fila/<int:fila_id>/', views.sair_fila_espera, name='sair_fila_espera'),
     path('minha/fila/espera/', views.minha_fila_espera, name='minha_fila_espera'),
     path('usuarios/reserva/<int:disponibilidade_id>/', views.usuarios_da_reserva, name='usuarios_da_reserva'),
-    path('disponibilidade/<int:disponibilidade_id>/registrar_frequencias/', views.registrar_frequencias, name='registrar_frequencias'),
+    path('frequencias/<int:disponibilidade_id>/', views.registrar_frequencias, name='registrar_frequencias'),
+    path('listar/disponibilidades/monitor/', views.listar_disponibilidades_monitor, name='listar_disponibilidades_monitor'),
 ]

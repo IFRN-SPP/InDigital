@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Minhas Disponibilidades</h2>
+    {% if disponibilidades %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Horário</th>
+                    <th>Laboratório</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disponibilidade in disponibilidades %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }}</td>
+                    <td>{{ disponibilidade.laboratorio.num_laboratorio }}</td>
+                    <td>{{ disponibilidade.data }}</td>
+                    <td>
+                        <a href="{% url 'registrar_frequencias' disponibilidade.id %}" class="btn btn-primary btn-sm">Registrar Frequência</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você ainda não tem disponibilidades atribuídas.</p>
+    {% endif %}
+</div>
+{% endblock %}

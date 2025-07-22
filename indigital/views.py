@@ -284,9 +284,18 @@ def usuarios_da_reserva(request, disponibilidade_id):
     return render(request, 'usuarios_da_reserva.html', {'disponibilidade': disponibilidade, 'reservas': reservas, 'fila_espera': fila_espera})
 
 @login_required
+def listar_disponibilidades_monitor(request):
+    disponibilidades = Disponibilidade.objects.filter(monitor=request.user)
+    return render(request, 'listar_disponibilidades_monitor.html', {'disponibilidades': disponibilidades})
+
+@login_required
 def registrar_frequencias(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+
+    if disponibilidade.monitor != request.user:
+        messages.error(request, "Você não tem permissão para registrar frequências para esta disponibilidade.")
+        return redirect('listar_disponibilidades_monitor')
 
     if request.method == "POST":
         reserva_id = request.POST.get("reserva_id")

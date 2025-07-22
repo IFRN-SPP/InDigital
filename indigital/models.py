@@ -15,6 +15,7 @@ class Disponibilidade(models.Model):
     horario_fim = models.TimeField()
     data = models.DateField()
     vagas = models.IntegerField()
+    monitor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='monitor_disponibilidade', null=True, blank=True)
 
     class Meta:
         unique_together = ('laboratorio', 'data', 'horario_inicio', 'horario_fim')
@@ -34,10 +35,8 @@ class Reserva(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     disponibilidade = models.ForeignKey(Disponibilidade, on_delete=models.CASCADE)
 
-    frequencia = (
-        ('P', 'Presente'),
-        ('F', 'Faltou')
-    )
+    status_frequencia = models.CharField(max_length=1, choices=[('P', 'Presente'), ('F', 'Faltou')], default='', blank=True)
+
     def __str__(self):
         return self.usuario.username
     
