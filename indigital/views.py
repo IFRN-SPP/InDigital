@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+
+from usuarios.models import User
 from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
 from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
@@ -303,10 +305,16 @@ def registrar_frequencias(request, disponibilidade_id):
 
         reserva = get_object_or_404(Reserva, id=reserva_id, disponibilidade=disponibilidade)
 
-        if status in ['P', 'F']:
+        if status in ['P', 'F', 'N']:
             reserva.status_frequencia = status
             reserva.save()
-            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {'Presente' if status == 'P' else 'Faltou'}.")
+            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {'Presente' if status == 'P' else 'Faltou' if status == 'F' else 'Não registrado'}.")
         return redirect('registrar_frequencias', disponibilidade_id=disponibilidade.id)
 
     return render(request, "registrar_frequencias.html", {"disponibilidade": disponibilidade, "reservas": reservas})
+
+@login_required
+def reservas_por_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    reservas = Reserva.objects.filter(usuario=usuario).select_related('disponibilidade__laboratorio')
+    return render(request, "reservas_por_usuario.html", {'usuario': usuario, 'reservas': reservas})

@@ -5,7 +5,7 @@
 <p>
     <strong>Horário:</strong> {{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }} |
     <strong>Laboratório:</strong> {{ disponibilidade.laboratorio }} |
-    <strong>Data:</strong> {{ disponibilidade.data }}
+    <strong>Data:</strong> {{ disponibilidade.data|date:"d/m/Y" }}
 </p>
 
 <table>

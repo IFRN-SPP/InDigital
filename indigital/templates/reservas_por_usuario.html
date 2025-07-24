@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Reservas de {{ usuario.username }}</h2>
+
+  {% if reservas %}
+    <table>
+      <thead>
+        <tr>
+          <th>Horário</th>
+          <th>Laboratório</th>
+          <th>Data</th>
+          <th>Status de Frequência</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reserva in reservas %}
+          <tr>
+            <td>{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}</td>
+            <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
+            <td>{{ reserva.disponibilidade.data|date:"d/m/Y" }}</td>
+            <td>
+              {% if reserva.status_frequencia == 'P' %}
+                Presente
+              {% elif reserva.status_frequencia == 'F' %}
+                Faltou
+              {% else %}
+                Não Registrado
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Este usuário não possui reservas registradas.</p>
+  {% endif %}
+
+  <a href="{% url 'listar_usuarios' %}"><button>Voltar</button></a>
+{% endblock %}

@@ -36,6 +36,8 @@
             {% else %}
               <a href="{% url 'remover_monitor' usuario.id %}">Remover Monitor</a>
             {% endif %}
+
+            <a href="{% url 'reservas_por_usuario' usuario.id %}">Ver Reservas</a>
           </td>
         </tr>
       {% endfor %}
