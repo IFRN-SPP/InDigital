@@ -315,6 +315,164 @@ def registrar_frequencias(request, disponibilidade_id):
 
 @login_required
 def reservas_por_usuario(request, usuario_id):
+    from datetime import date
+    
     usuario = get_object_or_404(User, id=usuario_id)
-    reservas = Reserva.objects.filter(usuario=usuario).select_related('disponibilidade__laboratorio')
-    return render(request, "reservas_por_usuario.html", {'usuario': usuario, 'reservas': reservas})
+    reservas = Reserva.objects.filter(usuario=usuario).select_related('disponibilidade__laboratorio').order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
+    # Estatísticas do usuário
+    reservas_presentes = reservas.filter(status_frequencia='P').count()
+    reservas_faltas = reservas.filter(status_frequencia='F').count()
+    reservas_pendentes = reservas.filter(status_frequencia__in=['', 'N']).count()
+    
+    context = {
+        'usuario': usuario, 
+        'reservas': reservas,
+        'reservas_presentes': reservas_presentes,
+        'reservas_faltas': reservas_faltas,
+        'reservas_pendentes': reservas_pendentes,
+        'today': date.today(),
+    }
+    
+    return render(request, "reservas_por_usuario.html", context)
+
+@login_required
+def historico_reservas(request):
+    from datetime import date, datetime, timedelta
+    from django.db.models import Q
+    
+    # Buscar todas as reservas do usuário logado
+    reservas = Reserva.objects.filter(usuario=request.user).select_related(
+        'disponibilidade__laboratorio'
+    ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
+    # Filtros opcionais
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    status_frequencia = request.GET.get('status_frequencia')
+    laboratorio_id = request.GET.get('laboratorio')
+    
+    # Aplicar filtros se fornecidos
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
+    
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    # Separar reservas por categoria
+    hoje = date.today()
+    reservas_futuras = reservas.filter(disponibilidade__data__gt=hoje)
+    reservas_passadas = reservas.filter(disponibilidade__data__lt=hoje)
+    reservas_hoje = reservas.filter(disponibilidade__data=hoje)
+    
+    # Estatísticas do usuário
+    total_reservas = reservas.count()
+    reservas_presentes = reservas.filter(status_frequencia='P').count()
+    reservas_faltas = reservas.filter(status_frequencia='F').count()
+    reservas_pendentes = reservas.filter(status_frequencia__in=['', 'N']).count()
+    
+    # Laboratórios para o filtro
+    laboratorios = Laboratorio.objects.all()
+    
+    context = {
+        'reservas': reservas,
+        'reservas_futuras': reservas_futuras,
+        'reservas_passadas': reservas_passadas,
+        'reservas_hoje': reservas_hoje,
+        'total_reservas': total_reservas,
+        'reservas_presentes': reservas_presentes,
+        'reservas_faltas': reservas_faltas,
+        'reservas_pendentes': reservas_pendentes,
+        'laboratorios': laboratorios,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'status_frequencia': status_frequencia,
+        'laboratorio_id': laboratorio_id,
+        'today': hoje,
+    }
+    
+    return render(request, 'historico_reservas.html', context)
+
+@login_required
+@permission_required('indigital.reservas', raise_exception=True)
+def historico_geral_reservas(request):
+    from datetime import date, datetime
+    
+    # Buscar todas as reservas
+    reservas = Reserva.objects.all().select_related(
+        'usuario', 'disponibilidade__laboratorio'
+    ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
+    # Filtros opcionais
+    usuario_id = request.GET.get('usuario')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    status_frequencia = request.GET.get('status_frequencia')
+    laboratorio_id = request.GET.get('laboratorio')
+    
+    # Aplicar filtros se fornecidos
+    if usuario_id and usuario_id != 'todos':
+        reservas = reservas.filter(usuario_id=usuario_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
+    
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    # Estatísticas gerais
+    total_reservas = reservas.count()
+    reservas_presentes = reservas.filter(status_frequencia='P').count()
+    reservas_faltas = reservas.filter(status_frequencia='F').count()
+    reservas_pendentes = reservas.filter(status_frequencia__in=['', 'N']).count()
+    
+    # Dados para os filtros
+    usuarios = User.objects.all().order_by('username')
+    laboratorios = Laboratorio.objects.all()
+    
+    context = {
+        'reservas': reservas,
+        'total_reservas': total_reservas,
+        'reservas_presentes': reservas_presentes,
+        'reservas_faltas': reservas_faltas,
+        'reservas_pendentes': reservas_pendentes,
+        'usuarios': usuarios,
+        'laboratorios': laboratorios,
+        'usuario_id': usuario_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'status_frequencia': status_frequencia,
+        'laboratorio_id': laboratorio_id,
+    }
+    
+    return render(request, 'historico_geral_reservas.html', context)
+
+

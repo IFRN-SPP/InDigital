@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Histórico de Reservas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="fas fa-history"></i> Meu Histórico de Reservas
+    </h2>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-filter"></i> Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="data_inicio" class="form-label">Data Início</label>
+                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="data_fim" class="form-label">Data Fim</label>
+                    <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="status_frequencia" class="form-label">Status</label>
+                    <select class="form-control" id="status_frequencia" name="status_frequencia">
+                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todos</option>
+                        <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
+                        <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
+                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
+                        <option value="" {% if status_frequencia == '' %}selected{% endif %}>Pendente</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="laboratorio" class="form-label">Laboratório</label>
+                    <select class="form-control" id="laboratorio" name="laboratorio">
+                        <option value="todos" {% if laboratorio_id == 'todos' or not laboratorio_id %}selected{% endif %}>Todos</option>
+                        {% for lab in laboratorios %}
+                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                {{ lab.num_laboratorio }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'historico_reservas' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabs para Categorizar Reservas -->
+    <ul class="nav nav-tabs" id="reservasTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button" role="tab">
+                Todas ({{ total_reservas }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="futuras-tab" data-bs-toggle="tab" data-bs-target="#futuras" type="button" role="tab">
+                Futuras ({{ reservas_futuras.count }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hoje-tab" data-bs-toggle="tab" data-bs-target="#hoje" type="button" role="tab">
+                Hoje ({{ reservas_hoje.count }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="passadas-tab" data-bs-toggle="tab" data-bs-target="#passadas" type="button" role="tab">
+                Passadas ({{ reservas_passadas.count }})
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="reservasTabsContent">
+        <!-- Tab Todas -->
+        <div class="tab-pane fade show active" id="todas" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    {% include 'partials/tabela_reservas.html' with reservas=reservas %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Futuras -->
+        <div class="tab-pane fade" id="futuras" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    {% include 'partials/tabela_reservas.html' with reservas=reservas_futuras %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Hoje -->
+        <div class="tab-pane fade" id="hoje" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    {% include 'partials/tabela_reservas.html' with reservas=reservas_hoje %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Passadas -->
+        <div class="tab-pane fade" id="passadas" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    {% include 'partials/tabela_reservas.html' with reservas=reservas_passadas %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

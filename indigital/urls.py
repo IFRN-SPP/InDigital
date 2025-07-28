@@ -27,4 +27,6 @@ urlpatterns = [
     path('frequencias/<int:disponibilidade_id>/', views.registrar_frequencias, name='registrar_frequencias'),
     path('listar/disponibilidades/monitor/', views.listar_disponibilidades_monitor, name='listar_disponibilidades_monitor'),
     path('usuario/<int:usuario_id>/reservas/', views.reservas_por_usuario, name='reservas_por_usuario'),
+    path('historico/reservas/', views.historico_reservas, name='historico_reservas'),
+    path('historico/geral/reservas/', views.historico_geral_reservas, name='historico_geral_reservas'),
 ]
