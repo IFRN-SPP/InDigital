@@ -11,6 +11,9 @@
           <th>Horário</th>
           <th>Laboratório</th>
           <th>Usuário</th>
+          {% if user.is_superuser or user.perfil == 'administrador' %}
+            <th>Monitor</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -20,11 +23,18 @@
             <td>{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}</td>
             <td>{{ reserva.disponibilidade.laboratorio }}</td>
             <td>{{ reserva.usuario.username }}</td>
+            {% if user.is_superuser or user.perfil == 'administrador' %}
+              <td>{{ reserva.disponibilidade.monitor.username|default:"Não definido" }}</td>
+            {% endif %}
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% else %}
-    <p>Não há reservas registradas para hoje.</p>
+    {% if user.perfil == 'monitor' %}
+      <p>Você não tem reservas registradas para hoje nos laboratórios que monitora.</p>
+    {% else %}
+      <p>Não há reservas registradas para hoje.</p>
+    {% endif %}
   {% endif %}
 {% endblock %}

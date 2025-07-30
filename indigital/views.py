@@ -28,13 +28,31 @@ def monitor_required(view_func):
     
     return _wrapped_view
 
+def admin_required(view_func):
+    """
+    Decorator para verificar se o usuário é um administrador.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        # Verificar se o usuário é administrador/superuser
+        if request.user.is_superuser or request.user.perfil == 'administrador':
+            return view_func(request, *args, **kwargs)
+        else:
+            messages.error(request, "Acesso negado. Apenas administradores têm permissão para acessar esta página.")
+            return render(request, '403.html', status=403)
+    
+    return _wrapped_view
+
 def index(request):
     return render(request, "index.html")
 
 # crud de disponibilidade
 
 @login_required
-@permission_required('indigital.criar_disponibilidade', raise_exception=True)
+@admin_required
 def criar_disponibilidade(request):
     laboratorios = Laboratorio.objects.all()
     if request.method == "POST":
@@ -51,7 +69,7 @@ def criar_disponibilidade(request):
     return render(request, "criar_disponibilidade.html", {'form' : form, "laboratorios": laboratorios})
 
 @login_required
-@permission_required('indigital.editar_reserva', raise_exception=True)
+@admin_required
 def editar_disponibilidade(request, reserva_id):
     reserva = get_object_or_404(Disponibilidade, id=reserva_id)
 
@@ -74,13 +92,13 @@ def editar_disponibilidade(request, reserva_id):
     return render(request, "editar_disponibilidade.html", context)
 
 @login_required
-@permission_required('indigital.listar_disponibilidades', raise_exception=True)
+@admin_required
 def listar_disponibilidades(request):
     reserva = Disponibilidade.objects.all()
     return render(request, "listar_disponibilidades.html", {'reservas' : reserva})
 
 @login_required
-@permission_required('indigital.excluir_disponibilidade', raise_exception=True)
+@admin_required
 def excluir_disponibilidade(request, reserva_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=reserva_id)
 
@@ -100,7 +118,7 @@ def excluir_disponibilidade(request, reserva_id):
 # crud laboratorio
 
 @login_required
-@permission_required('indigital.criar_laboratorio', raise_exception=True)
+@admin_required
 def criar_laboratorio(request):
     if request.method == "POST":
         form = LaboratorioForm(request.POST)
@@ -116,7 +134,7 @@ def criar_laboratorio(request):
     return render(request, "criar_laboratorio.html", {'form' : form})
 
 @login_required
-@permission_required('indigital.editar_laboratorio', raise_exception=True)
+@admin_required
 def editar_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
     context = {
@@ -138,7 +156,7 @@ def editar_laboratorio(request, laboratorio_id):
     return render(request, "editar_laboratorio.html", context)
 
 @login_required
-@permission_required('indigital.listar_laboratorios', raise_exception=True)
+@admin_required
 def listar_laboratorios(request):
     laboratorios_list = Laboratorio.objects.all()
     paginator = Paginator(laboratorios_list, 4)
@@ -147,7 +165,7 @@ def listar_laboratorios(request):
     return render(request, 'listar_laboratorios.html', {'page_obj': page_obj})
 
 @login_required
-@permission_required('indigital.excluir_laboratorio', raise_exception=True)
+@admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
     if request.method == "POST":
@@ -195,7 +213,7 @@ def reservar_laboratorio(request, disponibilidade_id):
     return redirect('horarios')
 
 @login_required
-@permission_required('indigital.reservas', raise_exception=True)
+@admin_required
 def reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user)
     return render(request, "gerenciar_reservas.html", {"reservas": reservas})
@@ -219,17 +237,35 @@ def minhas_reservas(request):
     return render(request, 'minhas_reservas.html', {'reservas': reservas})
 
 @login_required
+@monitor_required
 def reservas_do_dia(request):
     from datetime import date
-    reservas = Reserva.objects.filter(disponibilidade__data=date.today())
+    
+    # Se for administrador ou superuser, mostra todas as reservas
+    if request.user.is_superuser or request.user.perfil == 'administrador':
+        reservas = Reserva.objects.filter(disponibilidade__data=date.today()).select_related(
+            'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
+        )
+    # Se for monitor, mostra apenas as reservas dos laboratórios que ele monitora
+    elif request.user.perfil == 'monitor':
+        reservas = Reserva.objects.filter(
+            disponibilidade__data=date.today(),
+            disponibilidade__monitor=request.user
+        ).select_related('usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor')
+    else:
+        # Esta linha não será executada devido ao decorator, mas mantemos por segurança
+        reservas = Reserva.objects.none()
+    
     return render(request, 'reservas_do_dia.html', {'reservas': reservas})
 
 @login_required
+@admin_required
 def fila_espera(request):
     filas = FilaEspera.objects.select_related('usuario', 'disponibilidade').all()
     return render(request, 'fila_espera.html', {'filas': filas})
 
 @login_required
+@admin_required
 def promover_fila(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id)
     disponibilidade = fila.disponibilidade
@@ -246,6 +282,7 @@ def promover_fila(request, fila_id):
     return redirect('fila_espera')
 
 @login_required
+@admin_required
 def remover_fila(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id)
     fila.delete()
@@ -297,9 +334,17 @@ def minha_fila_espera(request):
     return render(request, 'minha_fila_espera.html', {'filas': dados_filas})
 
 @login_required
-@permission_required('indigital.reservas', raise_exception=True)
+@monitor_required
 def usuarios_da_reserva(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    
+    # Verificar se o usuário tem permissão para ver esta disponibilidade
+    if not (request.user.is_superuser or 
+            request.user.perfil == 'administrador' or 
+            (request.user.perfil == 'monitor' and disponibilidade.monitor == request.user)):
+        messages.error(request, "Acesso negado. Você não tem permissão para ver esta disponibilidade.")
+        return render(request, '403.html', status=403)
+    
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
     fila_espera = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
 
@@ -336,6 +381,7 @@ def registrar_frequencias(request, disponibilidade_id):
     return render(request, "registrar_frequencias.html", {"disponibilidade": disponibilidade, "reservas": reservas})
 
 @login_required
+@admin_required
 def reservas_por_usuario(request, usuario_id):
     from datetime import date
     
@@ -430,7 +476,7 @@ def historico_reservas(request):
     return render(request, 'historico_reservas.html', context)
 
 @login_required
-@permission_required('indigital.reservas', raise_exception=True)
+@admin_required
 def historico_geral_reservas(request):
     from datetime import date, datetime
     

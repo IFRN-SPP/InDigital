@@ -3,6 +3,25 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .forms import CadastroForm, EditarPerfilForm
 from django.contrib import messages
 from .models import User
+from functools import wraps
+
+def admin_required(view_func):
+    """
+    Decorator para verificar se o usuário é um administrador.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        # Verificar se o usuário é administrador/superuser
+        if request.user.is_superuser or request.user.perfil == 'administrador':
+            return view_func(request, *args, **kwargs)
+        else:
+            messages.error(request, "Acesso negado. Apenas administradores têm permissão para acessar esta página.")
+            return render(request, '403.html', status=403)
+    
+    return _wrapped_view
 
 def cadastro(request):
     if request.method == 'POST':
@@ -41,13 +60,13 @@ def editar_perfil(request):
     return render(request, "editar_perfil.html", {'form': form})
 
 @login_required
-@permission_required('usuarios.listar_usuarios', raise_exception=True)
+@admin_required
 def listar_usuarios(request):
     usuarios = User.objects.all()
     return render(request, "listar_usuarios.html", {'usuarios': usuarios})
 
 @login_required
-@permission_required('usuarios.editar_usuario', raise_exception=True)
+@admin_required
 def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
     form = EditarPerfilForm(request.POST or None, instance=usuario)
@@ -60,7 +79,7 @@ def editar_usuario(request, usuario_id):
     return render(request, 'editar_usuario.html', {'form': form})
 
 @login_required
-@permission_required('usuarios.deletar_usuario', raise_exception=True)
+@admin_required
 def deletar_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
 
@@ -72,7 +91,7 @@ def deletar_usuario(request, usuario_id):
     return render(request, 'deletar_usuario.html', {'usuario': usuario})
 
 @login_required
-@permission_required('usuarios.tornar_monitor', raise_exception=True)
+@admin_required
 def tornar_monitor(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
     usuario.perfil = 'monitor'
@@ -81,7 +100,7 @@ def tornar_monitor(request, usuario_id):
     return redirect('listar_usuarios')
 
 @login_required
-@permission_required('usuarios.remover_monitor', raise_exception=True)
+@admin_required
 def remover_monitor(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
     usuario.perfil = 'aluno'
@@ -90,7 +109,7 @@ def remover_monitor(request, usuario_id):
     return redirect('listar_usuarios')
 
 @login_required
-@permission_required('usuarios.listar_monitores', raise_exception=True)
+@admin_required
 def listar_monitores(request):
     monitores = User.objects.filter(perfil='monitor')
     return render(request, "listar_monitores.html", {'monitores': monitores})

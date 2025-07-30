@@ -27,14 +27,25 @@
         <a href="{% url 'index' %}"> Home</a>
         <a href="{% url 'horarios' %}"> Horários</a>
         <a href="{% url 'minhas_reservas' %}"> Minhas Reservas</a>
+        <a href="{% url 'minha_fila_espera' %}"> Minha Fila de Espera</a>
         <a href="{% url 'historico_reservas' %}"> Meu Histórico</a>
+        
+        <!-- Menu para Monitores -->
         {% if request.user.perfil == 'monitor' %}
         <a href="{% url 'listar_disponibilidades_monitor' %}"> Minhas Monitorias</a>
+        <a href="{% url 'reservas_do_dia' %}"> Reservas do Dia</a>
         {% endif %}
-        {% if request.user.is_superuser %}
+        
+        <!-- Menu para Administradores -->
+        {% if request.user.is_superuser or request.user.perfil == 'administrador' %}
         <a href="{% url 'reservas' %}"> Gerenciar Reservas</a>
+        <a href="{% url 'reservas_do_dia' %}"> Reservas do Dia</a>
+        <a href="{% url 'listar_usuarios' %}"> Gerenciar Usuários</a>
+        <a href="{% url 'listar_monitores' %}"> Monitores</a>
         <a href="{% url 'historico_geral_reservas' %}"> Histórico Geral</a>
+        <a href="{% url 'fila_espera' %}"> Fila de Espera</a>
         {% endif %}
+        
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">Sair</button>

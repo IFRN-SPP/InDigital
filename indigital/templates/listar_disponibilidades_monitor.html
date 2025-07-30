@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Minhas Disponibilidades</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Minhas Disponibilidades</h2>
+        <a href="{% url 'reservas_do_dia' %}" class="btn btn-info">
+            <i class="fas fa-calendar-day"></i> Reservas do Dia
+        </a>
+    </div>
     {% if disponibilidades %}
         <table class="table table-striped mt-3">
             <thead>
