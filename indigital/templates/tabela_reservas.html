@@ -69,8 +69,12 @@
                                    class="btn btn-sm btn-outline-danger" 
                                    onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')"
                                    title="Cancelar reserva">
-                                    <i class="fas fa-times"></i>
+                                    <i class="fas fa-times"></i> Cancelar
                                 </a>
+                            {% else %}
+                                <span class="text-muted">
+                                    <i class="fas fa-ban"></i> Não disponível
+                                </span>
                             {% endif %}
                         </td>
                     </tr>

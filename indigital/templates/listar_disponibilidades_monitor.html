@@ -24,6 +24,7 @@
                     <td>{{ disponibilidade.data|date:"d/m/Y" }}</td>
                     <td>
                         <a href="{% url 'registrar_frequencias' disponibilidade.id %}" class="btn btn-primary btn-sm">Registrar Frequência</a>
+                        <a href="{% url 'usuarios_da_reserva' disponibilidade.id %}" class="btn btn-secondary btn-sm ms-1">Ver usuários</a>
                     </td>
                 </tr>
                 {% endfor %}
