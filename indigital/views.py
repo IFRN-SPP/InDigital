@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from functools import wraps
+from django.http import HttpResponseForbidden
 
 from usuarios.models import User
 from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
@@ -7,6 +9,24 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
+
+def monitor_required(view_func):
+    """
+    Decorator para verificar se o usuário é um monitor.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        # Verificar se o usuário é monitor ou administrador/superuser
+        if request.user.perfil == 'monitor' or request.user.is_superuser or request.user.perfil == 'administrador':
+            return view_func(request, *args, **kwargs)
+        else:
+            messages.error(request, "Acesso negado. Apenas monitores têm permissão para acessar esta página.")
+            return render(request, '403.html', status=403)
+    
+    return _wrapped_view
 
 def index(request):
     return render(request, "index.html")
@@ -286,11 +306,13 @@ def usuarios_da_reserva(request, disponibilidade_id):
     return render(request, 'usuarios_da_reserva.html', {'disponibilidade': disponibilidade, 'reservas': reservas, 'fila_espera': fila_espera})
 
 @login_required
+@monitor_required
 def listar_disponibilidades_monitor(request):
     disponibilidades = Disponibilidade.objects.filter(monitor=request.user)
     return render(request, 'listar_disponibilidades_monitor.html', {'disponibilidades': disponibilidades})
 
 @login_required
+@monitor_required
 def registrar_frequencias(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')

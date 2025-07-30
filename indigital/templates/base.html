@@ -28,6 +28,9 @@
         <a href="{% url 'horarios' %}"> Horários</a>
         <a href="{% url 'minhas_reservas' %}"> Minhas Reservas</a>
         <a href="{% url 'historico_reservas' %}"> Meu Histórico</a>
+        {% if request.user.perfil == 'monitor' %}
+        <a href="{% url 'listar_disponibilidades_monitor' %}"> Minhas Monitorias</a>
+        {% endif %}
         {% if request.user.is_superuser %}
         <a href="{% url 'reservas' %}"> Gerenciar Reservas</a>
         <a href="{% url 'historico_geral_reservas' %}"> Histórico Geral</a>
