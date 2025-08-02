@@ -7,7 +7,7 @@
     <div class="h2-listar">
         <h2>Disponibilidades</h2>
     </div>
-    {% if reservas %}
+    {% if page_obj %}
         <table>
             <thead>
                 <tr>
@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for reserva in reservas %}
+                {% for reserva in page_obj %}
                     <tr>
                         <td>{{ reserva.id }}</td>
                         <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
@@ -45,9 +45,55 @@
                 {% endfor %}
             </tbody>
         </table>
-    </form>
-    <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
-      </form>
+        
+        <!-- Paginação -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
+                <ul class="pagination justify-content-center">
+                    
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="Primeira">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
+        
+        <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
     {% else %}
         <p>Nenhuma reserva encontrada.</p>
         <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>

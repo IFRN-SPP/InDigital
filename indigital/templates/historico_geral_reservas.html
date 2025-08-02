@@ -75,7 +75,7 @@
             <h5><i class="fas fa-table"></i> Reservas</h5>
         </div>
         <div class="card-body">
-            {% if reservas %}
+            {% if page_obj %}
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead class="table-dark">
@@ -89,7 +89,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for reserva in reservas %}
+                            {% for reserva in page_obj %}
                                 <tr>
                                     <td>
                                         <i class="fas fa-user"></i>
@@ -138,6 +138,54 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Paginação -->
+                {% if page_obj.has_other_pages %}
+                    <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
+                        <ul class="pagination justify-content-center">
+                            
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Primeira">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Próxima">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Última">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </nav>
+                {% endif %}
+                
             {% else %}
                 <div class="text-center text-muted py-4">
                     <i class="fas fa-inbox fa-3x mb-3"></i>

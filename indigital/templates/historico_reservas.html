@@ -85,7 +85,130 @@
         <div class="tab-pane fade show active" id="todas" role="tabpanel">
             <div class="card">
                 <div class="card-body">
-                    {% include 'tabela_reservas.html' with reservas=reservas %}
+                    {% if page_obj %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Horário</th>
+                                        <th>Laboratório</th>
+                                        <th>Status</th>
+                                        <th>Monitor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reserva in page_obj %}
+                                        <tr class="{% if reserva.disponibilidade.data < today %}table-secondary{% elif reserva.disponibilidade.data == today %}table-info{% endif %}">
+                                            <td>
+                                                <i class="fas fa-calendar"></i>
+                                                {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+                                                {% if reserva.disponibilidade.data == today %}
+                                                    <span class="badge bg-info">Hoje</span>
+                                                {% elif reserva.disponibilidade.data > today %}
+                                                    <span class="badge bg-success">Futuro</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Passado</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-clock"></i>
+                                                {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-flask"></i>
+                                                {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                            </td>
+                                            <td>
+                                                {% if reserva.status_frequencia == 'P' %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check"></i> Presente
+                                                    </span>
+                                                {% elif reserva.status_frequencia == 'F' %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times"></i> Faltou
+                                                    </span>
+                                                {% elif reserva.status_frequencia == 'N' %}
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-question"></i> Não Registrado
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-clock"></i> Pendente
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if reserva.disponibilidade.monitor %}
+                                                    <i class="fas fa-user-tie"></i>
+                                                    {{ reserva.disponibilidade.monitor.username }}
+                                                {% else %}
+                                                    <span class="text-muted">
+                                                        <i class="fas fa-user-slash"></i>
+                                                        Sem monitor
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                            <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
+                                <ul class="pagination justify-content-center">
+                                    
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Primeira">
+                                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Anterior">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Próxima">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" aria-label="Última">
+                                                <span aria-hidden="true">&raquo;&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
+                                </ul>
+                            </nav>
+                        {% endif %}
+                        
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Nenhuma reserva encontrada</h4>
+                            <p class="text-muted">Você ainda não possui reservas no sistema ou não há reservas que correspondem aos filtros aplicados.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

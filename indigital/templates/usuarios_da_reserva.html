@@ -13,29 +13,125 @@
 
     <hr>
 
-    <h3>Reservas confirmadas ({{ reservas.count }})</h3>
-    {% if reservas %}
+    <h3>Reservas confirmadas ({{ reservas_count }})</h3>
+    {% if reservas_page_obj %}
         <ul>
-            {% for reserva in reservas %}
+            {% for reserva in reservas_page_obj %}
                 <li>{{ reserva.usuario.username }}</li>
             {% endfor %}
         </ul>
+        
+        <!-- Paginação das Reservas -->
+        {% if reservas_page_obj.has_other_pages %}
+            <nav aria-label="Navegação de reservas" style="margin-top: 15px;">
+                <ul class="pagination justify-content-center">
+                    
+                    {% if reservas_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?reservas_page=1{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Primeira">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.previous_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in reservas_page_obj.paginator.page_range %}
+                        {% if reservas_page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > reservas_page_obj.number|add:'-3' and num < reservas_page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?reservas_page={{ num }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if reservas_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.next_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Próxima">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.paginator.num_pages }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
+        
     {% else %}
         <p>Nenhuma reserva confirmada para este horário.</p>
     {% endif %}
 
     <hr>
 
-    <h3>Fila de espera</h3>
-    {% if fila_espera %}
-        <ol>
-            {% for fila in fila_espera %}
+    <h3>Fila de espera ({{ fila_count }})</h3>
+    {% if fila_page_obj %}
+        <ol start="{{ fila_page_obj.start_index }}">
+            {% for fila in fila_page_obj %}
                 <li>
                     {{ fila.usuario.username }}
                     - solicitada em {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
                 </li>
             {% endfor %}
         </ol>
+        
+        <!-- Paginação da Fila de Espera -->
+        {% if fila_page_obj.has_other_pages %}
+            <nav aria-label="Navegação da fila de espera" style="margin-top: 15px;">
+                <ul class="pagination justify-content-center">
+                    
+                    {% if fila_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?fila_page=1{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Primeira">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?fila_page={{ fila_page_obj.previous_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in fila_page_obj.paginator.page_range %}
+                        {% if fila_page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > fila_page_obj.number|add:'-3' and num < fila_page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?fila_page={{ num }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if fila_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?fila_page={{ fila_page_obj.next_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Próxima">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?fila_page={{ fila_page_obj.paginator.num_pages }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
+        
     {% else %}
         <p>Ninguém na fila de espera.</p>
     {% endif %}

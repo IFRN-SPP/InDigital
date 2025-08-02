@@ -4,6 +4,7 @@ from .forms import CadastroForm, EditarPerfilForm
 from django.contrib import messages
 from .models import User
 from functools import wraps
+from django.core.paginator import Paginator
 
 def admin_required(view_func):
     """
@@ -63,7 +64,10 @@ def editar_perfil(request):
 @admin_required
 def listar_usuarios(request):
     usuarios = User.objects.all()
-    return render(request, "listar_usuarios.html", {'usuarios': usuarios})
+    paginator = Paginator(usuarios, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "listar_usuarios.html", {'page_obj': page_obj})
 
 @login_required
 @admin_required
@@ -112,4 +116,7 @@ def remover_monitor(request, usuario_id):
 @admin_required
 def listar_monitores(request):
     monitores = User.objects.filter(perfil='monitor')
-    return render(request, "listar_monitores.html", {'monitores': monitores})
+    paginator = Paginator(monitores, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "listar_monitores.html", {'page_obj': page_obj})
