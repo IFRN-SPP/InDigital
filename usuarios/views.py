@@ -64,10 +64,40 @@ def editar_perfil(request):
 @admin_required
 def listar_usuarios(request):
     usuarios = User.objects.all()
+    
+    # Filtros opcionais
+    nome = request.GET.get('nome')
+    matricula = request.GET.get('matricula')
+    email = request.GET.get('email')
+    perfil = request.GET.get('perfil')
+    
+    # Aplicar filtros se fornecidos
+    if nome:
+        usuarios = usuarios.filter(username__icontains=nome)
+    
+    if matricula:
+        usuarios = usuarios.filter(matricula__icontains=matricula)
+    
+    if email:
+        usuarios = usuarios.filter(email__icontains=email)
+    
+    if perfil and perfil != 'todos':
+        usuarios = usuarios.filter(perfil=perfil)
+    
+    # Paginação
     paginator = Paginator(usuarios, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, "listar_usuarios.html", {'page_obj': page_obj})
+    
+    context = {
+        'page_obj': page_obj,
+        'nome': nome,
+        'matricula': matricula,
+        'email': email,
+        'perfil': perfil,
+    }
+    
+    return render(request, "listar_usuarios.html", context)
 
 @login_required
 @admin_required
@@ -115,8 +145,33 @@ def remover_monitor(request, usuario_id):
 @login_required
 @admin_required
 def listar_monitores(request):
-    monitores = User.objects.filter(perfil='monitor')
-    paginator = Paginator(monitores, 5)
+    monitores = User.objects.filter(perfil='monitor').order_by('username')
+    
+    # Filtros opcionais
+    nome = request.GET.get('nome')
+    matricula = request.GET.get('matricula')
+    email = request.GET.get('email')
+    
+    # Aplicar filtros se fornecidos
+    if nome:
+        monitores = monitores.filter(username__icontains=nome)
+    
+    if matricula:
+        monitores = monitores.filter(matricula__icontains=matricula)
+    
+    if email:
+        monitores = monitores.filter(email__icontains=email)
+    
+    # Paginação
+    paginator = Paginator(monitores, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, "listar_monitores.html", {'page_obj': page_obj})
+    
+    context = {
+        'page_obj': page_obj,
+        'nome': nome,
+        'matricula': matricula,
+        'email': email,
+    }
+    
+    return render(request, "listar_monitores.html", context)

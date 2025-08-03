@@ -1,84 +1,170 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Lista de Monitores</h2>
+  <h2>Lista de Monitores</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Matrícula</th>
-      <th>Nome</th>
-      <th>Email</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for monitor in page_obj %}
-    <tr>
-      <td>{{ monitor.id }}</td>
-      <td>{{ monitor.matricula }}</td>
-      <td>{{ monitor.username }}</td>
-      <td>{{ monitor.email }}</td>
-      <td>
-        <a href="{% url 'editar_usuario' monitor.id %}">Editar</a>
-        <form action="{% url 'deletar_usuario' monitor.id %}" method="post" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este monitor?');">Excluir</button>
-        </form>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="5">Nenhum monitor encontrado.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-filter"></i> Filtros
+      </h5>
+    </div>
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <label for="nome" class="form-label">Nome:</label>
+          <input type="text" id="nome" name="nome" class="form-control" 
+                 value="{{ nome|default:'' }}" placeholder="Buscar por nome">
+        </div>
+        <div class="col-md-4">
+          <label for="matricula" class="form-label">Matrícula:</label>
+          <input type="text" id="matricula" name="matricula" class="form-control" 
+                 value="{{ matricula|default:'' }}" placeholder="Buscar por matrícula">
+        </div>
+        <div class="col-md-4">
+          <label for="email" class="form-label">Email:</label>
+          <input type="email" id="email" name="email" class="form-control" 
+                 value="{{ email|default:'' }}" placeholder="Buscar por email">
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Filtrar
+          </button>
+          <a href="{% url 'listar_monitores' %}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Limpar Filtros
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<!-- Paginação -->
-{% if page_obj.has_other_pages %}
-  <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
-    <ul class="pagination justify-content-center">
-      
-      {% if page_obj.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page=1" aria-label="Primeira">
-            <span aria-hidden="true">&laquo;&laquo;</span>
-          </a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
+  <!-- Resultados -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-user-cog"></i> Monitores
+      </h5>
+      <span class="badge bg-primary">{{ page_obj.paginator.count }} monitor{{ page_obj.paginator.count|pluralize:"es" }}</span>
+    </div>
+    <div class="card-body">
+      {% if page_obj %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for monitor in page_obj %}
+                <tr>
+                  <td>{{ monitor.id }}</td>
+                  <td>{{ monitor.matricula|default:"<span class='text-muted'>Não informado</span>" }}</td>
+                  <td>
+                    <strong>{{ monitor.username }}</strong>
+                    {% if monitor.first_name or monitor.last_name %}
+                      <br><small class="text-muted">{{ monitor.first_name }} {{ monitor.last_name }}</small>
+                    {% endif %}
+                  </td>
+                  <td>{{ monitor.email }}</td>
+                  <td class="text-center">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'editar_usuario' monitor.id %}" 
+                         class="btn btn-sm btn-outline-primary" 
+                         title="Editar monitor">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'deletar_usuario' monitor.id %}" 
+                         class="btn btn-sm btn-outline-danger" 
+                         title="Excluir monitor"
+                         onclick="return confirm('Tem certeza que deseja excluir este monitor?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                      <a href="{% url 'remover_monitor' monitor.id %}" 
+                         class="btn btn-sm btn-outline-warning" 
+                         title="Remover permissões de monitor"
+                         onclick="return confirm('Tem certeza que deseja remover as permissões de monitor deste usuário?')">
+                        <i class="fas fa-user-minus"></i>
+                      </a>
+                      <a href="{% url 'reservas_por_usuario' monitor.id %}" 
+                         class="btn btn-sm btn-outline-info" 
+                         title="Ver reservas">
+                        <i class="fas fa-calendar-alt"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">
+                    <i class="fas fa-user-cog fa-3x mb-3"></i>
+                    <p class="mb-0">Nenhum monitor encontrado com os filtros aplicados.</p>
+                    <small>Tente ajustar os filtros ou <a href="{% url 'listar_monitores' %}">limpar os filtros</a> para ver todos os monitores.</small>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-user-cog fa-3x mb-3"></i>
+          <p class="mb-0">Nenhum monitor encontrado.</p>
+        </div>
       {% endif %}
+    </div>
+  </div>
 
-      {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-          <li class="page-item active">
-            <span class="page-link">{{ num }}</span>
-          </li>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+  <!-- Paginação -->
+  {% if page_obj.has_other_pages %}
+    <nav aria-label="Navegação de páginas" class="mt-4">
+      <ul class="pagination justify-content-center">
+        
+        {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            <a class="page-link" href="?page=1{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}" aria-label="Primeira">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}" aria-label="Anterior">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
           </li>
         {% endif %}
-      {% endfor %}
 
-      {% if page_obj.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
-            <span aria-hidden="true">&raquo;&raquo;</span>
-          </a>
-        </li>
-      {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
 
-    </ul>
-  </nav>
-{% endif %}
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}" aria-label="Próxima">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}" aria-label="Última">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+        {% endif %}
+
+      </ul>
+    </nav>
+  {% endif %}
 
 {% endblock %}

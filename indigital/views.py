@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from functools import wraps
-from django.http import HttpResponseForbidden
+from datetime import date, datetime
 
 from usuarios.models import User
 from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
@@ -8,7 +8,6 @@ from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import render
 
 def monitor_required(view_func):
     """
@@ -94,11 +93,63 @@ def editar_disponibilidade(request, reserva_id):
 @login_required
 @admin_required
 def listar_disponibilidades(request):
-    reserva = Disponibilidade.objects.all()
-    paginator = Paginator(reserva, 5)
+    disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('-data', 'horario_inicio')
+    
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    monitor_id = request.GET.get('monitor')
+    vagas_min = request.GET.get('vagas_min')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if monitor_id and monitor_id != 'todos':
+        disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
+    
+    if vagas_min:
+        try:
+            disponibilidades = disponibilidades.filter(vagas__gte=int(vagas_min))
+        except ValueError:
+            messages.error(request, "Número mínimo de vagas deve ser um número.")
+    
+    # Paginação
+    paginator = Paginator(disponibilidades, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, "listar_disponibilidades.html", {'page_obj': page_obj})
+    
+    # Dados para os filtros
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+    monitores = User.objects.filter(perfil='monitor').order_by('username')
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'monitores': monitores,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'monitor_id': monitor_id,
+        'vagas_min': vagas_min,
+    }
+    
+    return render(request, "listar_disponibilidades.html", context)
 
 @login_required
 @admin_required
@@ -161,11 +212,42 @@ def editar_laboratorio(request, laboratorio_id):
 @login_required
 @admin_required
 def listar_laboratorios(request):
-    laboratorios_list = Laboratorio.objects.all()
+    laboratorios_list = Laboratorio.objects.all().order_by('num_laboratorio')
+    
+    # Filtros opcionais
+    num_laboratorio = request.GET.get('num_laboratorio')
+    capacidade_min = request.GET.get('capacidade_min')
+    capacidade_max = request.GET.get('capacidade_max')
+    
+    # Aplicar filtros se fornecidos
+    if num_laboratorio:
+        laboratorios_list = laboratorios_list.filter(num_laboratorio__icontains=num_laboratorio)
+    
+    if capacidade_min:
+        try:
+            laboratorios_list = laboratorios_list.filter(capacidade__gte=int(capacidade_min))
+        except ValueError:
+            messages.error(request, "Capacidade mínima deve ser um número.")
+    
+    if capacidade_max:
+        try:
+            laboratorios_list = laboratorios_list.filter(capacidade__lte=int(capacidade_max))
+        except ValueError:
+            messages.error(request, "Capacidade máxima deve ser um número.")
+    
+    # Paginação
     paginator = Paginator(laboratorios_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'listar_laboratorios.html', {'page_obj': page_obj})
+    
+    context = {
+        'page_obj': page_obj,
+        'num_laboratorio': num_laboratorio,
+        'capacidade_min': capacidade_min,
+        'capacidade_max': capacidade_max,
+    }
+    
+    return render(request, 'listar_laboratorios.html', context)
 
 @login_required
 @admin_required
@@ -181,15 +263,74 @@ def excluir_laboratorio(request, laboratorio_id):
 # horarios e reservas
 @login_required
 def horarios(request):
-    reservas = Disponibilidade.objects.all()
+    disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('data', 'horario_inicio')
     
-    paginator = Paginator(reservas, 5) 
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio_id')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    monitor_id = request.GET.get('monitor')
+    vagas_minimas = request.GET.get('vagas_minimas')
+    apenas_com_vagas = request.GET.get('apenas_com_vagas')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if vagas_minimas:
+        try:
+            disponibilidades = disponibilidades.filter(vagas__gte=int(vagas_minimas))
+        except ValueError:
+            messages.error(request, "Número mínimo de vagas deve ser um número.")
+    
+    if monitor_id and monitor_id != 'todos':
+        disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
+    
+    if apenas_com_vagas == 'sim':
+        disponibilidades = disponibilidades.filter(vagas__gt=0)
+    
+    paginator = Paginator(disponibilidades, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Buscar reservas e filas do usuário para verificar status
     reservas_em_fila = FilaEspera.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
+    minhas_reservas = Reserva.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
+    
+    # Dados para os filtros
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+    monitores = User.objects.filter(perfil='monitor').order_by('username')
+    
+    context = {
+        'page_obj': page_obj,
+        'reservas_em_fila': reservas_em_fila,
+        'minhas_reservas': minhas_reservas,
+        'laboratorios': laboratorios,
+        'monitores': monitores,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'vagas_minimas': vagas_minimas,
+        'monitor_id': monitor_id,
+        'apenas_com_vagas': apenas_com_vagas,
+        'today': date.today(),
+    }
 
-    return render(request, "horarios.html", {'page_obj': page_obj, 'reservas_em_fila': reservas_em_fila})
+    return render(request, "horarios.html", context)
 
 @login_required
 def reservar_laboratorio(request, disponibilidade_id):
@@ -240,17 +381,65 @@ def cancelar_reserva(request, reserva_id):
 
 @login_required
 def minhas_reservas(request):
-    reservas_list = Reserva.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio').order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
-    paginator = Paginator(reservas_list, 5)
+    reservas = Reserva.objects.filter(usuario=request.user).select_related(
+        'disponibilidade__laboratorio', 'disponibilidade__monitor'
+    ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
+    # Filtros
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    laboratorio_id = request.GET.get('laboratorio_id')
+    status = request.GET.get('status')
+    
+    # Aplicar filtros
+    if data_inicio:
+        try:
+            data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_parsed)
+        except ValueError:
+            pass
+    
+    if data_fim:
+        try:
+            data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_parsed)
+        except ValueError:
+            pass
+    
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    if status and status != 'todos':
+        today = date.today()
+        if status == 'futuras':
+            reservas = reservas.filter(disponibilidade__data__gt=today)
+        elif status == 'hoje':
+            reservas = reservas.filter(disponibilidade__data=today)
+        elif status == 'passadas':
+            reservas = reservas.filter(disponibilidade__data__lt=today)
+    
+    paginator = Paginator(reservas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'minhas_reservas.html', {'page_obj': page_obj})
+    
+    # Buscar laboratórios para o filtro
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'today': date.today(),
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'laboratorio_id': laboratorio_id,
+        'status': status,
+    }
+    
+    return render(request, 'minhas_reservas.html', context)
 
 @login_required
 @monitor_required
 def reservas_do_dia(request):
-    from datetime import date
-    
     # Se for administrador ou superuser, mostra todas as reservas
     if request.user.is_superuser or request.user.perfil == 'administrador':
         reservas = Reserva.objects.filter(disponibilidade__data=date.today()).select_related(
@@ -266,20 +455,109 @@ def reservas_do_dia(request):
         # Esta linha não será executada devido ao decorator, mas mantemos por segurança
         reservas = Reserva.objects.none()
     
-    paginator = Paginator(reservas, 5)
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    usuario_nome = request.GET.get('usuario_nome')
+    monitor_id = request.GET.get('monitor')
+    status_frequencia = request.GET.get('status_frequencia')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    if usuario_nome:
+        reservas = reservas.filter(usuario__username__icontains=usuario_nome)
+    
+    if monitor_id and monitor_id != 'todos' and (request.user.is_superuser or request.user.perfil == 'administrador'):
+        reservas = reservas.filter(disponibilidade__monitor_id=monitor_id)
+    
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
+    
+    # Paginação
+    paginator = Paginator(reservas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'reservas_do_dia.html', {'page_obj': page_obj})
+    # Dados para os filtros
+    if request.user.is_superuser or request.user.perfil == 'administrador':
+        laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+        monitores = User.objects.filter(perfil='monitor').order_by('username')
+    else:
+        laboratorios = Laboratorio.objects.filter(
+            disponibilidade__monitor=request.user
+        ).distinct().order_by('num_laboratorio')
+        monitores = None
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'monitores': monitores,
+        'laboratorio_id': laboratorio_id,
+        'usuario_nome': usuario_nome,
+        'monitor_id': monitor_id,
+        'status_frequencia': status_frequencia,
+        'today': date.today(),
+    }
+    
+    return render(request, 'reservas_do_dia.html', context)
 
 @login_required
 @admin_required
 def fila_espera(request):
-    filas = FilaEspera.objects.select_related('usuario', 'disponibilidade').all().order_by('disponibilidade__data', 'disponibilidade__horario_inicio', 'data_solicitacao')
+    filas = FilaEspera.objects.select_related('usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor').all().order_by('disponibilidade__data', 'disponibilidade__horario_inicio', 'data_solicitacao')
+    
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    usuario_nome = request.GET.get('usuario_nome')
+    monitor_id = request.GET.get('monitor')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        filas = filas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            filas = filas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            filas = filas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if usuario_nome:
+        filas = filas.filter(usuario__username__icontains=usuario_nome)
+    
+    if monitor_id and monitor_id != 'todos':
+        filas = filas.filter(disponibilidade__monitor_id=monitor_id)
+    
     paginator = Paginator(filas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'fila_espera.html', {'page_obj': page_obj})
+    
+    # Dados para os filtros
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+    monitores = User.objects.filter(perfil='monitor').order_by('username')
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'monitores': monitores,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'usuario_nome': usuario_nome,
+        'monitor_id': monitor_id,
+    }
+    
+    return render(request, 'fila_espera.html', context)
 
 @login_required
 @admin_required
@@ -332,7 +610,30 @@ def sair_fila_espera(request, fila_id):
 
 @login_required
 def minha_fila_espera(request):
-    minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
+    minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio', 'disponibilidade__monitor').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
+    
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        minhas_filas = minhas_filas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            minhas_filas = minhas_filas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            minhas_filas = minhas_filas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
     
     dados_filas = []
     for fila in minhas_filas:
@@ -348,9 +649,23 @@ def minha_fila_espera(request):
             'status': "Você é o próximo" if posicao == 1 else f"Posição {posicao}",
         })
 
-    paginator = Paginator(dados_filas, 5)
+    paginator = Paginator(dados_filas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
+    # Dados para os filtros
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'today': date.today(),
+    }
+    
+    return render(request, 'minha_fila_espera.html', context)
     return render(request, 'minha_fila_espera.html', {'page_obj': page_obj})
 
 @login_required
@@ -365,34 +680,100 @@ def usuarios_da_reserva(request, disponibilidade_id):
         messages.error(request, "Acesso negado. Você não tem permissão para ver esta disponibilidade.")
         return render(request, '403.html', status=403)
     
-    reservas_list = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
-    fila_espera_list = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    # Buscar reservas e fila de espera para esta disponibilidade
+    reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario').order_by('usuario__username')
+    fila_espera = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario').order_by('data_solicitacao')
 
+    # Filtros opcionais
+    usuario_nome = request.GET.get('usuario_nome')
+    status_frequencia = request.GET.get('status_frequencia')
+    
+    # Aplicar filtros nas reservas se fornecidos
+    if usuario_nome:
+        reservas = reservas.filter(usuario__username__icontains=usuario_nome)
+    
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
 
-    reservas_paginator = Paginator(reservas_list, 5)
+    # Aplicar filtro na fila de espera
+    if usuario_nome:
+        fila_espera = fila_espera.filter(usuario__username__icontains=usuario_nome)
+
+    reservas_paginator = Paginator(reservas, 10)
     reservas_page_number = request.GET.get('reservas_page')
     reservas_page_obj = reservas_paginator.get_page(reservas_page_number)
 
-    fila_paginator = Paginator(fila_espera_list, 5)
+    fila_paginator = Paginator(fila_espera, 10)
     fila_page_number = request.GET.get('fila_page')
     fila_page_obj = fila_paginator.get_page(fila_page_number)
 
-    return render(request, 'usuarios_da_reserva.html', {
+    context = {
         'disponibilidade': disponibilidade, 
         'reservas_page_obj': reservas_page_obj,
         'fila_page_obj': fila_page_obj,
-        'reservas_count': reservas_list.count(),
-        'fila_count': fila_espera_list.count()
-    })
+        'reservas_count': reservas.count(),
+        'fila_count': fila_espera.count(),
+        'usuario_nome': usuario_nome,
+        'status_frequencia': status_frequencia,
+    }
+
+    return render(request, 'usuarios_da_reserva.html', context)
 
 @login_required
 @monitor_required
 def listar_disponibilidades_monitor(request):
-    disponibilidades = Disponibilidade.objects.filter(monitor=request.user)
-    paginator = Paginator(disponibilidades, 5)
+    disponibilidades = Disponibilidade.objects.filter(monitor=request.user).select_related('laboratorio').order_by('-data', 'horario_inicio')
+    
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    vagas_min = request.GET.get('vagas_min')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if vagas_min:
+        try:
+            disponibilidades = disponibilidades.filter(vagas__gte=int(vagas_min))
+        except ValueError:
+            messages.error(request, "Número mínimo de vagas deve ser um número.")
+    
+    # Paginação
+    paginator = Paginator(disponibilidades, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'listar_disponibilidades_monitor.html', {'page_obj': page_obj})
+    
+    # Dados para os filtros (apenas laboratórios que o monitor tem disponibilidades)
+    laboratorios = Laboratorio.objects.filter(
+        disponibilidade__monitor=request.user
+    ).distinct().order_by('num_laboratorio')
+    
+    context = {
+        'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'vagas_min': vagas_min,
+    }
+    
+    return render(request, 'listar_disponibilidades_monitor.html', context)
 
 @login_required
 @monitor_required
@@ -425,17 +806,52 @@ def registrar_frequencias(request, disponibilidade_id):
 @login_required
 @admin_required
 def reservas_por_usuario(request, usuario_id):
-    from datetime import date
-    
     usuario = get_object_or_404(User, id=usuario_id)
     reservas = Reserva.objects.filter(usuario=usuario).select_related('disponibilidade__laboratorio').order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
+    # Filtros opcionais
+    laboratorio_id = request.GET.get('laboratorio')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    status_frequencia = request.GET.get('status_frequencia')
+    
+    # Aplicar filtros se fornecidos
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            messages.error(request, "Data de início inválida.")
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            messages.error(request, "Data de fim inválida.")
+    
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
+    
+    # Paginação
     paginator = Paginator(reservas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
+    # Dados para os filtros
+    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
 
     context = {
         'usuario': usuario, 
         'page_obj': page_obj,
+        'laboratorios': laboratorios,
+        'laboratorio_id': laboratorio_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'status_frequencia': status_frequencia,
         'today': date.today(),
     }
     
@@ -443,9 +859,6 @@ def reservas_por_usuario(request, usuario_id):
 
 @login_required
 def historico_reservas(request):
-    from datetime import date, datetime, timedelta
-    from django.db.models import Q
-    
     # Buscar todas as reservas do usuário logado
     reservas = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio'
@@ -511,8 +924,6 @@ def historico_reservas(request):
 @login_required
 @admin_required
 def historico_geral_reservas(request):
-    from datetime import date, datetime
-    
     # Buscar todas as reservas
     reservas = Reserva.objects.all().select_related(
         'usuario', 'disponibilidade__laboratorio'
@@ -570,5 +981,3 @@ def historico_geral_reservas(request):
     }
     
     return render(request, 'historico_geral_reservas.html', context)
-
-

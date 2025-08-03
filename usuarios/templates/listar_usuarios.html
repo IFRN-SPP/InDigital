@@ -3,60 +3,170 @@
 {% block content %}
   <h2>Lista de Usuários</h2>
 
-  <div style="margin-bottom: 10px;">
-    <a href="{% url 'cadastro' %}">
-      <button type="button">Adicionar Usuário</button>
+  <div class="mb-3">
+    <a href="{% url 'cadastro' %}" class="btn btn-success">
+      <i class="fas fa-user-plus"></i> Adicionar Usuário
     </a>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Matrícula</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for usuario in page_obj %}
-        <tr>
-          <td>{{ usuario.id }}</td>
-          <td>{{ usuario.matricula }}</td>
-          <td>{{ usuario.username }}</td>
-          <td>{{ usuario.email }}</td>
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-filter"></i> Filtros
+      </h5>
+    </div>
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-3">
+          <label for="nome" class="form-label">Nome:</label>
+          <input type="text" id="nome" name="nome" class="form-control" 
+                 value="{{ nome|default:'' }}" placeholder="Buscar por nome">
+        </div>
+        <div class="col-md-3">
+          <label for="matricula" class="form-label">Matrícula:</label>
+          <input type="text" id="matricula" name="matricula" class="form-control" 
+                 value="{{ matricula|default:'' }}" placeholder="Buscar por matrícula">
+        </div>
+        <div class="col-md-3">
+          <label for="email" class="form-label">Email:</label>
+          <input type="email" id="email" name="email" class="form-control" 
+                 value="{{ email|default:'' }}" placeholder="Buscar por email">
+        </div>
+        <div class="col-md-3">
+          <label for="perfil" class="form-label">Perfil:</label>
+          <select name="perfil" id="perfil" class="form-select">
+            <option value="todos" {% if not perfil or perfil == 'todos' %}selected{% endif %}>Todos os perfis</option>
+            <option value="aluno" {% if perfil == 'aluno' %}selected{% endif %}>Aluno</option>
+            <option value="monitor" {% if perfil == 'monitor' %}selected{% endif %}>Monitor</option>
+            <option value="administrador" {% if perfil == 'administrador' %}selected{% endif %}>Administrador</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Filtrar
+          </button>
+          <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Limpar Filtros
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 
-          <td>
-            <a href="{% url 'editar_usuario' usuario.id %}">Editar</a>
-            <a href="{% url 'deletar_usuario' usuario.id %}">Deletar</a>
-
-            {% if usuario.perfil != 'monitor' %}
-              <a href="{% url 'tornar_monitor' usuario.id %}">Definir como Monitor</a>
-            {% else %}
-              <a href="{% url 'remover_monitor' usuario.id %}">Remover Monitor</a>
-            {% endif %}
-
-            <a href="{% url 'reservas_por_usuario' usuario.id %}">Ver Reservas</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- Resultados -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-users"></i> Usuários
+      </h5>
+      <span class="badge bg-primary">{{ page_obj.paginator.count }} usuário{{ page_obj.paginator.count|pluralize:"s" }}</span>
+    </div>
+    <div class="card-body">
+      {% if page_obj %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Perfil</th>
+                <th class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in page_obj %}
+                <tr>
+                  <td>{{ usuario.id }}</td>
+                  <td>{{ usuario.matricula|default:"<span class='text-muted'>Não informado</span>" }}</td>
+                  <td>
+                    <strong>{{ usuario.username }}</strong>
+                    {% if usuario.first_name or usuario.last_name %}
+                      <br><small class="text-muted">{{ usuario.first_name }} {{ usuario.last_name }}</small>
+                    {% endif %}
+                  </td>
+                  <td>{{ usuario.email }}</td>
+                  <td>
+                    <span class="badge 
+                      {% if usuario.perfil == 'administrador' or usuario.is_superuser %}bg-danger
+                      {% elif usuario.perfil == 'monitor' %}bg-warning text-dark
+                      {% else %}bg-info{% endif %}">
+                      {% if usuario.is_superuser %}Superusuário
+                      {% else %}{{ usuario.get_perfil_display }}{% endif %}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'editar_usuario' usuario.id %}" 
+                         class="btn btn-sm btn-outline-primary" 
+                         title="Editar usuário">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'deletar_usuario' usuario.id %}" 
+                         class="btn btn-sm btn-outline-danger" 
+                         title="Deletar usuário"
+                         onclick="return confirm('Tem certeza que deseja deletar este usuário?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                      
+                      {% if usuario.perfil != 'monitor' and not usuario.is_superuser %}
+                        <a href="{% url 'tornar_monitor' usuario.id %}" 
+                           class="btn btn-sm btn-outline-success" 
+                           title="Definir como Monitor">
+                          <i class="fas fa-user-cog"></i>
+                        </a>
+                      {% elif usuario.perfil == 'monitor' %}
+                        <a href="{% url 'remover_monitor' usuario.id %}" 
+                           class="btn btn-sm btn-outline-warning" 
+                           title="Remover Monitor">
+                          <i class="fas fa-user-minus"></i>
+                        </a>
+                      {% endif %}
+                      
+                      <a href="{% url 'reservas_por_usuario' usuario.id %}" 
+                         class="btn btn-sm btn-outline-info" 
+                         title="Ver Reservas">
+                        <i class="fas fa-calendar-alt"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <p class="mb-0">Nenhum usuário encontrado com os filtros aplicados.</p>
+                    <small>Tente ajustar os filtros ou <a href="{% url 'listar_usuarios' %}">limpar os filtros</a> para ver todos os usuários.</small>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-users fa-3x mb-3"></i>
+          <p class="mb-0">Nenhum usuário encontrado.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 
   <!-- Paginação -->
   {% if page_obj.has_other_pages %}
-    <nav aria-label="Navegação de páginas">
+    <nav aria-label="Navegação de páginas" class="mt-4">
       <ul class="pagination justify-content-center">
         
         {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page=1" aria-label="Primeira">
+            <a class="page-link" href="?page=1{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}{% if perfil %}&perfil={{ perfil }}{% endif %}" aria-label="Primeira">
               <span aria-hidden="true">&laquo;&laquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}{% if perfil %}&perfil={{ perfil }}{% endif %}" aria-label="Anterior">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
@@ -69,19 +179,19 @@
             </li>
           {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              <a class="page-link" href="?page={{ num }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}{% if perfil %}&perfil={{ perfil }}{% endif %}">{{ num }}</a>
             </li>
           {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}{% if perfil %}&perfil={{ perfil }}{% endif %}" aria-label="Próxima">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if nome %}&nome={{ nome }}{% endif %}{% if matricula %}&matricula={{ matricula }}{% endif %}{% if email %}&email={{ email }}{% endif %}{% if perfil %}&perfil={{ perfil }}{% endif %}" aria-label="Última">
               <span aria-hidden="true">&raquo;&raquo;</span>
             </a>
           </li>

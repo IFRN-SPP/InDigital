@@ -1,141 +1,298 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Usuários da disponibilidade</h2>
-
-    <p><strong>Laboratório:</strong> {{ disponibilidade.laboratorio }}</p>
-    <p><strong>Data:</strong> {{ disponibilidade.data|date:"d/m/Y" }}</p>
-    <p><strong>Horário:</strong> {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}</p>
-    {% if disponibilidade.monitor %}
-        <p><strong>Monitor:</strong> {{ disponibilidade.monitor.username }}</p>
-    {% endif %}
-
-    <hr>
-
-    <h3>Reservas confirmadas ({{ reservas_count }})</h3>
-    {% if reservas_page_obj %}
-        <ul>
-            {% for reserva in reservas_page_obj %}
-                <li>{{ reserva.usuario.username }}</li>
-            {% endfor %}
-        </ul>
-        
-        <!-- Paginação das Reservas -->
-        {% if reservas_page_obj.has_other_pages %}
-            <nav aria-label="Navegação de reservas" style="margin-top: 15px;">
-                <ul class="pagination justify-content-center">
-                    
-                    {% if reservas_page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?reservas_page=1{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Primeira">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.previous_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+<div class="container-fluid">
+    <!-- Cabeçalho da Disponibilidade -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">
+                <i class="fas fa-users"></i> Usuários da Disponibilidade
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong><i class="fas fa-flask"></i> Laboratório:</strong><br>
+                    <span class="text-primary">{{ disponibilidade.laboratorio.num_laboratorio }}</span>
+                </div>
+                <div class="col-md-3">
+                    <strong><i class="fas fa-calendar"></i> Data:</strong><br>
+                    <span class="text-info">{{ disponibilidade.data|date:"d/m/Y" }}</span>
+                </div>
+                <div class="col-md-3">
+                    <strong><i class="fas fa-clock"></i> Horário:</strong><br>
+                    <span class="text-success">{{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}</span>
+                </div>
+                <div class="col-md-3">
+                    <strong><i class="fas fa-user-tie"></i> Monitor:</strong><br>
+                    {% if disponibilidade.monitor %}
+                        <span class="text-warning">{{ disponibilidade.monitor.username }}</span>
+                    {% else %}
+                        <span class="text-muted">Sem monitor</span>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    {% for num in reservas_page_obj.paginator.page_range %}
-                        {% if reservas_page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                        {% elif num > reservas_page_obj.number|add:'-3' and num < reservas_page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?reservas_page={{ num }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="usuario_nome" class="form-label">Nome do Usuário:</label>
+                    <input type="text" name="usuario_nome" id="usuario_nome" 
+                           class="form-control" placeholder="Digite o nome do usuário"
+                           value="{{ usuario_nome }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="status_frequencia" class="form-label">Status Frequência:</label>
+                    <select name="status_frequencia" id="status_frequencia" class="form-select">
+                        <option value="todos" {% if not status_frequencia or status_frequencia == 'todos' %}selected{% endif %}>Todos os status</option>
+                        <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
+                        <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
+                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não registrado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <a href="{% url 'usuarios_da_reserva' disponibilidade.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    {% if reservas_page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.next_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Próxima">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?reservas_page={{ reservas_page_obj.paginator.num_pages }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}" aria-label="Última">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
-                            </a>
-                        </li>
-                    {% endif %}
+    <!-- Reservas Confirmadas -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-check-circle text-success"></i> Reservas Confirmadas
+            </h5>
+            <span class="badge bg-success">{{ reservas_count }} reserva{{ reservas_count|pluralize:"s" }}</span>
+        </div>
+        <div class="card-body">
+            {% if reservas_page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Status Frequência</th>
+                                <th>Data da Reserva</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in reservas_page_obj %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-user"></i>
+                                        {{ reserva.usuario.username }}
+                                    </td>
+                                    <td>
+                                        {% if reserva.status_frequencia == 'P' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Presente
+                                            </span>
+                                        {% elif reserva.status_frequencia == 'F' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i> Faltou
+                                            </span>
+                                        {% elif reserva.status_frequencia == 'N' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-question"></i> Não Registrado
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-clock"></i> Pendente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-calendar-plus"></i>
+                                        {{ reserva.data_reserva|date:"d/m/Y H:i" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação das Reservas -->
+                {% if reservas_page_obj.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Navegação de reservas">
+                            <ul class="pagination justify-content-center mb-0">
+                                
+                                {% if reservas_page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?reservas_page=1{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Primeira">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?reservas_page={{ reservas_page_obj.previous_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Anterior">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
-                </ul>
-            </nav>
-        {% endif %}
-        
-    {% else %}
-        <p>Nenhuma reserva confirmada para este horário.</p>
-    {% endif %}
+                                {% for num in reservas_page_obj.paginator.page_range %}
+                                    {% if reservas_page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > reservas_page_obj.number|add:'-3' and num < reservas_page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?reservas_page={{ num }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
 
-    <hr>
+                                {% if reservas_page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?reservas_page={{ reservas_page_obj.next_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Próxima">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?reservas_page={{ reservas_page_obj.paginator.num_pages }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Última">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
-    <h3>Fila de espera ({{ fila_count }})</h3>
-    {% if fila_page_obj %}
-        <ol start="{{ fila_page_obj.start_index }}">
-            {% for fila in fila_page_obj %}
-                <li>
-                    {{ fila.usuario.username }}
-                    - solicitada em {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
-                </li>
-            {% endfor %}
-        </ol>
-        
-        <!-- Paginação da Fila de Espera -->
-        {% if fila_page_obj.has_other_pages %}
-            <nav aria-label="Navegação da fila de espera" style="margin-top: 15px;">
-                <ul class="pagination justify-content-center">
-                    
-                    {% if fila_page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?fila_page=1{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Primeira">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?fila_page={{ fila_page_obj.previous_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhuma reserva encontrada</h4>
+                    <p class="text-muted">Não há reservas confirmadas para esta disponibilidade.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
-                    {% for num in fila_page_obj.paginator.page_range %}
-                        {% if fila_page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                        {% elif num > fila_page_obj.number|add:'-3' and num < fila_page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?fila_page={{ num }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
+    <!-- Fila de Espera -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-hourglass-half text-warning"></i> Fila de Espera
+            </h5>
+            <span class="badge bg-warning">{{ fila_count }} usuário{{ fila_count|pluralize:"s" }}</span>
+        </div>
+        <div class="card-body">
+            {% if fila_page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Posição</th>
+                                <th>Usuário</th>
+                                <th>Data de Entrada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fila in fila_page_obj %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            {{ forloop.counter0|add:fila_page_obj.start_index }}º
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-user"></i>
+                                        {{ fila.usuario.username }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-calendar-plus"></i>
+                                        {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação da Fila -->
+                {% if fila_page_obj.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Navegação da fila">
+                            <ul class="pagination justify-content-center mb-0">
+                                
+                                {% if fila_page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?fila_page=1{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Primeira">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?fila_page={{ fila_page_obj.previous_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Anterior">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
-                    {% if fila_page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?fila_page={{ fila_page_obj.next_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Próxima">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?fila_page={{ fila_page_obj.paginator.num_pages }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}" aria-label="Última">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
-                            </a>
-                        </li>
-                    {% endif %}
+                                {% for num in fila_page_obj.paginator.page_range %}
+                                    {% if fila_page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > fila_page_obj.number|add:'-3' and num < fila_page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?fila_page={{ num }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
 
-                </ul>
-            </nav>
-        {% endif %}
-        
-    {% else %}
-        <p>Ninguém na fila de espera.</p>
-    {% endif %}
+                                {% if fila_page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?fila_page={{ fila_page_obj.next_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Próxima">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?fila_page={{ fila_page_obj.paginator.num_pages }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" aria-label="Última">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
-    <a href="{% url 'listar_disponibilidades' %}" class="btn">← Voltar</a>
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Fila de espera vazia</h4>
+                    <p class="text-muted">Não há usuários na fila de espera para esta disponibilidade.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botão Voltar -->
+    <div class="mt-4">
+        <a href="{% url 'listar_disponibilidades' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar para Disponibilidades
+        </a>
+    </div>
 </div>
 {% endblock %}

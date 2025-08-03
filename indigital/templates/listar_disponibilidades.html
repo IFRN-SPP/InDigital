@@ -3,100 +3,210 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-listar-reservas">
-    <div class="h2-listar">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Disponibilidades</h2>
+        <a href="{% url 'criar_disponibilidade' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Adicionar Disponibilidade
+        </a>
     </div>
-    {% if page_obj %}
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Horário</th>
-                    <th>Laboratório</th>
-                    <th>Vagas</th>
-                    <th>Data</th>
-                    {% if request.user.is_authenticated %}
-                    <th>Ações</th>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="laboratorio" class="form-label">Laboratório:</label>
+                    <select name="laboratorio" id="laboratorio" class="form-select">
+                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                        {% for lab in laboratorios %}
+                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                {{ lab.num_laboratorio }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="data_inicio" class="form-label">Data Início:</label>
+                    <input type="date" id="data_inicio" name="data_inicio" class="form-control" 
+                           value="{{ data_inicio|default:'' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="data_fim" class="form-label">Data Fim:</label>
+                    <input type="date" id="data_fim" name="data_fim" class="form-control" 
+                           value="{{ data_fim|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="monitor" class="form-label">Monitor:</label>
+                    <select name="monitor" id="monitor" class="form-select">
+                        <option value="todos" {% if not monitor_id or monitor_id == 'todos' %}selected{% endif %}>Todos os monitores</option>
+                        {% for monitor in monitores %}
+                            <option value="{{ monitor.id }}" {% if monitor_id == monitor.id|stringformat:"s" %}selected{% endif %}>
+                                {{ monitor.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="vagas_min" class="form-label">Vagas Mín.:</label>
+                    <input type="number" id="vagas_min" name="vagas_min" class="form-control" 
+                           value="{{ vagas_min|default:'' }}" placeholder="Ex: 5" min="0">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'listar_disponibilidades' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-calendar-alt"></i> Disponibilidades Encontradas
+            </h5>
+            <span class="badge bg-primary">{{ page_obj.paginator.count }} disponibilidade{{ page_obj.paginator.count|pluralize:"s" }}</span>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Horário</th>
+                                <th>Laboratório</th>
+                                <th>Monitor</th>
+                                <th>Vagas</th>
+                                <th>Data</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in page_obj %}
+                                <tr>
+                                    <td>{{ reserva.id }}</td>
+                                    <td>
+                                        <i class="fas fa-clock"></i> 
+                                        {{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-flask"></i> 
+                                        {{ reserva.laboratorio.num_laboratorio }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-user-cog"></i> 
+                                        {{ reserva.monitor.username|default:"<span class='text-muted'>Não definido</span>" }}
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if reserva.vagas > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ reserva.vagas }} vaga{{ reserva.vagas|pluralize:"s" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-calendar"></i> 
+                                        {{ reserva.data|date:"d/m/Y" }}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            {% if perms.indigital.editar_reserva %}
+                                                <a href="{% url 'editar_disponibilidade' reserva.id %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Editar disponibilidade">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if perms.indigital.excluir_reserva %}
+                                                <a href="{% url 'excluir_disponibilidade' reserva.id %}" 
+                                                   class="btn btn-sm btn-outline-danger" 
+                                                   title="Excluir disponibilidade"
+                                                   onclick="return confirm('Tem certeza que deseja excluir esta disponibilidade?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                            <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
+                                               class="btn btn-sm btn-outline-info" 
+                                               title="Ver usuários">
+                                                <i class="fas fa-users"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                                        <p class="mb-0">Nenhuma disponibilidade encontrada com os filtros aplicados.</p>
+                                        <small>Tente ajustar os filtros ou <a href="{% url 'listar_disponibilidades' %}">limpar os filtros</a> para ver todas as disponibilidades.</small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                    <p class="mb-0">Nenhuma disponibilidade encontrada.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Paginação -->
+    {% if page_obj.has_other_pages %}
+        <nav aria-label="Navegação de páginas" class="mt-4">
+            <ul class="pagination justify-content-center">
+                
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" aria-label="Primeira">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}">{{ num }}</a>
+                        </li>
                     {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for reserva in page_obj %}
-                    <tr>
-                        <td>{{ reserva.id }}</td>
-                        <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
-                        <td>{{ reserva.laboratorio }}</td>
-                        <td>{{ reserva.vagas }}</td>
-                        <td>{{ reserva.data|date:"d/m/Y" }}</td>
-    
-                        <td>
-                            {% if perms.indigital.editar_reserva %}
-                                <a href="{% url 'editar_disponibilidade' reserva.id %}" class="btn edit">Editar</a>
-                            {% endif %}
-                            {% if perms.indigital.excluir_reserva %}
-                                <a href="{% url 'excluir_disponibilidade' reserva.id %}" class="btn delete">Excluir</a>
-                            {% endif %}
-                            <form method="get" action="{% url 'usuarios_da_reserva' reserva.id %}">
-                                <button type="submit" class="btn reserve">Ver usuários</button>
-                            </form>
-                        </td>
-                    </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-        
-        <!-- Paginação -->
-        {% if page_obj.has_other_pages %}
-            <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
-                <ul class="pagination justify-content-center">
-                    
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1" aria-label="Primeira">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    {% endif %}
 
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" aria-label="Próxima">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" aria-label="Última">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                    </li>
+                {% endif %}
 
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
-                            </a>
-                        </li>
-                    {% endif %}
-
-                </ul>
-            </nav>
-        {% endif %}
-        
-        <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
-    {% else %}
-        <p>Nenhuma reserva encontrada.</p>
-        <a href="{% url 'reservas' %}" class="botao-voltar-disp">Voltar</a>
+            </ul>
+        </nav>
     {% endif %}
-</div>
+
 {% endblock content %}

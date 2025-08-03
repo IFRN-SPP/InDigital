@@ -55,31 +55,7 @@
             </form>
         </div>
     </div>
-
-    <!-- Tabs para Categorizar Reservas -->
-    <ul class="nav nav-tabs" id="reservasTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button" role="tab">
-                Todas ({{ total_reservas }})
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="futuras-tab" data-bs-toggle="tab" data-bs-target="#futuras" type="button" role="tab">
-                Futuras ({{ reservas_futuras.count }})
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="hoje-tab" data-bs-toggle="tab" data-bs-target="#hoje" type="button" role="tab">
-                Hoje ({{ reservas_hoje.count }})
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="passadas-tab" data-bs-toggle="tab" data-bs-target="#passadas" type="button" role="tab">
-                Passadas ({{ reservas_passadas.count }})
-            </button>
-        </li>
-    </ul>
-
+    
     <div class="tab-content" id="reservasTabsContent">
         <!-- Tab Todas -->
         <div class="tab-pane fade show active" id="todas" role="tabpanel">

@@ -1,104 +1,225 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block content %}
-<div class="container-reserva">
-    <div class="logo-reserva">
-        <!-- Se quiser colocar logo aqui -->
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-0">
+                <i class="fas fa-clock"></i> Horários Disponíveis
+            </h2>
+            <p class="text-muted">Escolha o horário, laboratório e data para realizar sua reserva</p>
+        </div>
     </div>
-    <div class="reservation-box">
-        <h3>Horários disponíveis</h3>
-        {% if page_obj %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Horário</th>
-                        <th>Laboratório</th>
-                        <th>Vagas</th>
-                        <th>Data</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reserva in page_obj %}
-                        <tr>
-                            <td>{{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}</td>
-                            <td>{{ reserva.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.vagas }}</td>
-                            <td>{{ reserva.data|date:"d/m/Y" }}</td>
-                            <td>
-                                {% if reserva.vagas > 0 %}
-                                    <form method="post" action="{% url 'reservar_laboratorio' reserva.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn reserve">Reservar</button>
-                                    </form>
-                                {% else %}
-                                    {% if reserva.id not in reservas_em_fila %}
-                                        <form method="post" action="{% url 'entrar_fila_espera' reserva.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn reserve">Entrar na fila</button>
-                                        </form>
-                                    {% else %}
-                                        <span class="btn disabled">Você já está na fila</span>
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            
-            <!-- Paginação -->
-            {% if page_obj.has_other_pages %}
-                <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
-                    <ul class="pagination justify-content-center">
-                        
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1" aria-label="Primeira">
-                                    <span aria-hidden="true">&laquo;&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        {% endif %}
 
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                </li>
-                            {% endif %}
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="data_inicio" class="form-label">Data Início:</label>
+                    <input type="date" name="data_inicio" id="data_inicio" 
+                           class="form-control" value="{{ data_inicio }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="data_fim" class="form-label">Data Fim:</label>
+                    <input type="date" name="data_fim" id="data_fim" 
+                           class="form-control" value="{{ data_fim }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="laboratorio_id" class="form-label">Laboratório:</label>
+                    <select name="laboratorio_id" id="laboratorio_id" class="form-select">
+                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                        {% for lab in laboratorios %}
+                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                {{ lab.num_laboratorio }}
+                            </option>
                         {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'horarios' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
-                                    <span aria-hidden="true">&raquo;&raquo;</span>
-                                </a>
-                            </li>
-                        {% endif %}
+    <!-- Resultados -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> Horários Disponíveis
+            </h5>
+            <span class="badge bg-primary">{{ page_obj.paginator.count }} horário{{ page_obj.paginator.count|pluralize:"s" }}</span>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Laboratório</th>
+                                <th>Vagas Disponíveis</th>
+                                <th>Monitor</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for disponibilidade in page_obj %}
+                                <tr class="{% if disponibilidade.data < today %}table-light{% elif disponibilidade.data == today %}table-info{% endif %}">
+                                    <td>
+                                        <i class="fas fa-calendar"></i>
+                                        {{ disponibilidade.data|date:"d/m/Y" }}
+                                        {% if disponibilidade.data == today %}
+                                            <span class="badge bg-info">Hoje</span>
+                                        {% elif disponibilidade.data > today %}
+                                            <span class="badge bg-success">Futuro</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Passado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-clock"></i>
+                                        {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-flask"></i>
+                                        {{ disponibilidade.laboratorio.num_laboratorio }}
+                                    </td>
+                                    <td>
+                                        {% if disponibilidade.vagas > 0 %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-users"></i> {{ disponibilidade.vagas }} vaga{{ disponibilidade.vagas|pluralize:"s" }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i> Esgotado
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if disponibilidade.monitor %}
+                                            <i class="fas fa-user-tie"></i>
+                                            {{ disponibilidade.monitor.username }}
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-user-slash"></i>
+                                                Sem monitor
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if disponibilidade.data >= today %}
+                                            {% if disponibilidade.vagas > 0 %}
+                                                <form method="post" action="{% url 'reservar_laboratorio' disponibilidade.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                            onclick="return confirm('Confirma a reserva para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                        <i class="fas fa-check"></i> Reservar
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                {% if disponibilidade.id not in reservas_em_fila %}
+                                                    <form method="post" action="{% url 'entrar_fila_espera' disponibilidade.id %}" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-warning"
+                                                                onclick="return confirm('Entrar na fila de espera para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                            <i class="fas fa-hourglass-half"></i> Fila de Espera
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="btn btn-sm btn-secondary disabled">
+                                                        <i class="fas fa-check-circle"></i> Na Fila
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-clock"></i> Expirado
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação -->
+                {% if page_obj.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Navegação de páginas">
+                            <ul class="pagination justify-content-center mb-0">
+                                
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if vagas_minimas %}&vagas_minimas={{ vagas_minimas }}{% endif %}" aria-label="Primeira">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if vagas_minimas %}&vagas_minimas={{ vagas_minimas }}{% endif %}" aria-label="Anterior">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
-                    </ul>
-                </nav>
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if vagas_minimas %}&vagas_minimas={{ vagas_minimas }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if vagas_minimas %}&vagas_minimas={{ vagas_minimas }}{% endif %}" aria-label="Próxima">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if vagas_minimas %}&vagas_minimas={{ vagas_minimas }}{% endif %}" aria-label="Última">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+                
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhum horário disponível</h4>
+                    <p class="text-muted">Não há horários disponíveis que correspondem aos filtros aplicados ou ainda não foram criados horários.</p>
+                    {% if user.perfil == 'administrador' or user.is_superuser %}
+                        <a href="{% url 'criar_disponibilidade' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Criar Disponibilidade
+                        </a>
+                    {% endif %}
+                </div>
             {% endif %}
-            
-            <p>Escolha o horário, laboratório e data para realizar a reserva.</p>
-        {% else %}
-            <p>Nenhum horário disponível.</p>
-        {% endif %}
+        </div>
+    </div>
     </div>
 </div>
 {% endblock content %}

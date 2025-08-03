@@ -7,42 +7,124 @@
     <h2>Laboratórios</h2>
 </div>
 
-<!-- Container para os laboratórios -->
-<div class="laboratorios-container">
-    {% for laboratorio in page_obj %}
-    <div class="laboratorio-item">
-        <div class="laboratorio-info">
-            <strong>Número:</strong> {{ laboratorio.num_laboratorio }}
-        </div>
-        <div class="laboratorio-info">
-            <strong>Capacidade:</strong> {{ laboratorio.capacidade }}
-        </div>
+<!-- Botão para adicionar laboratório -->
+<div class="mb-3">
+  <a href="{% url 'criar_laboratorio' %}" class="btn btn-success">
+    <i class="fas fa-plus"></i> Adicionar Laboratório
+  </a>
+</div>
 
-        <div class="laboratorio-acoes">
-            {% if perms.indigital.editar_laboratorio %}
-                <a href="{% url 'editar_laboratorio' laboratorio.id %}" class="laboratorio-botao-editar">Editar</a>
-            {% endif %}
-            {% if perms.indigital.excluir_laboratorio %}
-                <a href="{% url 'excluir_laboratorio' laboratorio.id %}" class="laboratorio-botao-excluir">Excluir</a>
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
+<!-- Filtros -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="fas fa-filter"></i> Filtros
+    </h5>
+  </div>
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label for="num_laboratorio" class="form-label">Número do Laboratório:</label>
+        <input type="text" id="num_laboratorio" name="num_laboratorio" class="form-control" 
+               value="{{ num_laboratorio|default:'' }}" placeholder="Buscar por número">
+      </div>
+      <div class="col-md-4">
+        <label for="capacidade_min" class="form-label">Capacidade Mínima:</label>
+        <input type="number" id="capacidade_min" name="capacidade_min" class="form-control" 
+               value="{{ capacidade_min|default:'' }}" placeholder="Ex: 20" min="1">
+      </div>
+      <div class="col-md-4">
+        <label for="capacidade_max" class="form-label">Capacidade Máxima:</label>
+        <input type="number" id="capacidade_max" name="capacidade_max" class="form-control" 
+               value="{{ capacidade_max|default:'' }}" placeholder="Ex: 50" min="1">
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-search"></i> Filtrar
+        </button>
+        <a href="{% url 'listar_laboratorios' %}" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Limpar Filtros
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Resultados -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+      <i class="fas fa-flask"></i> Laboratórios
+    </h5>
+    <span class="badge bg-primary">{{ page_obj.paginator.count }} laboratório{{ page_obj.paginator.count|pluralize:"s" }}</span>
+  </div>
+  <div class="card-body">
+    {% if page_obj %}
+      <div class="row">
+        {% for laboratorio in page_obj %}
+          <div >
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="fas fa-flask"></i> Laboratório {{ laboratorio.num_laboratorio }}
+                </h5>
+                <p class="card-text">
+                  <i class="fas fa-users"></i> <strong>Capacidade:</strong> {{ laboratorio.capacidade }} pessoas
+                </p>
+              </div>
+              <div class="card-footer">
+                <div class="btn-group w-100" role="group">
+                  {% if perms.indigital.editar_laboratorio %}
+                    <a href="{% url 'editar_laboratorio' laboratorio.id %}" 
+                       class="btn btn-outline-primary" 
+                       title="Editar laboratório">
+                      <i class="fas fa-edit"></i> Editar
+                    </a>
+                  {% endif %}
+                  {% if perms.indigital.excluir_laboratorio %}
+                    <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
+                       class="btn btn-outline-danger" 
+                       title="Excluir laboratório"
+                       onclick="return confirm('Tem certeza que deseja excluir este laboratório?')">
+                      <i class="fas fa-trash"></i> Excluir
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="text-center text-muted py-4">
+              <i class="fas fa-flask fa-3x mb-3"></i>
+              <p class="mb-0">Nenhum laboratório encontrado com os filtros aplicados.</p>
+              <small>Tente ajustar os filtros ou <a href="{% url 'listar_laboratorios' %}">limpar os filtros</a> para ver todos os laboratórios.</small>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center text-muted py-4">
+        <i class="fas fa-flask fa-3x mb-3"></i>
+        <p class="mb-0">Nenhum laboratório encontrado.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 <!-- Paginação -->
 {% if page_obj.has_other_pages %}
-    <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
+    <nav aria-label="Navegação de páginas" class="mt-4">
         <ul class="pagination justify-content-center">
             
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1" aria-label="Primeira">
+                    <a class="page-link" href="?page=1{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Primeira">
                         <span aria-hidden="true">&laquo;&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Anterior">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -55,19 +137,19 @@
                     </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Próxima">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Última">
                         <span aria-hidden="true">&raquo;&raquo;</span>
                     </a>
                 </li>
@@ -77,5 +159,3 @@
     </nav>
 {% endif %}
 {% endblock %}
-
-
