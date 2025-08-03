@@ -76,7 +76,7 @@ def listar_usuarios(request):
         usuarios = usuarios.filter(username__icontains=nome)
     
     if matricula:
-        usuarios = usuarios.filter(matricula__icontains=matricula)
+        usuarios = usuarios.filter(username__icontains=matricula)
     
     if email:
         usuarios = usuarios.filter(email__icontains=email)
@@ -157,7 +157,7 @@ def listar_monitores(request):
         monitores = monitores.filter(username__icontains=nome)
     
     if matricula:
-        monitores = monitores.filter(matricula__icontains=matricula)
+        monitores = monitores.filter(username__icontains=matricula)
     
     if email:
         monitores = monitores.filter(email__icontains=email)

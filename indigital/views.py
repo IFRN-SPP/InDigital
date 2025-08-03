@@ -613,9 +613,10 @@ def minha_fila_espera(request):
     minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio', 'disponibilidade__monitor').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
     
     # Filtros opcionais
-    laboratorio_id = request.GET.get('laboratorio')
+    laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
+    status = request.GET.get('status')
     
     # Aplicar filtros se fornecidos
     if laboratorio_id and laboratorio_id != 'todos':
@@ -636,18 +637,30 @@ def minha_fila_espera(request):
             messages.error(request, "Data de fim inválida.")
     
     dados_filas = []
+    today = date.today()
+    
     for fila in minhas_filas:
         fila_geral = FilaEspera.objects.filter(disponibilidade=fila.disponibilidade).order_by('data_solicitacao')
         usuarios_em_ordem = list(fila_geral.values_list('usuario_id', flat=True))
         posicao = usuarios_em_ordem.index(request.user.id) + 1
+        
+        # Determinar o status da fila
+        if fila.disponibilidade.data < today:
+            status_fila = 'processado'
+        else:
+            status_fila = 'ativo'
 
-        dados_filas.append({
+        item = {
             'id': fila.id,
             'disponibilidade': fila.disponibilidade,
             'data_solicitacao': fila.data_solicitacao,
             'posicao': posicao,
-            'status': "Você é o próximo" if posicao == 1 else f"Posição {posicao}",
-        })
+            'status': status_fila,
+        }
+        
+        # Aplicar filtro de status se especificado
+        if not status or status == 'todos' or status == status_fila:
+            dados_filas.append(item)
 
     paginator = Paginator(dados_filas, 10)
     page_number = request.GET.get('page')
@@ -662,11 +675,11 @@ def minha_fila_espera(request):
         'laboratorio_id': laboratorio_id,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
-        'today': date.today(),
+        'status': status,
+        'today': today,
     }
     
     return render(request, 'minha_fila_espera.html', context)
-    return render(request, 'minha_fila_espera.html', {'page_obj': page_obj})
 
 @login_required
 @monitor_required

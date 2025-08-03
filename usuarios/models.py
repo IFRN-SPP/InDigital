@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    matricula = models.CharField(max_length=20, blank=True, null=True)
+    username = models.CharField(max_length=20, unique=True, verbose_name='Matrícula')
     perfil = models.CharField(max_length=20, choices=[('aluno', 'Aluno'), ('administrador', 'Administrador'), ('monitor', 'Monitor')], default='aluno')
     foto_perfil = models.ImageField(upload_to='perfil_fotos/', blank=True, null=True)
     def vinculo(self):

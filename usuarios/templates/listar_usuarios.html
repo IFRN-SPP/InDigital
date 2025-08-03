@@ -80,11 +80,12 @@
               {% for usuario in page_obj %}
                 <tr>
                   <td>{{ usuario.id }}</td>
-                  <td>{{ usuario.matricula|default:"<span class='text-muted'>Não informado</span>" }}</td>
+                  <td>{{ usuario.username|default:"<span class='text-muted'>Não informado</span>" }}</td>
                   <td>
-                    <strong>{{ usuario.username }}</strong>
                     {% if usuario.first_name or usuario.last_name %}
-                      <br><small class="text-muted">{{ usuario.first_name }} {{ usuario.last_name }}</small>
+                      <strong>{{ usuario.first_name }} {{ usuario.last_name }}</strong>
+                    {% else %}
+                      <span class="text-muted">Nome não informado</span>
                     {% endif %}
                   </td>
                   <td>{{ usuario.email }}</td>
