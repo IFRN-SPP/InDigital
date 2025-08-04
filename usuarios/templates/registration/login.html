@@ -3,20 +3,49 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="login-container">
-    <div class="login-logo">
-        <img src="{% static 'assets/img/InDigital logo.png' %}" alt="logo" class="logo">
-        <h1>Login</h1>
-    </div>
-    <form class="login-form" method="post">
-        {% csrf_token %}
-        {{ form | crispy }}
-        <a href="{% url 'password_reset' %}" class="forgot-password">Esqueceu a senha?</a>
-        <button type="submit" class="btn-login">Entrar</button>
-    </form>
-    <div class="cadastre-se">
-        <span>Ainda não tem conta?</span>
-        <a href="{% url 'cadastro' %}" class="btn-register">Cadastre-se</a>
+<div class="container-fluid">
+    <div class="container">
+        <div id="loginContainer" class="d-flex justify-content-center mt-5">
+            <div class="col-sm-12 col-lg-10">
+                <div class="wrap d-md-flex">
+                    <img src="{% static 'img/inDigital-logo.png' %}" alt="Logo" class="hidden-mobile">
+
+                    <div class="login-wrap p-4 p-md-5">
+                        <div class="d-flex">
+                            <div class="mb-3 mx-auto fs-5">
+                                <a href="{% url 'index' %}"><h2 class="fs-2 m-0">Login</h2></a>
+                            </div>
+                        </div>
+
+                        <!-- Formulário de Login -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group mb-3">
+                                <label for="email" class="form-label">Usuário</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Digite seu e-mail" required>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="password" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha" required>
+                            </div>
+
+                            <div class="bnt-entrar">
+                                <button type="submit" class="form-control btn btn-success rounded submit px-3">Entrar</button>
+                            </div>
+
+                            <div id="loginLink" class="text-center mb-2">
+                                <a href="{% url 'password_reset' %}">Esqueceu a senha?</a>
+                            </div>
+                        </form>
+
+                        <p class="text-center pt-4">
+                            Ainda não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}

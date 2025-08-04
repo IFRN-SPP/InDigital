@@ -1,61 +1,84 @@
-{% extends "base.html" %}
-{% load static %}
-
+{% extends 'base.html' %}
 {% block content %}
-{% if not request.user.is_authenticated %}
-<section class="index-pag">
-    <div class="index-content">
-        <h1 class="index-title">Acesse  Nosso Sistema e Realize Sua Reserva!</h1>
-        <p class="index-description">Sistema de Reservas de Laboratórios de Informática para Estudantes - IFRN/SPP</p>
-    </div> 
-</section>
-{% else %}
-<section class="welcome-section">
-    <div class="container-pag">
-        <h1 class="texto-central">Bem-vindo, {{ request.user }}!</h1>
-        <p class="texto-central">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
-    </div>
-</section>
-<section class="info-section">
-    <div class="container">
-        <h2 class="info-title">Sobre o Sistema de Reservas</h2>
-        <div class="info-grid">
-            <div class="info-card">
-                <h3>Reservas Rápidas</h3>
-                <p>Reserve horários em laboratórios de informática de forma simples e eficiente.</p>
-            </div>
-            <div class="info-card">
-                <h3>Disponibilidade em Tempo Real</h3>
-                <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
-            </div>
-            <div class="info-card">
-                <h3>Gerenciamento de Reservas</h3>
-                <p>Controle total das reservas para administradores e facilidade para estudantes.</p>
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
 
-<section class="sobre">
-    <div class="container">
-        <div class="sobre-text">
-            <h3>InDigital</h3>
-            <p>
-                Um sistema intuitivo e eficiente para você
-                reservar horários em laboratórios de 
-                informática de forma rápida e organizada.
-            </p>
-            <a href="{% url 'horarios' %}" class="botao-realize-reserva">Realize sua reserva!</a>
+<!-- CARROSSEL -->
+<header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">InDigital</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Cadastre-se</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+<div id="myCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <svg class="bd-placeholder-img" width="100%" height="400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                <rect width="100%" height="100%" />
+            </svg>
+            <div class="container">
+                <div class="carousel-caption">
+                    <h1>Acesse nosso sistema e realize sua reserva!</h1>
+                    <p><a class="btn btn-lg btn-primary" href="{% url 'login' %}">Acessar</a></p>
+                </div>
+            </div>
         </div>
-        <div class="sobre-img-index">
-            <img src="{% static 'assets/img/indigitallogotipo.png' %}" alt="Logo InDigital">
-        </div>
-    </div> 
-</section>
-<footer class="footer">
+    </div>
+</div>
+
+<!-- ÍCONES -->
+<div class="row justify-content-center text-center">
+    <div class="col-lg-4">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" />
+        </svg>
+        <h2 class="fw-normal mt-3">Disponibilidade em Tempo Real</h2>
+        <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários</p>
+    </div>
+    <div class="col-lg-4">
+        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" />
+        </svg>
+        <h2 class="fw-normal mt-3">Gerenciamento de Reservas</h2>
+        <p>Controle total das reservas para administradores e facilidade para estudantes.</p>
+    </div>
+</div>
+
+<hr class="featurette-divider" />
+
+<!-- DESTAQUE -->
+<div class="row featurette">
+    <div class="col-md-7 text-center">
+        <h2 class="featurette-heading">Reserve com facilidade!</h2>
+        <p class="lead">Um sistema intuitivo e eficiente para você reservar horários nos laboratórios de informática de forma rápida e organizada no campus IFRN SPP.</p>
+    </div>
+    <div class="col-md-5">
+        <svg class="bd-placeholder-img img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#eee" />
+        </svg>
+    </div>
+</div>
+
+<hr class="featurette-divider" />
+
+<footer class="text-center text-muted">
     <div class="container">
-        <p>Copyright © {% now 'Y' %}</p>
+        <p class="mb-1">Copyright © InDigital 2025</p>
     </div>
 </footer>
-{% endblock content %}
+
+{% endblock %}
