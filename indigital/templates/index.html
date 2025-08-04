@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% if not request.user.is_authenticated %}
 <!-- CARROSSEL -->
 <header>
         <nav class="navbar navbar-expand-md navbar-dark fixed-top">
@@ -12,10 +13,10 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">Cadastre-se</a>
+                            <a class="nav-link active" href="{% url 'cadastro' %}">Cadastre-se</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Login</a>
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
                         </li>
                     </ul>
                 </div>
@@ -80,5 +81,28 @@
         <p class="mb-1">Copyright © InDigital 2025</p>
     </div>
 </footer>
-
+{% else %}
+<section class="welcome-section">
+    <div class="container-pag">
+        <h1 class="texto-central">Bem-vindo, {{ request.user }}!</h1>
+        <p class="texto-central">Você está logado no sistema de reservas de laboratórios de informática do IFRN/SPP.</p>
+    </div>
+</section>
+<section class="info-section">
+    <div class="container">
+        <h2 class="info-title">Sobre o Sistema de Reservas</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Reservas Rápidas</h3>
+                <p>Reserve horários em laboratórios de informática de forma simples e eficiente.</p>
+            </div>
+            <div class="info-card">
+                <h3>Disponibilidade em Tempo Real</h3>
+                <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Sair</button>
+            </form>
+{% endif %}
 {% endblock %}
