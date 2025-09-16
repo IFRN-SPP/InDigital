@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,8 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "crispy_forms",
-    "crispy_bootstrap5",
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth_suap',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -103,6 +111,52 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by email
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+SOCIALACCOUNT_ADAPTER = "usuarios.adapters.SuapSocialAccountAdapter"
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_PROVIDERS = {
+    "suap": {
+        "VERIFIED_EMAIL": True,
+        "EMAIL_AUTHENTICATION": True,
+        "SUAP_URL": "https://suap.ifrn.edu.br",
+        "SCOPE": ["identificacao", "email"],
+        "APP": {
+            "client_id": os.getenv("SUAP_CLIENT_ID"),
+            "secret": os.getenv("SUAP_CLIENT_SECRET"),
+        },
+    }
+}
+
+SITE_ID = 1
+
+# config users
+AUTH_USER_MODEL = "usuarios.User"
+LOGIN_URL = "account_login"
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "index"
+
+ACCOUNT_ADAPTER = "usuarios.adapters.CustomAccountAdapter"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_CHANGE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SESSION_REMEMBER = True
+OPEN_FOR_SIGNUP = False
+
+ACCOUNT_FORMS = {
+    "login": "usuarios.forms.UserLoginForm",
+    "reset_password": "usuarios.forms.UserResetPasswordForm",
+    "reset_password_from_key": "usuarios.forms.UserResetPasswordKeyForm",
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

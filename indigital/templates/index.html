@@ -13,10 +13,10 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                         <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'cadastro' %}">Cadastre-se</a>
+                            <a class="nav-link active" href="{% url 'account_signup' %}">Cadastre-se</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                            <a class="nav-link" href="{% url 'account_login' %}">Login</a>
                         </li>
                     </ul>
                 </div>
@@ -34,7 +34,7 @@
             <div class="container">
                 <div class="carousel-caption">
                     <h1>Acesse nosso sistema e realize sua reserva!</h1>
-                    <p><a class="btn btn-lg btn-primary" href="{% url 'login' %}">Acessar</a></p>
+                    <p><a class="btn btn-lg btn-primary" href="{% url 'account_login' %}">Acessar</a></p>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
 
 <footer class="text-center text-muted">
     <div class="container">
-        <p class="mb-1">Copyright © InDigital 2025</p>
+        <p class="mb-1">Copyright © InDigital {% now 'Y' %}</p>
     </div>
 </footer>
 {% else %}
@@ -100,7 +100,7 @@
                 <h3>Disponibilidade em Tempo Real</h3>
                 <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
             </div>
-            <form method="post" action="{% url 'logout' %}">
+            <form method="post" action="{% url 'account_logout' %}">
                 {% csrf_token %}
                 <button type="submit">Sair</button>
             </form>
