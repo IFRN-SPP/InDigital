@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,13 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4liv9t-_!c9=kwa#fj=4elu1w**bb=b_q(!5)bf%#k9m51k2#+'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", default="127.0.0.1").split()
 
+if os.getenv("CSRF_TRUSTED_ORIGINS"):
+    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split()
 
 # Application definition
 
@@ -66,7 +69,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,22 +121,6 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SOCIALACCOUNT_ADAPTER = "usuarios.adapters.SuapSocialAccountAdapter"
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_PROVIDERS = {
-    "suap": {
-        "VERIFIED_EMAIL": True,
-        "EMAIL_AUTHENTICATION": True,
-        "SUAP_URL": "https://suap.ifrn.edu.br",
-        "SCOPE": ["identificacao", "email"],
-        "APP": {
-            "client_id": os.getenv("SUAP_CLIENT_ID"),
-            "secret": os.getenv("SUAP_CLIENT_SECRET"),
-        },
-    }
-}
-
 SITE_ID = 1
 
 # config users
@@ -158,6 +145,22 @@ ACCOUNT_FORMS = {
     "reset_password_from_key": "usuarios.forms.UserResetPasswordKeyForm",
 }
 
+SOCIALACCOUNT_ADAPTER = "usuarios.adapters.SuapSocialAccountAdapter"
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_PROVIDERS = {
+    "suap": {
+        "VERIFIED_EMAIL": True,
+        "EMAIL_AUTHENTICATION": True,
+        "SUAP_URL": "https://suap.ifrn.edu.br",
+        "SCOPE": ["identificacao", "email"],
+        "APP": {
+            "client_id": os.getenv("SUAP_CLIENT_ID"),
+            "secret": os.getenv("SUAP_CLIENT_SECRET"),
+        },
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -176,6 +179,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 MEDIA_URL = 'media/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles/'
+STATICFILES_DIRS = [BASE_DIR / 'static/']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
