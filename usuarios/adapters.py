@@ -16,6 +16,7 @@ class SuapSocialAccountAdapter(DefaultSocialAccountAdapter):
         user_email(user, data.get("email") or "")
         user_field(user, "first_name", data.get("first_name"))
         user_field(user, "last_name", data.get("last_name"))
+        user_field(user, "username", data.get("username"))
         return user
 
     def is_open_for_signup(self, request, sociallogin):
