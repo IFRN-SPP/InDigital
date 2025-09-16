@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-{% load socialaccount %}
+{% load allauth account socialaccount %}
 
 {% block content %}
 <div class="container-fluid">
@@ -45,7 +45,7 @@
                         </form>
 
                         <p class="text-center pt-4">
-                            Ainda não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se</a>
+                            Ainda não tem conta? <a href="{% url 'account_signup' %}">Cadastre-se</a>
                         </p>
                     </div>
                 </div>
