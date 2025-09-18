@@ -46,7 +46,18 @@ def admin_required(view_func):
     return _wrapped_view
 
 def index(request):
-    return render(request, "index.html")
+    total_reservas = Reserva.objects.count()
+    presentes = Reserva.objects.filter(status_frequencia='P').count()
+    faltas = Reserva.objects.filter(status_frequencia='F').count()
+    from datetime import date
+    pendentes = Reserva.objects.filter(disponibilidade__data__gte=date.today()).count()
+    context = {
+        'total_reservas': total_reservas,
+        'presentes': presentes,
+        'faltas': faltas,
+        'pendentes': pendentes,
+    }
+    return render(request, "index.html", context)
 
 # crud de disponibilidade
 
