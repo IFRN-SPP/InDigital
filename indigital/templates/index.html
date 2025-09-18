@@ -306,8 +306,8 @@
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item dropdown user-menu">
-            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+          <li >
+            <a class="nav-link" href="{% url 'perfil' %}">
               <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
             </a>
             </ul>
@@ -317,7 +317,7 @@
       </nav>
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a class="brand-link">
+        <a href="{% url 'index' %}" class="brand-link">
           <span>InDigital</span>
         </a>
 
@@ -367,7 +367,7 @@
 <li class="nav-item">
     <form method="post" action="{% url 'account_logout' %}">
         {% csrf_token %}
-        <button type="submit" class="nav-link" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+        <button type="submit" class="nav-link btn btn-link text-start w-100">
             <i class="nav-icon fas fa-sign-out-alt"></i>
             <p>Sair</p>
         </button>
