@@ -347,6 +347,17 @@ def horarios(request):
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
+    # Limite de reservas por usuário por dia
+    limite_reservas_por_dia = 1
+    reservas_do_dia = Reserva.objects.filter(
+        usuario=request.user,
+        disponibilidade__data=disponibilidade.data
+    ).count()
+    if reservas_do_dia >= limite_reservas_por_dia:
+        messages.error(request, f"Você já atingiu o limite de {limite_reservas_por_dia} reserva(s) para este dia.")
+        return redirect('horarios')
+
+    # Verifica conflito de horário
     conflito = Reserva.objects.filter(
         usuario=request.user,
         disponibilidade__data=disponibilidade.data,
@@ -356,7 +367,7 @@ def reservar_laboratorio(request, disponibilidade_id):
     if conflito:
         messages.error(request, "Você já possui uma reserva para este dia e horário.")
         return redirect('horarios')
-    
+
     if disponibilidade.vagas > 0:
         reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
         disponibilidade.vagas -= 1
