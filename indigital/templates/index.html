@@ -2,7 +2,7 @@
 {% block content %}
 
 {% if not request.user.is_authenticated %}
-<!-- CARROSSEL -->
+
 <header>
         <nav class="navbar navbar-expand-md navbar-dark fixed-top">
             <div class="container-fluid">
@@ -24,7 +24,6 @@
         </nav>
     </header>
 
-
 <div id="myCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
@@ -34,21 +33,33 @@
             <div class="container">
                 <div class="carousel-caption">
                     <h1>Acesse nosso sistema e realize sua reserva!</h1>
-                    <p><a class="btn btn-lg btn-primary" href="{% url 'account_login' %}">Acessar</a></p>
+                    <p>
+    <a class="btn btn-lg btn-primary rounded-pill fw-bold d-inline-flex align-items-center shadow" 
+       href="{% url 'account_login' %}"
+       style="background: linear-gradient(135deg, #20597F 0%, #3A7098 100%);
+              border: none;
+              padding: 14px 36px;
+              transition: all 0.3s ease;
+              letter-spacing: 0.5px;"
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 25px rgba(32, 89, 127, 0.25) !important';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(32, 89, 127, 0.2) !important';">
+        <i class="fas fa-sign-in-alt me-2"></i>
+        Acessar Sistema
+    </a>
+</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ÍCONES -->
 <div class="row justify-content-center text-center">
     <div class="col-lg-4">
         <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" />
         </svg>
-        <h2 class="fw-normal mt-3">Disponibilidade em Tempo Real</h2>
-        <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários</p>
+        <h2 class="fw-normal mt-3">Disponibilidades</h2>
+        <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
     </div>
     <div class="col-lg-4">
         <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
@@ -61,19 +72,20 @@
 
 <hr class="featurette-divider" />
 
-<!-- DESTAQUE -->
-<div class="row featurette">
-    <div class="col-md-7 text-center">
-        <h2 class="featurette-heading">Reserve com facilidade!</h2>
-        <p class="lead">Um sistema intuitivo e eficiente para você reservar horários nos laboratórios de informática de forma rápida e organizada no campus IFRN SPP.</p>
+<div class="row featurette align-items-center">
+    <div class="col-md-7 text-center mx-auto">
+        <h2 class="featurette-heading display-6 fw-bold">Reserve com facilidade!</h2>
+        <p class="lead fs-5 text-muted mx-auto" style="max-width: 90%;">
+            Um sistema intuitivo e eficiente para você reservar horários nos laboratórios 
+            de informática de forma rápida e organizada no campus IFRN SPP.
+        </p>
     </div>
-    <div class="col-md-5">
-        <svg class="bd-placeholder-img img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+    <div class="col-md-5 text-center">
+        <svg class="bd-placeholder-img img-fluid mx-auto" width="350" height="350" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" fill="#eee" />
         </svg>
     </div>
 </div>
-
 <hr class="featurette-divider" />
 
 {% else %}

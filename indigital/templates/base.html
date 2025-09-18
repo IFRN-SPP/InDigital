@@ -38,7 +38,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
+
 {% block header %}
 {% endblock header %}
 
@@ -52,11 +53,13 @@
     </div>
 {% endif %}
 
-{% block content %}
-{% endblock content %}
-<footer class="text-center text-muted">
+<main class="flex-grow-1">
+    {% block content %}{% endblock content %}
+</main>
+
+<footer class="text-center py-3 mt-auto" style="background-color: #20597F; color: white;">
     <div class="container">
-        <p class="mb-1">Copyright © InDigital {% now 'Y' %}</p>
+        <p class="mb-0">Copyright © InDigital {% now 'Y' %}</p>
     </div>
 </footer>
 </body>

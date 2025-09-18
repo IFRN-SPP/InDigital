@@ -4,12 +4,28 @@
 {% load allauth account socialaccount %}
 
 {% block content %}
+
+<!-- BOTÃO VOLTAR NO TOPO, CANTO ESQUERDO -->
+<div class="position-absolute top-0 start-0 m-3">
+    <a href="{% url 'index' %}" 
+       class="btn px-4 py-2"
+       style="background-color: #20597F; color: white;">
+        <i class="fas fa-arrow-left me-2"></i>
+        Voltar
+    </a>
+</div>
+
 <div class="container-fluid">
     <div class="container">
         <div id="loginContainer" class="d-flex justify-content-center mt-5">
             <div class="col-sm-12 col-lg-10">
                 <div class="wrap d-md-flex">
-                    <img src="{% static 'assets/img/indigital.png' %}" alt="Logo" class="hidden-mobile">
+                    
+                    <img src="{% static 'assets/img/indigital.png' %}" 
+                         alt="Logo" 
+                         class="hidden-mobile img-fluid"
+                         style="max-width: 250px; height: auto;">
+                         
                     <div class="login-wrap p-4 p-md-5">
                         <div class="d-flex">
                             <div class="mb-3 mx-auto fs-5">
@@ -17,36 +33,29 @@
                             </div>
                         </div>
 
-                        <!-- Formulário de Login -->
-                        <form method="post">
+                        <!-- FORMULÁRIO -->
+                        <form method="POST" class="signin-form"> 
                             {% csrf_token %}
-                            <div class="form-group mb-3">
-                                <label for="username" class="form-label">Usuário</label>
-                                <input type="username" class="form-control" id="username" name="username" placeholder="Digite sua matrícula" required>
+                            <div class="text-center mb-4" style="color: white;">
+                                <h5 class="fw-bold">Acesso ao Sistema</h5>
+                                <p>Utilize sua conta do SUAP para acessar o sistema</p>
+                            </div>
+                            
+                            <div class="text-center mb-4">
+                                <a href="{% provider_login_url 'suap' %}" 
+                                   class="btn btn-success btn-md px-4 py-2">
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    Entrar com SUAP
+                                </a>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="password" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha" required>
-                            </div>
-
-                            <div class="bnt-entrar">
-                                <button type="submit" class="form-control btn btn-success rounded submit px-3">Entrar</button>
-                            </div>
-
-                            <!-- Botão de login com SUAP -->
-                            <a href="{% provider_login_url 'suap' %}" class="btn btn-block btn-success text-light p-2">
-                                Entrar com o SUAP
-                            </a>
-
-                            <div id="loginLink" class="text-center mb-2">
-                                <a href="{% url  'account_reset_password' %}">Esqueceu a senha?</a>
+                            <div class="text-center mt-4" style="color: white;">
+                                <small class="d-block mb-2">
+                                    Sistema integrado com SUAP - Instituto Federal
+                                </small>
                             </div>
                         </form>
 
-                        <p class="text-center pt-4">
-                            Ainda não tem conta? <a href="{% url 'account_signup' %}">Cadastre-se</a>
-                        </p>
                     </div>
                 </div>
             </div>
