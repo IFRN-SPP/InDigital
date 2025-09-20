@@ -1,16 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-/* 🎨 Paleta de Cores */
+/* Cores */
 :root {
-    /* Login */
-    --deep-color: #3A7098;
-    --low-color: #3A7098;
-    --primary-color: #c3cdd7;
-    --secondary-color: #ffffff;
-    --contrast-color: #f5fcfd;
-    --toggle-color: #ffffff;
-
-    /* Site Geral */
     --cor-primaria: #20597F;
     --cor-secundaria: #20597F;
     --cor-intermediaria1: #20597F;
@@ -18,7 +9,7 @@
     --cor-intermediaria3: #20597F;
 }
 
-/* 🌍 Estilos Globais */
+/* Estilos Globais */
 * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;
@@ -44,107 +35,6 @@ button {
 
 a:hover {
     color: var(--primary-color);
-}
-
-/* ===========================
-   🟦 LOGIN PAGE
-=========================== */
-#loginContainer .wrap {
-    width: 100%;
-    overflow: hidden;
-    background: var(--low-color);
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-#loginContainer img,
-#loginContainer .login-wrap {
-    width: 100%;
-}
-
-#loginContainer img {
-    max-width: 60%;
-    height: auto;
-    object-fit: contain; 
-}
-
-#loginContainer .form-control {
-    height: 45px;
-    margin-bottom: 4%;
-}
-
-#loginContainer .social-media {
-    width: 100%;
-}
-
-#loginContainer .social-icon {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background: transparent;
-    border: 1px solid white;
-    font-size: 16px;
-    margin-right: 5px;
-    border-radius: 50%;
-    color: var(--contrast-color);
-    text-align: center;
-    line-height: 40px;
-    transition: all 0.3s ease;
-}
-
-#loginContainer .social-icon:hover,
-#loginContainer .social-icon:focus {
-    background-color: var(--primary-color);
-    color: var(--deep-color);
-}
-
-#loginContainer .form-check-input {
-    background-color: var(--deep-color);
-    border-color: var(--primary-color);
-}
-
-#loginContainer .form-check-input:checked {
-    background-color: var(--primary-color);
-}
-
-#loginContainer #loginLink {
-    color: var(--primary-color);
-    font-size: 15px;
-}
-
-.form-control:focus,
-.form-control:active {
-    color: var(--primary-color);
-    background-color: var(--deep-color);
-    outline: none !important;
-    box-shadow: none;
-    border: 1px solid var(--secondary-color);
-}
-
-.form-control::placeholder {
-    color: var(--contrast-color);
-    opacity: 0.5;
-}
-
-#loginContainer .btn {
-    background-color: #86B5E1;
-    color: #f5fcfd;
-    border: none;
-}
-
-#loginContainer .btn:hover,
-#loginContainer .btn:focus {
-    background-color: #20597F;
-    color: #f5fcfd;
-}
-
-#loginContainer h2,
-#loginContainer h3,
-#loginContainer label,
-#loginContainer a,
-#loginContainer p {
-    color: white;
-    text-align: center;
 }
 
 /* Responsividade Login */
@@ -183,9 +73,8 @@ a:hover {
     }
 }
 
-/* ===========================
-   🌐 SITE GERAL
-=========================== */
+/* SITE GERAL */
+
 .navbar {
     background-color: var(--cor-primaria) !important;
 }
