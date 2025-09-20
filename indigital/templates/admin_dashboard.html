@@ -275,7 +275,25 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'listar_disponibilidades_monitor' %}" class="nav-link">
+                        <a href="{% url 'listar_disponibilidades' %}" class="nav-link">
+                            <i class="nav-icon fas fa-clock"></i>
+                            <p>Gerenciar Disponibilidades</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'listar_laboratorios' %}" class="nav-link">
+                            <i class="nav-icon fas fa-laptop"></i>
+                            <p>Gerenciar Laboratórios</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'listar_usuarios' %}" class="nav-link">
+                            <i class="nav-icon fas "></i>
+                            <p>Gerenciar Usuários</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'listar_monitores' %}" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Gerenciar Monitores</p>
                         </a>
@@ -286,6 +304,13 @@
                             <p>Gerenciar Fila de Espera</p>
                         </a>
                     </li>
+                    <li class="nav-header">MONITORAÇÃO</li>
+                    <li class="nav-item">
+                      <a href="{% url 'listar_disponibilidades_monitor' %}" class="nav-link">
+                        <i class="nav-icon fas fa-clipboard-check"></i>
+                        <p>Registrar Frequências</p>
+                      </a>
+                    </li> 
                     <li class="nav-header">USUÁRIO</li>
                     <li class="nav-item">
                         <a href="{% url 'perfil' %}" class="nav-link">
@@ -329,7 +354,7 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3>4</h3>
+                                <h3>{{ total_users }}</h3>
                                 <p>Usuários</p>
                             </div>
                             <div class="icon">
@@ -339,8 +364,8 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>5</h3>
-                                <p>Disponibilidades</p>
+                                <h3>{{ total_reservations }}</h3>
+                                <p>Total Reservas</p>
                             </div>
                             <div class="icon">
                             </div>
@@ -349,8 +374,8 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-warning">
                             <div class="inner">
-                                <h3>2</h3>
-                                <p>Monitores</p>
+                                <h3>{{ pending_requests }}</h3>
+                                <p>Pendentes</p>
                             </div>
                             <div class="icon">
                             </div>
@@ -359,7 +384,7 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>0</h3>
+                                <h3>{{ waiting_queue }}</h3>
                                 <p>Fila de Espera</p>
                             </div>
                             <div class="icon">
@@ -383,40 +408,70 @@
                                             <th>Horário</th>
                                             <th>Laboratório</th>
                                             <th>Usuário</th>
+                                            <th>Monitor</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for reserva in reservas_hoje %}
                                         <tr>
-                                            <td>1</td>
-                                            <td>13:00 ás 13:45</td>
-                                            <td>214</td>
-                                            <td>Ana</td>
-                                            <td><span class="badge bg-success">Confirmada</span></td>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}</td>
+                                            <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
+                                            <td>{{ reserva.usuario.first_name|default:reserva.usuario.username }}</td>
+                                            <td>{{ reserva.disponibilidade.monitor.first_name|default:reserva.disponibilidade.monitor.username }}</td>
+                                            <td>
+                                                {% if reserva.status_frequencia == 'P' %}
+                                                    <span class="badge bg-success">Presente</span>
+                                                {% elif reserva.status_frequencia == 'F' %}
+                                                    <span class="badge bg-danger">Falta</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Pendente</span>
+                                                {% endif %}
+                                            </td>
                                         </tr>
+                                        {% empty %}
                                         <tr>
-                                            <td>2</td>
-                                            <td>13:00 ás 13:45</td>
-                                            <td>214</td>
-                                            <td>Maria</td>
-                                            <td><span class="badge bg-success">Confirmada</span></td>
+                                            <td colspan="6" class="text-center">Nenhuma reserva encontrada para hoje</td>
                                         </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>13:00 ás 13:45</td>
-                                            <td>214</td>
-                                            <td>Beatriz</td>
-                                            <td><span class="badge bg-warning">Pendente</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>13:00 ás 13:45</td>
-                                            <td>214</td>
-                                            <td>Carla</td>
-                                            <td><span class="badge bg-success">Confirmada</span></td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="card-footer clearfix">
+                                <ul class="pagination pagination-sm m-0 float-right">
+                                  {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                      <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                    </li>
+                                  {% else %}
+                                    <li class="page-item disabled">
+                                      <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+                                    </li>
+                                  {% endif %}
+                                  
+                                  {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                      <li class="page-item active">
+                                        <a class="page-link" href="#">{{ num }}</a>
+                                      </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                      <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                      </li>
+                                    {% endif %}
+                                  {% endfor %}
+                                  
+                                  {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                      <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                    </li>
+                                  {% else %}
+                                    <li class="page-item disabled">
+                                      <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+                                    </li>
+                                  {% endif %}
+                                </ul>
                             </div>
                         </div>
                     </div>

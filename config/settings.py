@@ -126,7 +126,7 @@ SITE_ID = 1
 # config users
 AUTH_USER_MODEL = "usuarios.User"
 LOGIN_URL = "account_login"
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "dashboard_redirect"
 LOGOUT_REDIRECT_URL = "index"
 
 ACCOUNT_ADAPTER = "usuarios.adapters.CustomAccountAdapter"
@@ -195,6 +195,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 AUTH_USER_MODEL = "usuarios.User"
 
 LOGOUT_REDIRECT_URL = "index"
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "dashboard_redirect"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

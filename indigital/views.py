@@ -8,6 +8,20 @@ from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model
+
+@login_required
+def dashboard_redirect(request):
+    """
+    Redireciona o usuário para o dashboard apropriado baseado no seu perfil
+    """
+    user = request.user
+    if user.is_superuser or user.perfil == 'administrador':
+        return redirect('admin_dashboard')
+    elif user.perfil == 'monitor':
+        return redirect('monitor_dashboard')
+    else:  # perfil == 'aluno' ou qualquer outro
+        return redirect('index')
 
 def monitor_required(view_func):
     """
@@ -46,31 +60,102 @@ def admin_required(view_func):
     return _wrapped_view
 
 @login_required
+@admin_required
 def admin_dashboard(request):
+    User = get_user_model()
+    
+    # Estatísticas
+    total_users = User.objects.count()
+    total_reservations = Reserva.objects.count()
+    pending_requests = Reserva.objects.filter(disponibilidade__data__gte=date.today()).count()
+    waiting_queue = FilaEspera.objects.count()
+    
+    # Reservas do dia 
+    reservas_hoje = Reserva.objects.filter(
+        disponibilidade__data=date.today()
+    ).select_related(
+        'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
+    ).order_by('disponibilidade__horario_inicio')
+    
+    # Paginação
+    paginator = Paginator(reservas_hoje, 5)  # 5 reservas por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'total_users': 4,
-        'total_reservations': 5,
-        'pending_requests': 2,
-        'waiting_queue': 0
+        'total_users': total_users,
+        'total_reservations': total_reservations,
+        'pending_requests': pending_requests,
+        'waiting_queue': waiting_queue,
+        'reservas_hoje': page_obj,
+        'page_obj': page_obj,
+        'today': date.today(),
     }
     return render(request, 'admin_dashboard.html', context)
 
 @login_required
+@monitor_required
 def monitor_dashboard(request):
+    # Buscar reservas do dia de hoje diretamente
+    reservas_hoje = Reserva.objects.filter(
+        disponibilidade__data=date.today()
+    ).select_related(
+        'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
+    ).order_by('disponibilidade__horario_inicio')
+    
+    # Paginação
+    paginator = Paginator(reservas_hoje, 5)  # 5 reservas por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Reservas que o monitor é responsável (para estatísticas)
+    reservas_monitor = Reserva.objects.filter(
+        disponibilidade__monitor=request.user
+    )
+    
+    # Estatísticas
+    total_reservas = reservas_monitor.count()
+    presentes = reservas_monitor.filter(status_frequencia='P').count()
+    faltas = reservas_monitor.filter(status_frequencia='F').count()
+    pendentes = reservas_monitor.filter(disponibilidade__data__gte=date.today()).count()
+    
     context = {
-        'total_reservas': 8,
-        'presentes': 6,
-        'faltas': 2,
-        'pendentes': 0
+        'total_reservas': total_reservas,
+        'presentes': presentes,
+        'faltas': faltas,
+        'pendentes': pendentes,
+        'reservas_hoje': page_obj,
+        'page_obj': page_obj,
+        'today': date.today(),
+    }
+    return render(request, 'monitor_dashboard.html', context)
+    
+    context = {
+        'total_reservas': total_reservas,
+        'presentes': presentes,
+        'faltas': faltas,
+        'pendentes': pendentes,
+        'reservas_hoje': page_obj,  # Usar page_obj em vez de reservas_hoje
+        'page_obj': page_obj,
+        'today': date.today(),
     }
     return render(request, 'monitor_dashboard.html', context)
 
+@login_required
 def index(request):
+    # Redirecionar superusuários e administradores para seus dashboards específicos
+    user = request.user
+    if user.is_superuser or user.perfil == 'administrador':
+        return redirect('admin_dashboard')
+    elif user.perfil == 'monitor':
+        return redirect('monitor_dashboard')
+    
+    # Se for aluno, mostrar o dashboard de aluno
     total_reservas = Reserva.objects.count()
     presentes = Reserva.objects.filter(status_frequencia='P').count()
     faltas = Reserva.objects.filter(status_frequencia='F').count()
-    from datetime import date
     pendentes = Reserva.objects.filter(disponibilidade__data__gte=date.today()).count()
+    
     context = {
         'total_reservas': total_reservas,
         'presentes': presentes,

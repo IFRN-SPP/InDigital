@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('dashboard-redirect/', views.dashboard_redirect, name='dashboard_redirect'),
     path('listar/disponibilidades/', views.listar_disponibilidades, name='listar_disponibilidades'),
     path('criar/disponibilidade/', views.criar_disponibilidade, name='criar_disponibilidade'),
     path('disponibilidade/<int:reserva_id>/editar', views.editar_disponibilidade, name='editar_disponibilidade'),
@@ -29,6 +30,6 @@ urlpatterns = [
     path('usuario/<int:usuario_id>/reservas/', views.reservas_por_usuario, name='reservas_por_usuario'),
     path('historico/reservas/', views.historico_reservas, name='historico_reservas'),
     path('historico/geral/reservas/', views.historico_geral_reservas, name='historico_geral_reservas'),
-    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('monitor-dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
 ]
