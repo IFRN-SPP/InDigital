@@ -45,6 +45,26 @@ def admin_required(view_func):
     
     return _wrapped_view
 
+@login_required
+def admin_dashboard(request):
+    context = {
+        'total_users': 4,
+        'total_reservations': 5,
+        'pending_requests': 2,
+        'waiting_queue': 0
+    }
+    return render(request, 'admin_dashboard.html', context)
+
+@login_required
+def monitor_dashboard(request):
+    context = {
+        'total_reservas': 8,
+        'presentes': 6,
+        'faltas': 2,
+        'pendentes': 0
+    }
+    return render(request, 'monitor_dashboard.html', context)
+
 def index(request):
     total_reservas = Reserva.objects.count()
     presentes = Reserva.objects.filter(status_frequencia='P').count()
