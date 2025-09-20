@@ -1,86 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
+{% load static %}
 
-{% if not request.user.is_authenticated %}
-
-<header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">InDigital</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                </div>
-            </div>
-        </nav>
-    </header>
-
-<div id="myCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <svg class="bd-placeholder-img" width="100%" height="400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-                <rect width="100%" height="100%" />
-            </svg>
-            <div class="container">
-                <div class="carousel-caption">
-                    <h1>Acesse nosso sistema e realize sua reserva!</h1>
-                    <p>
-    <a class="btn btn-lg btn-primary rounded-pill fw-bold d-inline-flex align-items-center shadow" 
-       href="{% url 'account_login' %}"
-       style="background: linear-gradient(135deg, #20597F 0%, #3A7098 100%);
-              border: none;
-              padding: 14px 36px;
-              transition: all 0.3s ease;
-              letter-spacing: 0.5px;"
-       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 25px rgba(32, 89, 127, 0.25) !important';"
-       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(32, 89, 127, 0.2) !important';">
-        <i class="fas fa-sign-in-alt me-2"></i>
-        Acessar Sistema
-    </a>
-</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row justify-content-center text-center">
-    <div class="col-lg-4">
-        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100%" height="100%" />
-        </svg>
-        <h2 class="fw-normal mt-3">Disponibilidades</h2>
-        <p>Verifique a disponibilidade dos laboratórios e evite conflitos de horários.</p>
-    </div>
-    <div class="col-lg-4">
-        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100%" height="100%" />
-        </svg>
-        <h2 class="fw-normal mt-3">Gerenciamento de Reservas</h2>
-        <p>Controle total das reservas para administradores e facilidade para estudantes.</p>
-    </div>
-</div>
-
-<hr class="featurette-divider" />
-
-<div class="row featurette align-items-center">
-    <div class="col-md-7 text-center mx-auto">
-        <h2 class="featurette-heading display-6 fw-bold">Reserve com facilidade!</h2>
-        <p class="lead fs-5 text-muted mx-auto" style="max-width: 90%;">
-            Um sistema intuitivo e eficiente para você reservar horários nos laboratórios 
-            de informática de forma rápida e organizada no campus IFRN SPP.
-        </p>
-    </div>
-    <div class="col-md-5 text-center">
-        <svg class="bd-placeholder-img img-fluid mx-auto" width="350" height="350" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100%" height="100%" fill="#eee" />
-        </svg>
-    </div>
-</div>
-<hr class="featurette-divider" />
-
-{% else %}
 {% block extra_css %}
 <style>
       :root {
@@ -125,7 +45,7 @@
         font-weight: 600;
       }
       .app-sidebar {
-        background: linear-gradient(180deg, #3A7098 0%, #3A7098 100%) !important;
+        background: linear-gradient(180deg, var(--cor-primaria) 0%, var(--cor-primaria) 100%) !important;
       }
       .sidebar-brand .brand-text {
         font-weight: 700;
@@ -301,8 +221,12 @@
         }
       }
     </style>
-    {% endblock %}
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <!-- Left navbar links -->
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -310,7 +234,8 @@
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-          <li >
+          <li class="nav-item dropdown user-menu">
+            <li >
             <a class="nav-link" href="{% url 'perfil' %}">
               <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
             </a>
@@ -319,10 +244,10 @@
           </li>
         </ul>
       </nav>
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="{% url 'index' %}" class="brand-link">
-          <span>InDigital</span>
+        <a href="{% url 'monitor_dashboard' %}" class="brand-link">
+            <span class="brand-text font-weight-light">InDigital</span>
         </a>
 
         <!-- Sidebar -->
@@ -331,59 +256,67 @@
           <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
               <li class="nav-header">NAVEGAÇÃO</li>
-                  <li class="nav-item">
-    <a href="{% url 'index' %}" class="nav-link">
+              <li class="nav-item">
+                <a href="{% url 'monitor_dashboard' %}" class="nav-link">
         <i class="nav-icon fas fa-home"></i>
         <p>Início</p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'horarios' %}" class="nav-link">
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'horarios' %}" class="nav-link">
         <i class="nav-icon fas fa-calendar-check"></i>
         <p>Disponibilidades</p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'minhas_reservas' %}" class="nav-link">
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'minhas_reservas' %}" class="nav-link">
         <i class="nav-icon fas fa-users"></i>
         <p>Minhas Reservas</p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'historico_reservas' %}" class="nav-link">
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'historico_reservas' %}" class="nav-link">
         <i class="nav-icon fas fa-history"></i>
         <p>Histórico de Reservas</p>
     </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'minha_fila_espera' %}" class="nav-link">
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'minha_fila_espera' %}" class="nav-link">
         <i class="nav-icon fas fa-hourglass-half"></i>
         <p>Fila de Espera</p>
     </a>
-</li>
-<li class="nav-header">USUÁRIO</li>
+              </li>
+              <li class="nav-header">MONITORAÇÃO</li>
               <li class="nav-item">
-    <a href="{% url 'perfil' %}" class="nav-link">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-clipboard-check"></i>
+                  <p>Registrar Frequência</p>
+                </a>
+              </li> 
+              <li class="nav-header">USUÁRIO</li>
+              <li class="nav-item">
+                <a href="{% url 'perfil' %}" class="nav-link">
         <i class="nav-icon fas fa-user"></i>
         <p>Perfil</p>
     </a>
-</li>
-<li class="nav-item">
-    <form method="post" action="{% url 'account_logout' %}">
+              </li>    
+              <li class="nav-item">
+                <form method="post" action="{% url 'account_logout' %}">
         {% csrf_token %}
         <button type="submit" class="nav-link btn btn-link text-start w-100">
             <i class="nav-icon fas fa-sign-out-alt"></i>
             <p>Sair</p>
         </button>
     </form>
-</li>
-</ul>
-</nav>
-</div>
-</aside>
-<!-- Content Wrapper. Contains page content -->
+              </li>
+            </ul>
+          </nav>
+          <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+      </aside>
+
       <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
         <div class="content-header">
           <div class="container-fluid">
             <div class="row mb-2">
@@ -392,66 +325,71 @@
             </div>
           </div>
         </div>
-<section class="content">
+
+        <section class="content">
           <div class="container-fluid">
-            <!-- Banner de boas-vindas -->
             <div class="welcome-banner">
               <h1>Bem vindo ao InDigital!</h1>
               <p>Sistema de gerenciamento de reservas de laboratórios</p>
               <i class="fas fa-laptop-code welcome-icon"></i>
             </div>
             
-            <!-- Small boxes (Stat box) -->
-            <div class="row">
-              <div class="col-lg-3 col-6">
-                <div class="small-box bg-info">
-                  <div class="inner">
-                    <h3>{{ total_reservas }}</h3>
-                    <p>Total de Reservas</p>
+ <div class="row">
+              <section class="col-lg-12 connectedSortable">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      Reservas do dia
+                    </h3>
                   </div>
-                  <div class="icon">
-                    <i class="ion ion-bag"></i>
+                  <div class="card-body">
+                    <div class="tab-content p-0">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width: 10px">#</th>
+                            <th>Horário</th>
+                            <th>Laboratório</th>
+                            <th style="width: 40px">Usuário</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="align-middle">
+                            <td>1</td>
+                            <td>13:00 ás 13:45</td>
+                            <td>214</td>
+                            <td>Ana</td>
+                          </tr>
+                          <tr class="align-middle">
+                            <td>2</td>
+                            <td>13:00 ás 13:45</td>
+                            <td>214</td>
+                            <td>Maria</td>
+                          </tr>
+                          <tr class="align-middle">
+                            <td>3</td>
+                            <td>13:00 ás 13:45</td>
+                            <td>214</td>
+                            <td>Beatriz</td>
+                          </tr>
+                          <tr class="align-middle">
+                            <td>4</td>
+                            <td>13:00 ás 13:45</td>
+                            <td>214</td>
+                            <td>Carla</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  <a href="{% url 'minhas_reservas' %}" class="small-box-footer">Mais info <i class="fas fa-arrow-circle-right"></i></a>
-                </div>
-              </div>
-              <!-- ./col -->
-              <div class="col-lg-3 col-6">
-                <div class="small-box bg-success">
-                  <div class="inner">
-                    <h3>{{ presentes }}</h3>
-                    <p>Presentes</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-stats-bars"></i>
-                  </div>
-                </div>
-              </div>
-              <!-- ./col -->
-              <div class="col-lg-3 col-6">
-                <div class="small-box bg-warning">
-                  <div class="inner">
-                    <h3>{{ faltas }}</h3>
-                    <p>Faltas</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-person-add"></i>
-                  </div>
-                </div>
-              </div>
-              <!-- ./col -->
-              <div class="col-lg-3 col-6">
-                <div class="small-box bg-danger">
-                  <div class="inner">
-                    <h3>{{ pendentes }}</h3>
-                    <p>Pendentes</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                  </div>
-                </div>
-              </div>
-            </div>   
+                  <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right">
+                      <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                    </ul>
                   </div>
                 </div>
               </section>
@@ -459,13 +397,8 @@
           </div>
         </section>
       </div>
-            {% block extra_js %}
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-  {% endblock %}
-{% endif %}
+      {% endblock %}
+
+{% block extra_js %}
+
 {% endblock %}
