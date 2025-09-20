@@ -158,22 +158,22 @@
       
       /* Aplicando as cores padrão nos elementos */
       .bg-info {
-        background-color: var(--cor-primaria) !important;
+        background-color: #20597F !important; /* Azul escuro */
         color: white !important;
       }
       
       .bg-success {
-        background-color: var(--cor-intermediaria2) !important;
+        background-color: #86B5E1 !important; /* Azul claro */
         color: white !important;
       }
       
       .bg-warning {
-        background-color: var(--cor-intermediaria1) !important;
+        background-color: #20597F !important; /* Azul escuro */
         color: white !important;
       }
       
       .bg-danger {
-        background-color: var(--cor-intermediaria3) !important;
+        background-color: #86B5E1 !important; /* Azul claro */
         color: white !important;
       }
       
@@ -288,7 +288,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'listar_usuarios' %}" class="nav-link">
-                            <i class="nav-icon fas "></i>
+                            <i class="nav-icon fas fa-user"></i> <!-- Ícone adicionado -->
                             <p>Gerenciar Usuários</p>
                         </a>
                     </li>
@@ -304,13 +304,6 @@
                             <p>Gerenciar Fila de Espera</p>
                         </a>
                     </li>
-                    <li class="nav-header">MONITORAÇÃO</li>
-                    <li class="nav-item">
-                      <a href="{% url 'listar_disponibilidades_monitor' %}" class="nav-link">
-                        <i class="nav-icon fas fa-clipboard-check"></i>
-                        <p>Registrar Frequências</p>
-                      </a>
-                    </li> 
                     <li class="nav-header">USUÁRIO</li>
                     <li class="nav-item">
                         <a href="{% url 'perfil' %}" class="nav-link">
@@ -345,11 +338,10 @@
             <div class="container-fluid">
                 <div class="welcome-banner">
                     <h1>Painel Administrativo</h1>
-                    <p>Gerencie usuários, reservas e monitores do sistema</p>
+                    <p>Gerencie usuários, reservas và monitores do sistema</p>
                     <i class="fas fa-cogs welcome-icon"></i>
                 </div>
                 
-                <!-- Estatísticas -->
                 <div class="row">
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-info">
