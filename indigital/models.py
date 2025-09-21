@@ -37,6 +37,28 @@ class Reserva(models.Model):
 
     status_frequencia = models.CharField(max_length=1, choices=[('P', 'Presente'), ('F', 'Faltou'), ('N', 'Não registrado')], default='', blank=True)
 
+    def clean(self):
+        super().clean()
+        
+        # Verificar se já existe uma reserva que se sobrepõe para o mesmo usuário
+        reservas_conflitantes = Reserva.objects.filter(
+            usuario=self.usuario,
+            disponibilidade__data=self.disponibilidade.data
+        ).exclude(id=self.id)  # Excluir a própria reserva em caso de edição
+        
+        for reserva in reservas_conflitantes:
+            # Verificar sobreposição de horários
+            # Dois intervalos [a1, a2] e [b1, b2] se sobrepõem se a1 < b2 e b1 < a2
+            inicio_atual = self.disponibilidade.horario_inicio
+            fim_atual = self.disponibilidade.horario_fim
+            inicio_existente = reserva.disponibilidade.horario_inicio
+            fim_existente = reserva.disponibilidade.horario_fim
+            
+            if inicio_atual < fim_existente and inicio_existente < fim_atual:
+                raise ValidationError(
+                    "Você já possui uma reserva que se sobrepõe a este horário e data."
+                )
+
     def __str__(self):
         return self.usuario.username
     

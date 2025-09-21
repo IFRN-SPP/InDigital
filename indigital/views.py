@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from functools import wraps
 from datetime import date, datetime
+from django.core.exceptions import ValidationError
 
 from usuarios.models import User
 from .models import Laboratorio, Reserva, Disponibilidade, FilaEspera
@@ -452,32 +453,20 @@ def horarios(request):
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
-    # Limite de reservas por usuário por dia
-    limite_reservas_por_dia = 1
-    reservas_do_dia = Reserva.objects.filter(
-        usuario=request.user,
-        disponibilidade__data=disponibilidade.data
-    ).count()
-    if reservas_do_dia >= limite_reservas_por_dia:
-        messages.error(request, f"Você já atingiu o limite de {limite_reservas_por_dia} reserva(s) para este dia.")
-        return redirect('horarios')
-
-    # Verifica conflito de horário
-    conflito = Reserva.objects.filter(
-        usuario=request.user,
-        disponibilidade__data=disponibilidade.data,
-        disponibilidade__horario_inicio=disponibilidade.horario_inicio,
-    ).exists()
-
-    if conflito:
-        messages.error(request, "Você já possui uma reserva para este dia e horário.")
-        return redirect('horarios')
-
     if disponibilidade.vagas > 0:
-        reserva = Reserva.objects.create(usuario=request.user, disponibilidade=disponibilidade)
-        disponibilidade.vagas -= 1
-        disponibilidade.save()
-        messages.success(request, "Reserva realizada com sucesso!")
+        try:
+            # Criar uma instância da reserva para validar
+            reserva = Reserva(usuario=request.user, disponibilidade=disponibilidade)
+            # Chamar o método clean() para validar sobreposições
+            reserva.clean()
+            # Se não houve erro, salvar a reserva
+            reserva.save()
+            disponibilidade.vagas -= 1
+            disponibilidade.save()
+            messages.success(request, "Reserva realizada com sucesso!")
+        except ValidationError as e:
+            messages.error(request, str(e.message))
+            return redirect('horarios')
     else:
         fila_espera = FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists()
         if fila_espera:
@@ -693,11 +682,19 @@ def promover_fila(request, fila_id):
     disponibilidade = fila.disponibilidade
 
     if disponibilidade.vagas > 0:
-        reserva = Reserva.objects.create(usuario=fila.usuario, disponibilidade=disponibilidade)
-        disponibilidade.vagas -= 1
-        disponibilidade.save()
-        fila.delete()
-        messages.success(request, f"Usuário {fila.usuario.username} promovido da fila de espera para reserva.")
+        try:
+            # Criar uma instância da reserva para validar
+            reserva = Reserva(usuario=fila.usuario, disponibilidade=disponibilidade)
+            # Chamar o método clean() para validar sobreposições
+            reserva.clean()
+            # Se não houve erro, salvar a reserva
+            reserva.save()
+            disponibilidade.vagas -= 1
+            disponibilidade.save()
+            fila.delete()
+            messages.success(request, f"Usuário {fila.usuario.username} promovido da fila de espera para reserva.")
+        except ValidationError as e:
+            messages.error(request, f"Não foi possível promover {fila.usuario.username}: {str(e.message)}")
     else:
         messages.error(request, "Não há vagas disponíveis para promover o usuário da fila de espera.")
 
