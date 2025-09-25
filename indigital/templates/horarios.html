@@ -122,7 +122,41 @@
                                     </td>
                                     <td>
                                         {% if disponibilidade.data >= today %}
-                                            {% if disponibilidade.vagas > 0 %}
+                                            {% if disponibilidade.id in minhas_reservas %}
+                                                {% if disponibilidade.id in reservas_pendentes %}
+                                                    <span class="btn btn-sm btn-warning disabled">
+                                                        <i class="fas fa-clock"></i> Aguardando Aprovação
+                                                    </span>
+                                                {% else %}
+                                                    <span class="btn btn-sm btn-info disabled">
+                                                        <i class="fas fa-check-circle"></i> Já Reservado
+                                                    </span>
+                                                {% endif %}
+                                            {% elif disponibilidade.id in reservas_rejeitadas %}
+                                                {% if disponibilidade.vagas > 0 %}
+                                                    <form method="post" action="{% url 'reservar_laboratorio' disponibilidade.id %}" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-success"
+                                                                onclick="return confirm('Confirma uma nova reserva para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                            <i class="fas fa-check"></i> Tentar Novamente
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    {% if disponibilidade.id not in reservas_em_fila %}
+                                                        <form method="post" action="{% url 'entrar_fila_espera' disponibilidade.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-warning"
+                                                                    onclick="return confirm('Entrar na fila de espera para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                                <i class="fas fa-hourglass-half"></i> Fila de Espera
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <span class="btn btn-sm btn-secondary disabled">
+                                                            <i class="fas fa-check-circle"></i> Na Fila
+                                                        </span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% elif disponibilidade.vagas > 0 %}
                                                 <form method="post" action="{% url 'reservar_laboratorio' disponibilidade.id %}" class="d-inline">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-sm btn-success"

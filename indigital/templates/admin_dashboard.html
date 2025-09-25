@@ -269,6 +269,12 @@
                     </li>
                     <li class="nav-header">ADMINISTRAÇÃO</li>
                     <li class="nav-item">
+                        <a href="{% url 'reservas_pendentes' %}" class="nav-link">
+                            <i class="nav-icon fas fa-clock text-warning"></i>
+                            <p>Aprovar Reservas</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{% url 'reservas' %}" class="nav-link">
                             <i class="nav-icon fas fa-calendar-check"></i>
                             <p>Gerenciar Reservas</p>
@@ -338,7 +344,7 @@
             <div class="container-fluid">
                 <div class="welcome-banner">
                     <h1>Painel Administrativo</h1>
-                    <p>Gerencie usuários, reservas và monitores do sistema</p>
+                    <p>Gerencie usuários, monitores e reservas do sistema</p>
                     <i class="fas fa-cogs welcome-icon"></i>
                 </div>
                 
@@ -356,22 +362,18 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>{{ total_reservations }}</h3>
-                                <p>Total Reservas</p>
-                            </div>
-                            <div class="icon">
+                                <h3>{{ approved_reservations }}</h3>
+                                <p>Reservas Aprovadas</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
-                            <div class="inner">
-                                <h3>{{ pending_requests }}</h3>
-                                <p>Pendentes</p>
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ pending_requests }}</h3>
+                                    <p>Reservas Pendentes</p>
+                                </div>
                             </div>
-                            <div class="icon">
-                            </div>
-                        </div>
                     </div>
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-danger">

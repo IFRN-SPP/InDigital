@@ -34,29 +34,42 @@ class Disponibilidade(models.Model):
 class Reserva(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     disponibilidade = models.ForeignKey(Disponibilidade, on_delete=models.CASCADE)
+    status_aprovacao = models.CharField(max_length=1, choices=[('P', 'Pendente'), ('A', 'Aprovada'), ('R', 'Rejeitada')], default='')
+    data_solicitacao = models.DateTimeField(auto_now_add=True)
 
     status_frequencia = models.CharField(max_length=1, choices=[('P', 'Presente'), ('F', 'Faltou'), ('N', 'Não registrado')], default='', blank=True)
 
     def clean(self):
         super().clean()
         
-        # Verificar se já existe uma reserva que se sobrepõe para o mesmo usuário
+        reserva_duplicada = Reserva.objects.filter(
+            usuario=self.usuario,
+            disponibilidade=self.disponibilidade
+        ).exclude(id=self.id).first()
+        
+        if reserva_duplicada:
+            if reserva_duplicada.status_aprovacao in ['P', 'A']:
+                status_texto = "pendente" if reserva_duplicada.status_aprovacao == 'P' else "aprovada"
+                raise ValidationError(
+                    f"Você já possui uma reserva {status_texto} para este mesmo horário."
+                )
+        
         reservas_conflitantes = Reserva.objects.filter(
             usuario=self.usuario,
-            disponibilidade__data=self.disponibilidade.data
-        ).exclude(id=self.id)  # Excluir a própria reserva em caso de edição
+            disponibilidade__data=self.disponibilidade.data,
+            status_aprovacao__in=['P', 'A'] 
+        ).exclude(id=self.id)
         
         for reserva in reservas_conflitantes:
-            # Verificar sobreposição de horários
-            # Dois intervalos [a1, a2] e [b1, b2] se sobrepõem se a1 < b2 e b1 < a2
             inicio_atual = self.disponibilidade.horario_inicio
             fim_atual = self.disponibilidade.horario_fim
             inicio_existente = reserva.disponibilidade.horario_inicio
             fim_existente = reserva.disponibilidade.horario_fim
             
             if inicio_atual < fim_existente and inicio_existente < fim_atual:
+                status_texto = "pendente" if reserva.status_aprovacao == 'P' else "aprovada"
                 raise ValidationError(
-                    "Você já possui uma reserva que se sobrepõe a este horário e data."
+                    f"Você já possui uma reserva {status_texto} que se sobrepõe a este horário na mesma data."
                 )
 
     def __str__(self):

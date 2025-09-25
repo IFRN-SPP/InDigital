@@ -32,4 +32,8 @@ urlpatterns = [
     path('historico/geral/reservas/', views.historico_geral_reservas, name='historico_geral_reservas'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
+    path('reservas/pendentes/', views.reservas_pendentes, name='reservas_pendentes'),
+    path('aprovar/reserva/<int:reserva_id>/', views.aprovar_reserva, name='aprovar_reserva'),
+    path('rejeitar/reserva/<int:reserva_id>/', views.rejeitar_reserva, name='rejeitar_reserva'),
+    path('aprovar/multiplas/reservas/', views.aprovar_multiplas_reservas, name='aprovar_multiplas_reservas'),
 ]

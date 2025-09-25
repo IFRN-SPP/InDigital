@@ -81,6 +81,7 @@
                                 <th>Horário</th>
                                 <th>Laboratório</th>
                                 <th>Status</th>
+                                <th>Frequência</th>
                                 <th>Monitor</th>
                                 <th>Ações</th>
                             </tr>
@@ -108,6 +109,21 @@
                                         {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
                                     </td>
                                     <td>
+                                        {% if reserva.status_aprovacao == 'A' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Aprovada
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'P' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock"></i> Pendente
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'R' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i> Rejeitada
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         {% if reserva.status_frequencia == 'P' %}
                                             <span class="badge bg-success">
                                                 <i class="fas fa-check"></i> Presente
@@ -122,7 +138,7 @@
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">
-                                                <i class="fas fa-clock"></i> Pendente
+                                                <i class="fas fa-clock"></i> Aguardando
                                             </span>
                                         {% endif %}
                                     </td>
@@ -138,7 +154,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if reserva.disponibilidade.data >= today %}
+                                        {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
                                             <a href="{% url 'cancelar_reserva' reserva.id %}" 
                                                class="btn btn-sm btn-outline-danger"
                                                onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">

@@ -68,12 +68,14 @@ def admin_dashboard(request):
     # Estatísticas
     total_users = User.objects.count()
     total_reservations = Reserva.objects.count()
-    pending_requests = Reserva.objects.filter(disponibilidade__data__gte=date.today()).count()
+    approved_reservations = Reserva.objects.filter(status_aprovacao='A').count()
+    pending_requests = Reserva.objects.filter(status_aprovacao='P').count()
     waiting_queue = FilaEspera.objects.count()
     
-    # Reservas do dia 
+    # Reservas do dia (apenas aprovadas)
     reservas_hoje = Reserva.objects.filter(
-        disponibilidade__data=date.today()
+        disponibilidade__data=date.today(),
+        status_aprovacao='A'
     ).select_related(
         'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
     ).order_by('disponibilidade__horario_inicio')
@@ -86,6 +88,7 @@ def admin_dashboard(request):
     context = {
         'total_users': total_users,
         'total_reservations': total_reservations,
+        'approved_reservations': approved_reservations,
         'pending_requests': pending_requests,
         'waiting_queue': waiting_queue,
         'reservas_hoje': page_obj,
@@ -97,9 +100,10 @@ def admin_dashboard(request):
 @login_required
 @monitor_required
 def monitor_dashboard(request):
-    # Buscar reservas do dia de hoje diretamente
+    # Buscar reservas aprovadas do dia de hoje diretamente
     reservas_hoje = Reserva.objects.filter(
-        disponibilidade__data=date.today()
+        disponibilidade__data=date.today(),
+        status_aprovacao='A'
     ).select_related(
         'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
     ).order_by('disponibilidade__horario_inicio')
@@ -109,9 +113,10 @@ def monitor_dashboard(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Reservas que o monitor é responsável (para estatísticas)
+    # Reservas aprovadas que o monitor é responsável (para estatísticas)
     reservas_monitor = Reserva.objects.filter(
-        disponibilidade__monitor=request.user
+        disponibilidade__monitor=request.user,
+        status_aprovacao='A'
     )
     
     # Estatísticas
@@ -126,17 +131,6 @@ def monitor_dashboard(request):
         'faltas': faltas,
         'pendentes': pendentes,
         'reservas_hoje': page_obj,
-        'page_obj': page_obj,
-        'today': date.today(),
-    }
-    return render(request, 'monitor_dashboard.html', context)
-    
-    context = {
-        'total_reservas': total_reservas,
-        'presentes': presentes,
-        'faltas': faltas,
-        'pendentes': pendentes,
-        'reservas_hoje': page_obj,  # Usar page_obj em vez de reservas_hoje
         'page_obj': page_obj,
         'today': date.today(),
     }
@@ -426,7 +420,24 @@ def horarios(request):
 
     # Buscar reservas e filas do usuário para verificar status
     reservas_em_fila = FilaEspera.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
-    minhas_reservas = Reserva.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
+    
+    # Buscar reservas do usuário (pendentes e aprovadas)
+    minhas_reservas = Reserva.objects.filter(
+        usuario=request.user,
+        status_aprovacao__in=['P', 'A']
+    ).values_list('disponibilidade_id', flat=True)
+    
+    # Buscar reservas pendentes específicas para mostrar status
+    reservas_pendentes = Reserva.objects.filter(
+        usuario=request.user,
+        status_aprovacao='P'
+    ).values_list('disponibilidade_id', flat=True)
+    
+    # Buscar reservas rejeitadas para mostrar feedback
+    reservas_rejeitadas = Reserva.objects.filter(
+        usuario=request.user,
+        status_aprovacao='R'
+    ).values_list('disponibilidade_id', flat=True)
     
     # Dados para os filtros
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
@@ -436,6 +447,8 @@ def horarios(request):
         'page_obj': page_obj,
         'reservas_em_fila': reservas_em_fila,
         'minhas_reservas': minhas_reservas,
+        'reservas_pendentes': reservas_pendentes,
+        'reservas_rejeitadas': reservas_rejeitadas,
         'laboratorios': laboratorios,
         'monitores': monitores,
         'laboratorio_id': laboratorio_id,
@@ -453,19 +466,37 @@ def horarios(request):
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
 
+    # Verificar se o usuário já tem uma reserva para essa disponibilidade
+    reserva_existente = Reserva.objects.filter(
+        usuario=request.user, 
+        disponibilidade=disponibilidade,
+        status_aprovacao__in=['P', 'A']  # Pendente ou Aprovada
+    ).first()
+    
+    if reserva_existente:
+        status_texto = "pendente" if reserva_existente.status_aprovacao == 'P' else "aprovada"
+        messages.error(request, f"Você já possui uma reserva {status_texto} para este horário.")
+        return redirect('horarios')
+
     if disponibilidade.vagas > 0:
         try:
             # Criar uma instância da reserva para validar
-            reserva = Reserva(usuario=request.user, disponibilidade=disponibilidade)
+            reserva = Reserva(usuario=request.user, disponibilidade=disponibilidade, status_aprovacao='P')
             # Chamar o método clean() para validar sobreposições
             reserva.clean()
-            # Se não houve erro, salvar a reserva
+            # Se não houve erro, salvar a reserva com status pendente
             reserva.save()
-            disponibilidade.vagas -= 1
-            disponibilidade.save()
-            messages.success(request, "Reserva realizada com sucesso!")
+            # Não diminuir as vagas até a aprovação pelo admin
+            messages.success(request, "Solicitação de reserva enviada! Aguarde a aprovação do administrador.")
         except ValidationError as e:
-            messages.error(request, str(e.message))
+            # Extrair a mensagem de erro corretamente
+            if hasattr(e, 'message'):
+                error_msg = e.message
+            elif hasattr(e, 'messages') and e.messages:
+                error_msg = e.messages[0]
+            else:
+                error_msg = str(e)
+            messages.error(request, error_msg)
             return redirect('horarios')
     else:
         fila_espera = FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists()
@@ -485,10 +516,18 @@ def reservas(request):
 @login_required
 def cancelar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
+    
+    # Não permitir cancelar reservas rejeitadas
+    if reserva.status_aprovacao == 'R':
+        messages.error(request, "Não é possível cancelar uma reserva rejeitada.")
+        return redirect("minhas_reservas")
+    
     disponibilidade = reserva.disponibilidade
 
-    disponibilidade.vagas += 1
-    disponibilidade.save()
+    # Só devolver vaga se a reserva estava aprovada
+    if reserva.status_aprovacao == 'A':
+        disponibilidade.vagas += 1
+        disponibilidade.save()
 
     reserva.delete()
 
@@ -556,16 +595,20 @@ def minhas_reservas(request):
 @login_required
 @monitor_required
 def reservas_do_dia(request):
-    # Se for administrador ou superuser, mostra todas as reservas
+    # Se for administrador ou superuser, mostra todas as reservas aprovadas
     if request.user.is_superuser or request.user.perfil == 'administrador':
-        reservas = Reserva.objects.filter(disponibilidade__data=date.today()).select_related(
+        reservas = Reserva.objects.filter(
+            disponibilidade__data=date.today(),
+            status_aprovacao='A'
+        ).select_related(
             'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
         )
-    # Se for monitor, mostra apenas as reservas dos laboratórios que ele monitora
+    # Se for monitor, mostra apenas as reservas aprovadas dos laboratórios que ele monitora
     elif request.user.perfil == 'monitor':
         reservas = Reserva.objects.filter(
             disponibilidade__data=date.today(),
-            disponibilidade__monitor=request.user
+            disponibilidade__monitor=request.user,
+            status_aprovacao='A'
         ).select_related('usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor')
     else:
         # Esta linha não será executada devido ao decorator, mas mantemos por segurança
@@ -712,8 +755,16 @@ def remover_fila(request, fila_id):
 def entrar_fila_espera(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     
-    if Reserva.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
-        messages.error(request, "Você já tem uma reserva para esse horário.")
+    # Verificar se já tem uma reserva ativa (pendente ou aprovada) para essa disponibilidade
+    reserva_ativa = Reserva.objects.filter(
+        usuario=request.user, 
+        disponibilidade=disponibilidade,
+        status_aprovacao__in=['P', 'A']
+    ).first()
+    
+    if reserva_ativa:
+        status_texto = "pendente" if reserva_ativa.status_aprovacao == 'P' else "aprovada"
+        messages.error(request, f"Você já possui uma reserva {status_texto} para este horário.")
         return redirect('horarios')
 
     if FilaEspera.objects.filter(usuario=request.user, disponibilidade=disponibilidade).exists():
@@ -1118,3 +1169,131 @@ def historico_geral_reservas(request):
     }
     
     return render(request, 'historico_geral_reservas.html', context)
+
+@login_required
+@admin_required
+def reservas_pendentes(request):
+    reservas = Reserva.objects.filter(status_aprovacao='P').select_related(
+        'usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor'
+    ).order_by('data_solicitacao')
+    
+    # Filtros
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    laboratorio_id = request.GET.get('laboratorio_id')
+    usuario_id = request.GET.get('usuario_id')
+    
+    # Aplicar filtros
+    if data_inicio:
+        try:
+            data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_parsed)
+        except ValueError:
+            pass
+    
+    if data_fim:
+        try:
+            data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_parsed)
+        except ValueError:
+            pass
+    
+    if laboratorio_id:
+        reservas = reservas.filter(disponibilidade__laboratorio__id=laboratorio_id)
+    
+    if usuario_id:
+        reservas = reservas.filter(usuario__id=usuario_id)
+    
+    # Paginação
+    paginator = Paginator(reservas, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Dados para os filtros
+    usuarios = User.objects.all().order_by('username')
+    laboratorios = Laboratorio.objects.all()
+    
+    context = {
+        'page_obj': page_obj,
+        'usuarios': usuarios,
+        'laboratorios': laboratorios,
+        'usuario_id': usuario_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'laboratorio_id': laboratorio_id,
+    }
+    
+    return render(request, 'reservas_pendentes.html', context)
+
+@login_required
+@admin_required
+def aprovar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
+    disponibilidade = reserva.disponibilidade
+    
+    # Verificar se ainda há vagas disponíveis
+    if disponibilidade.vagas > 0:
+        reserva.status_aprovacao = 'A'
+        reserva.save()
+        
+        # Diminuir as vagas disponíveis
+        disponibilidade.vagas -= 1
+        disponibilidade.save()
+        
+        messages.success(request, f"Reserva de {reserva.usuario.username} foi aprovada com sucesso!")
+    else:
+        messages.error(request, "Não há mais vagas disponíveis para este horário.")
+    
+    return redirect('reservas_pendentes')
+
+@login_required
+@admin_required
+def rejeitar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
+    
+    reserva.status_aprovacao = 'R'
+    reserva.save()
+    
+    messages.success(request, f"Reserva de {reserva.usuario.username} foi rejeitada.")
+    
+    return redirect('reservas_pendentes')
+
+@login_required
+@admin_required
+def aprovar_multiplas_reservas(request):
+    if request.method == 'POST':
+        reservas_ids = request.POST.getlist('reservas_selecionadas')
+        
+        if not reservas_ids:
+            messages.error(request, "Nenhuma reserva foi selecionada.")
+            return redirect('reservas_pendentes')
+        
+        aprovadas = 0
+        sem_vagas = 0
+        
+        for reserva_id in reservas_ids:
+            try:
+                reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
+                disponibilidade = reserva.disponibilidade
+                
+                # Verificar se ainda há vagas disponíveis
+                if disponibilidade.vagas > 0:
+                    reserva.status_aprovacao = 'A'
+                    reserva.save()
+                    
+                    # Diminuir as vagas disponíveis
+                    disponibilidade.vagas -= 1
+                    disponibilidade.save()
+                    
+                    aprovadas += 1
+                else:
+                    sem_vagas += 1
+            except Reserva.DoesNotExist:
+                continue
+        
+        if aprovadas > 0:
+            messages.success(request, f"{aprovadas} reserva(s) aprovada(s) com sucesso!")
+        if sem_vagas > 0:
+            messages.warning(request, f"{sem_vagas} reserva(s) não puderam ser aprovadas por falta de vagas.")
+    
+    return redirect('reservas_pendentes')
