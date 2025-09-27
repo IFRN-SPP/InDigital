@@ -6,6 +6,17 @@ from .models import User
 from functools import wraps
 from django.core.paginator import Paginator
 
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard_redirect(request):
+    """Redireciona o usuário para a página apropriada após login"""
+    if request.user.perfil == 'administrador' or request.user.is_superuser:
+        return redirect('admin_dashboard')  # Altere para sua view de admin
+    else:
+        return redirect('index')  # Altere para sua view principal
+
 def admin_required(view_func):
     """
     Decorator para verificar se o usuário é um administrador.
@@ -42,7 +53,20 @@ def cadastro(request):
 @login_required
 def perfil(request):
     usuario = request.user
-    return render(request, "perfil.html", {'usuario': usuario})
+    
+    total_reservations = 0  
+    approved_reservations = 0 
+    pending_requests = 0  
+    
+    context = {
+        'usuario': usuario,
+        'total_reservations': total_reservations,
+        'approved_reservations': approved_reservations,
+        'pending_requests': pending_requests,
+    }
+    
+    return render(request, "perfil.html", context)
+
 
 @login_required
 def editar_perfil(request):

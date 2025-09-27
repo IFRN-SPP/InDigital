@@ -98,7 +98,7 @@
         width: 78px;
     }
     
-    /* Estilos para o banner de boas-vindas */
+    /* Estilo do banner */
     .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -174,24 +174,24 @@
         color: #6c757d;
     }
     
-    /* Aplicando as cores padrão nos elementos */
+    /* cores padrão dos elementos */
     .bg-info {
-        background-color: #20597F !important; /* Azul escuro */
+        background-color: #20597F !important;
         color: white !important;
     }
     
     .bg-success {
-        background-color: #86B5E1 !important; /* Azul claro */
+        background-color: #86B5E1 !important;
         color: white !important;
     }
     
     .bg-warning {
-        background-color: #20597F !important; /* Azul escuro */
+        background-color: #20597F !important;
         color: white !important;
     }
     
     .bg-danger {
-        background-color: #86B5E1 !important; /* Azul claro */
+        background-color: #86B5E1 !important;
         color: white !important;
     }
     
@@ -228,12 +228,12 @@
     }
     
     .profile-avatar {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
         object-fit: cover;
-        margin-right: 20px;
-        border: 3px solid var(--cor-intermediaria2);
+        margin-right: 25px;
+        border: 4px solid var(--cor-intermediaria2);
     }
     
     .profile-info h3 {
@@ -242,7 +242,7 @@
     }
     
     .profile-info p {
-        margin-bottom: 0;
+        margin-bottom: 5px;
         color: #6c757d;
     }
     
@@ -280,6 +280,23 @@
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #dee2e6;
+    }
+    
+    .avatar-upload-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    /* Botão primário */
+    .btn-primary {
+        background-color: var(--cor-primaria) !important;
+        border-color: var(--cor-primaria) !important;
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466c !important;
+        border-color: #16466c !important;
     }
     
     @media (max-width: 767.98px) {
@@ -330,217 +347,225 @@
     }
 </style>
 {% endblock %}
+
 {% block content %}
 <div class="wrapper">
-
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-          </li>
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </li>
         </ul>
+        
         <ul class="navbar-nav ml-auto">
-          <li >
-            <a class="nav-link" href="{% url 'perfil' %}">
-              <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
-            </a>
-            </ul>
-        </li>
-          </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'perfil' %}">
+                    <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
+                </a>
+            </li>
         </ul>
-      </nav>
+    </nav>
+    
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <a href="{% url 'index' %}" class="brand-link">
-          <span>InDigital</span>
+            <span class="brand-text font-weight-light">InDigital</span>
         </a>
+        
         <div class="sidebar">
-          <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              <li class="nav-header">NAVEGAÇÃO</li>
-                  <li class="nav-item">
-    <a href="{% url 'index' %}" class="nav-link">
-        <i class="nav-icon fas fa-home"></i>
-        <p>Início</p>
-    </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'horarios' %}" class="nav-link">
-        <i class="nav-icon fas fa-calendar-check"></i>
-        <p>Disponibilidades</p>
-    </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'minhas_reservas' %}" class="nav-link">
-        <i class="nav-icon fas fa-users"></i>
-        <p>Minhas Reservas</p>
-    </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'historico_reservas' %}" class="nav-link">
-        <i class="nav-icon fas fa-history"></i>
-        <p>Histórico de Reservas</p>
-    </a>
-</li>
-<li class="nav-item">
-    <a href="{% url 'minha_fila_espera' %}" class="nav-link">
-        <i class="nav-icon fas fa-hourglass-half"></i>
-        <p>Fila de Espera</p>
-    </a>
-</li>
-<li class="nav-header">USUÁRIO</li>
-              <li class="nav-item">
-    <a href="{% url 'perfil' %}" class="nav-link">
-        <i class="nav-icon fas fa-user"></i>
-        <p>Perfil</p>
-    </a>
-</li>
-<li class="nav-item">
-    <form method="post" action="{% url 'account_logout' %}">
-        {% csrf_token %}
-        <button type="submit" class="nav-link btn btn-link text-start w-100">
-            <i class="nav-icon fas fa-sign-out-alt"></i>
-            <p>Sair</p>
-        </button>
-    </form>
-</li>
-</ul>
-</nav>
-</div>
-</aside>
-
-<div class="content-wrapper">
-    <section class="content">
-        <div class="container-fluid">
-            <div class="welcome-banner">
-                <h1>Editar Perfil</h1>
-                <p>Atualize suas informações pessoais</p>
-                <div class="welcome-icon">
-                    <i class="fas fa-user-edit"></i>
-                </div>
-            </div>
-            
-            <div class="profile-header">
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="Avatar do usuário" class="profile-avatar">
-                {% else %}
-                    <img src="https://via.placeholder.com/100" alt="Avatar do usuário" class="profile-avatar">
-                {% endif %}
-                <div class="profile-info">
-                    <h3>{{ user.get_full_name|default:user.username }}</h3>
-                    <p>Email: {{ user.email }}</p>
-                    <p>Vínculo: {{ user.get_vinculo_display|default:"Não informado" }}</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Informações Pessoais</div>
-                        </div>
-                        
-                        
-                        <form method="post" enctype="multipart/form-data">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-header">NAVEGAÇÃO</li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'index' %}" class="nav-link">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>Início</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'horarios' %}" class="nav-link">
+                            <i class="nav-icon fas fa-calendar-check"></i>
+                            <p>Disponibilidades</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'minhas_reservas' %}" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Minhas Reservas</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'historico_reservas' %}" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>Histórico de Reservas</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'minha_fila_espera' %}" class="nav-link">
+                            <i class="nav-icon fas fa-hourglass-half"></i>
+                            <p>Fila de Espera</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-header">USUÁRIO</li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'perfil' %}" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>Perfil</p>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'account_logout' %}">
                             {% csrf_token %}
-                            
-                            <div class="card-body">
-                                <div class="form-section">
-                                    <div class="form-section-title">
-                                        <i class="fas fa-camera me-2"></i>Foto de Perfil
-                                    </div>
-                                    <div class="avatar-upload">
-                                        {% if user.avatar %}
-                                            <img src="{{ user.avatar.url }}" alt="Preview do avatar" class="avatar-preview" id="avatarPreview">
-                                        {% else %}
-                                            <img src="https://via.placeholder.com/80" alt="Preview do avatar" class="avatar-preview" id="avatarPreview">
-                                        {% endif %}
-                                        <div class="flex-grow-1">
-                                            <div class="input-group">
-                                                {{ form.avatar }}
-                                                <button class="btn btn-outline-secondary" type="button" id="removeAvatar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                            <div class="form-text">
-                                                Formatos suportados: JPG, PNG. Tamanho máximo: 2MB.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                
-                                <div class="form-section">
-                                    <div class="form-section-title">
-                                        <i class="fas fa-user me-2"></i>Informações Básicas
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="{{ form.first_name.id_for_label }}" class="form-label">Nome</label>
-                                                {{ form.first_name }}
-                                                {% if form.first_name.errors %}
-                                                    <div class="text-danger">{{ form.first_name.errors }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
-                                                {{ form.last_name }}
-                                                {% if form.last_name.errors %}
-                                                    <div class="text-danger">{{ form.last_name.errors }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
-                                                {{ form.email }}
-                                                {% if form.email.errors %}
-                                                    <div class="text-danger">{{ form.email.errors }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                               
-                                {% for field in form %}
-                                    {% if field.name not in 'avatar,first_name,last_name,email,vinculo' %}
-                                    <div class="mb-3">
-                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.errors %}
-                                            <div class="text-danger">{{ field.errors }}</div>
-                                        {% endif %}
-                                        {% if field.help_text %}
-                                            <div class="form-text">{{ field.help_text }}</div>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            
-                            <div class="form-actions">
-                                <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">Cancelar</a>
-                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                            </div>
+                            <button type="submit" class="nav-link btn btn-link text-start w-100">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <p>Sair</p>
+                            </button>
                         </form>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="welcome-banner">
+                    <h1>Editar Perfil</h1>
+                    <p>Atualize suas informações pessoais</p>
+                    <div class="welcome-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                </div>
+                
+                <div class="profile-header">
+                    <img src="{{ user.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar">
+                    <div class="profile-info">
+                        <h3>{{ user.get_nome_completo }}</h3>
+                        <p>Email: {{ user.email }}</p>
+                        <p>Vínculo: {{ user.vinculo }}</p>
+                        {% if user.suap_id %}
+                        <p>Matrícula SUAP: {{ user.username }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Informações Pessoais</div>
+                            </div>
+                            
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="card-body">
+                                    <div class="form-section">
+                                        <div class="form-section-title">
+                                            <i class="fas fa-camera me-2"></i>Foto de Perfil
+                                        </div>
+                                        <div class="avatar-upload">
+                                            <img src="{{ user.get_foto_perfil_url }}" alt="Preview do avatar" class="avatar-preview" id="avatarPreview">
+                                            
+                                            <div class="flex-grow-1">
+                                                {% if user.suap_foto_url and not user.foto_perfil %}
+                                                <div class="alert alert-info mb-2">
+                                                    <small>
+                                                        <i class="fas fa-info-circle"></i> 
+                                                        Foto atual importada do SUAP. Faça upload de uma nova foto para substituir.
+                                                    </small>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <div class="mb-3">
+                                                    <label for="{{ form.foto_perfil.id_for_label }}" class="form-label">Alterar Foto</label>
+                                                    {{ form.foto_perfil }}
+                                                    {% if form.foto_perfil.errors %}
+                                                        <div class="text-danger">{{ form.foto_perfil.errors }}</div>
+                                                    {% endif %}
+                                                    <div class="form-text">
+                                                        Formatos suportados: JPG, PNG. Tamanho máximo: 2MB.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                
+                                    <div class="form-section">
+                                        <div class="form-section-title">
+                                            <i class="fas fa-user me-2"></i>Informações Básicas
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Nome</label>
+                                                    {{ form.first_name }}
+                                                    {% if form.first_name.errors %}
+                                                        <div class="text-danger">{{ form.first_name.errors }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
+                                                    {{ form.last_name }}
+                                                    {% if form.last_name.errors %}
+                                                        <div class="text-danger">{{ form.last_name.errors }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
+                                                    {{ form.email }}
+                                                    {% if form.email.errors %}
+                                                        <div class="text-danger">{{ form.email.errors }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">Cancelar</a>
+                                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </div>
 {% endblock content %}
 
 {% block extra_js %}
-
+<script>
+    document.getElementById('id_foto_perfil').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}

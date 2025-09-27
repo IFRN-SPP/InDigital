@@ -98,7 +98,7 @@
         width: 78px;
     }
     
-    /* Estilos para o banner de boas-vindas */
+    /* Estilo do banner */
     .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -174,7 +174,7 @@
         color: #6c757d;
     }
     
-    /* Aplicando as cores padrão nos elementos */
+    /* Cores padrão dos elementos */
     .bg-info {
         background-color: #20597F !important;
         color: white !important;
@@ -216,7 +216,7 @@
         color: var(--cor-primaria);
     }
     
-    /* Estilos específicos para a página de perfil */
+    /* Estilos da página de perfil */
     .profile-header {
         display: flex;
         align-items: center;
@@ -236,37 +236,13 @@
         border: 4px solid var(--cor-intermediaria2);
     }
     
-    .profile-info h2 {
+    .profile-info h3 {
         margin-bottom: 5px;
         color: var(--cor-primaria);
     }
     
     .profile-info p {
         margin-bottom: 5px;
-        color: #6c757d;
-    }
-    
-    .profile-stats {
-        display: flex;
-        gap: 20px;
-        margin-top: 15px;
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 10px 15px;
-        background-color: #f8f9fa;
-        border-radius: 6px;
-    }
-    
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--cor-primaria);
-    }
-    
-    .stat-label {
-        font-size: 0.9rem;
         color: #6c757d;
     }
     
@@ -303,22 +279,36 @@
         border-bottom: 1px solid #eaecef;
     }
     
-    .badge-status {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-    
-    .badge-active {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    
     .action-buttons {
         display: flex;
+        justify-content: center;
         gap: 10px;
-        margin-top: 20px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid var(--cor-primaria);
+    }
+
+    /* Botão primário */
+    .btn-primary {
+        background-color: var(--cor-primaria) !important;
+        border-color: var(--cor-primaria) !important;
+        padding: 10px 25px;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466c !important;
+        border-color: #16466c !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
+    }
+    
+    .profile-content {
+        margin-bottom: 40px;
     }
     
     @media (max-width: 767.98px) {
@@ -358,13 +348,14 @@
             margin-bottom: 15px;
         }
         
-        .profile-stats {
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
         .action-buttons {
             flex-direction: column;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            margin-bottom: 10px;
         }
     }
 </style>
@@ -382,8 +373,8 @@
         </ul>
         
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown user-menu">
-                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'perfil' %}">
                     <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
                 </a>
             </li>
@@ -396,7 +387,6 @@
         </a>
         
         <div class="sidebar">
-            <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-header">NAVEGAÇÃO</li>
@@ -470,82 +460,86 @@
                     </div>
                 </div>
                 
-                <div class="profile-header">
-                    {% if user.avatar %}
-                        <img src="{{ user.avatar.url }}" alt="Avatar do usuário" class="profile-avatar">
-                    {% else %}
-                        <img src="https://via.placeholder.com/100" alt="Avatar do usuário" class="profile-avatar">
-                    {% endif %}
-                    
-                    <div class="profile-info">
-                        <h3>{{ user.get_full_name|default:user.username }}</h3>
-                        <p>Email: {{ user.email }}</p>
-                        <p>Vínculo: {{ user.get_vinculo_display|default:"Não informado" }}</p>
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <img src="{{ usuario.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar">
+                        <div class="profile-info">
+                            <h3>{{ usuario.get_nome_completo }}</h3>
+                            <p>Email: {{ usuario.email }}</p>
+                            <p>Vínculo: {{ usuario.vinculo }}</p>
+                            {% if usuario.suap_id %}
+                            <p>Matrícula SUAP: {{ usuario.username }}</p>
+                            {% endif %}
+                            {% if usuario.suap_foto_url and not usuario.foto_perfil %}
+                            <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card info-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="fas fa-id-card me-2"></i>Informações Pessoais
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card info-card">
+                                <div class="card-header">
+                                    <div class="card-title">
+                                        <i class="fas fa-id-card me-2"></i>Informações Pessoais
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <span class="info-label">Nome Completo</span>
+                                        <span class="info-value">{{ usuario.get_nome_completo }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">E-mail</span>
+                                        <span class="info-value">{{ usuario.email }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">Vínculo</span>
+                                        <span class="info-value">{{ usuario.vinculo }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="card-body">
-                                <div class="info-item">
-                                    <span class="info-label">Nome Completo</span>
-                                    <span class="info-value">{{ user.perfil.nome_completo|default:user.get_full_name }}</span>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card info-card">
+                                <div class="card-header">
+                                    <div class="card-title">
+                                        <i class="fas fa-chart-bar me-2"></i>Estatísticas
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <span class="info-label">E-mail</span>
-                                    <span class="info-value">{{ user.email }}</span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label">Vínculo</span>
-                                    <span class="info-value">{{ user.perfil.vinculo|default:"Aluno" }}</span>
+                                <div class="card-body">
+                                    <div class="info-item">
+                                        <span class="info-label">Total de Reservas</span>
+                                        <span class="info-value">{{ total_reservations|default:"0" }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">Reservas Aprovadas</span>
+                                        <span class="info-value">{{ approved_reservations|default:"0" }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">Solicitações Pendentes</span>
+                                        <span class="info-value">{{ pending_requests|default:"0" }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card info-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="fas fa-chart-bar me-2"></i>Estatísticas
-                                </div>
-                            </div>
-                            
-                            <div class="card-body">
-                                <div class="info-item">
-                                    <span class="info-label">Total de Reservas</span>
-                                    <span class="info-value">{{ total_reservations }}</span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label">Reservas Aprovadas</span>
-                                    <span class="info-value">{{ approved_reservations }}</span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label">Solicitações Pendentes</span>
-                                    <span class="info-value">{{ pending_requests }}</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'editar_perfil' %}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Editar Perfil
+                        </a>
                     </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
                 </div>
             </div>
         </section>
     </div>
 </div>
 {% endblock content %}
-
