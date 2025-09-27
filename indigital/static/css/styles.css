@@ -123,3 +123,13 @@ footer {
     padding: 20px 0;
     color: var(--cor-secundaria);
 }
+
+.main-sidebar,
+.main-header {
+    display: none !important;
+}
+
+.content-wrapper {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}
