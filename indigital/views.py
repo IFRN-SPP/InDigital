@@ -347,7 +347,7 @@ def listar_laboratorios(request):
             messages.error(request, "Capacidade máxima deve ser um número.")
     
     # Paginação
-    paginator = Paginator(laboratorios_list, 10)
+    paginator = Paginator(laboratorios_list, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     

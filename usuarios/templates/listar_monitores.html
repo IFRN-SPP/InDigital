@@ -296,7 +296,7 @@
                                         <span class="text-muted">{{ monitor.id }}</span>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <strong>{{ monitor.matricula|default:"<span class='text-muted'>Não informado</span>" }}</strong>
+                                        <strong>{{ monitor.suap_id|default:"<span class='text-muted'>Não informado</span>" }}</strong>
                                     </td>
                                     <td class="monitor-name" style="border-color: #86B5E1;">
                                         <span class="monitor-username">{{ monitor.username }}</span>
@@ -360,11 +360,6 @@
                 </div>
                 {% if page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    <div class="float-left">
-                        <span class="text-muted">
-                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
-                        </span>
-                    </div>
                     {% if page_obj.has_other_pages %}
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}
