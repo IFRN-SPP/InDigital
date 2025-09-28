@@ -2,180 +2,422 @@
 
 {% block title %}Reservas Pendentes - InDigital{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
+    
+    /* Estilo do banner */
+    .welcome-banner {
+        background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner h1 {
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 3.5rem;
+        opacity: 0.2;
+        z-index: 0;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(134, 181, 225, 0.1);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86B5E1;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+    .page-link:hover {
+        background-color: #86B5E1;
+        color: #20597F;
+        border-color: #86B5E1;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .btn-primary {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466d;
+        border-color: #16466d;
+    }
+    
+    .btn-outline-primary {
+        color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    .card-header {
+        background-color: var(--cor-primaria);
+        color: white;
+    }
+    
+    .table thead {
+        background-color: var(--cor-intermediaria2);
+        color: var(--cor-primaria);
+    }
+    
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Reservas Pendentes de Aprovação</h2>
-        <div>
-            <span class="badge bg-warning text-dark fs-6">{{ page_obj.paginator.count }} pendente(s)</span>
+<div class="container-fluid">
+    <!-- Banner -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-clock mr-2"></i>Reservas Pendentes de Aprovação</h1>
+        <p>
+            Gerencie as solicitações de reserva que aguardam aprovação
+        </p>
+        <div class="welcome-icon">
+            <i class="fas fa-hourglass-half"></i>
         </div>
     </div>
 
     <!-- Filtros -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Filtros</h5>
-        </div>
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label for="data_inicio" class="form-label">Data início:</label>
-                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio }}">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label for="data_fim" class="form-label">Data fim:</label>
-                    <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim }}">
+                <div class="card-body">
+                    <form method="get" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data início:</label>
+                                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data fim:</label>
+                                    <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select class="form-select" id="laboratorio_id" name="laboratorio_id" style="border-color: #86B5E1;">
+                                        <option value="">Todos</option>
+                                        {% for lab in laboratorios %}
+                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>{{ lab.num_laboratorio }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="usuario_id" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                    <select class="form-select" id="usuario_id" name="usuario_id" style="border-color: #86B5E1;">
+                                        <option value="">Todos</option>
+                                        {% for usuario in usuarios %}
+                                            <option value="{{ usuario.id }}" {% if usuario_id == usuario.id|stringformat:"s" %}selected{% endif %}>{{ usuario.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
+                                <a href="{% url 'reservas_pendentes' %}" class="btn" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-3">
-                    <label for="laboratorio_id" class="form-label">Laboratório:</label>
-                    <select class="form-select" id="laboratorio_id" name="laboratorio_id">
-                        <option value="">Todos</option>
-                        {% for lab in laboratorios %}
-                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>{{ lab.num_laboratorio }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="usuario_id" class="form-label">Usuário:</label>
-                    <select class="form-select" id="usuario_id" name="usuario_id">
-                        <option value="">Todos</option>
-                        {% for usuario in usuarios %}
-                            <option value="{{ usuario.id }}" {% if usuario_id == usuario.id|stringformat:"s" %}selected{% endif %}>{{ usuario.username }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Filtrar</button>
-                    <a href="{% url 'reservas_pendentes' %}" class="btn btn-outline-secondary">Limpar</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    {% if page_obj %}
-        <form method="POST" action="{% url 'aprovar_multiplas_reservas' %}">
-            {% csrf_token %}
-            
-            <!-- Botões de ação em lote -->
-            <div class="mb-3">
-                <button type="submit" class="btn btn-success" onclick="return confirm('Tem certeza que deseja aprovar as reservas selecionadas?')">
-                    <i class="fas fa-check"></i> Aprovar Selecionadas
-                </button>
-                <button type="button" class="btn btn-outline-primary" id="select-all">
-                    Selecionar Todas
-                </button>
-                <button type="button" class="btn btn-outline-secondary" id="unselect-all">
-                    Desmarcar Todas
-                </button>
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-list mr-2"></i>Reservas Pendentes
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge badge-warning" style="font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} pendente{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if page_obj %}
+                <form method="POST" action="{% url 'aprovar_multiplas_reservas' %}">
+                    {% csrf_token %}
+                    
+                    <div class="card-body p-0">
+                        <div class="p-3" style="background-color: rgba(134, 181, 225, 0.1); border-bottom: 1px solid #86B5E1;">
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Tem certeza que deseja aprovar as reservas selecionadas?')">
+                                <i class="fas fa-check"></i> Aprovar Selecionadas
+                            </button>
+                            <button type="button" class="btn" id="select-all" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                Selecionar Todas
+                            </button>
+                            <button type="button" class="btn" id="unselect-all" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                Desmarcar Todas
+                            </button>
+                        </div>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th><input type="checkbox" id="check-all"></th>
-                            <th>Usuário</th>
-                            <th>Laboratório</th>
-                            <th>Data</th>
-                            <th>Horário</th>
-                            <th>Monitor</th>
-                            <th>Solicitada em</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for reserva in page_obj %}
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
-                            </td>
-                            <td>
-                                <strong>{{ reserva.usuario.username }}</strong>
-                                <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
-                            </td>
-                            <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.disponibilidade.data|date:"d/m/Y" }}</td>
-                            <td>{{ reserva.disponibilidade.horario_inicio }} - {{ reserva.disponibilidade.horario_fim }}</td>
-                            <td>
-                                {% if reserva.disponibilidade.monitor %}
-                                    {{ reserva.disponibilidade.monitor.username }}
-                                {% else %}
-                                    <span class="text-muted">N/A</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ reserva.data_solicitacao|date:"d/m/Y H:i" }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{% url 'aprovar_reserva' reserva.id %}" 
-                                       class="btn btn-success btn-sm"
-                                       onclick="return confirm('Tem certeza que deseja aprovar esta reserva?')"
-                                       title="Aprovar">
-                                        <i class="fas fa-check"></i>
-                                    </a>
-                                    <a href="{% url 'rejeitar_reserva' reserva.id %}" 
-                                       class="btn btn-danger btn-sm"
-                                       onclick="return confirm('Tem certeza que deseja rejeitar esta reserva?')"
-                                       title="Rejeitar">
-                                        <i class="fas fa-times"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center text-muted">Nenhuma reserva pendente encontrada.</td>
-                        </tr>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%; border-color: #20597F;">
+                                            <input type="checkbox" id="check-all">
+                                        </th>
+                                        <th style="width: 15%; border-color: #20597F;">Usuário</th>
+                                        <th style="width: 10%; border-color: #20597F;">Laboratório</th>
+                                        <th style="width: 10%; border-color: #20597F;">Data</th>
+                                        <th style="width: 15%; border-color: #20597F;">Horário</th>
+                                        <th style="width: 15%; border-color: #20597F;">Monitor</th>
+                                        <th style="width: 15%; border-color: #20597F;">Solicitada em</th>
+                                        <th style="width: 15%; border-color: #20597F;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reserva in page_obj %}
+                                    <tr>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <strong>{{ reserva.usuario.username }}</strong>
+                                            <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.horario_inicio }} - {{ reserva.disponibilidade.horario_fim }}
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            {% if reserva.disponibilidade.monitor %}
+                                                <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
+                                                {{ reserva.disponibilidade.monitor.username }}
+                                            {% else %}
+                                                <span class="text-muted">
+                                                    <i class="fas fa-user-slash mr-1"></i>
+                                                    N/A
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <i class="fas fa-calendar-check mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.data_solicitacao|date:"d/m/Y H:i" }}
+                                        </td>
+                                        <td style="border-color: #86B5E1; vertical-align: middle;">
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'aprovar_reserva' reserva.id %}" 
+                                                   class="btn btn-success btn-sm"
+                                                   onclick="return confirm('Tem certeza que deseja aprovar esta reserva?')"
+                                                   title="Aprovar">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                <a href="{% url 'rejeitar_reserva' reserva.id %}" 
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('Tem certeza que deseja rejeitar esta reserva?')"
+                                                   title="Rejeitar">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                        <h4 style="color: #20597F;">Nenhuma reserva pendente encontrada</h4>
+                        <p class="text-muted">
+                            {% if data_inicio or data_fim or laboratorio_id or usuario_id %}
+                                Tente ajustar os filtros ou <a href="{% url 'reservas_pendentes' %}" style="color: #20597F;">limpar os filtros</a> para ver todas as reservas pendentes.
+                            {% else %}
+                                Não há reservas pendentes de aprovação no momento.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if page_obj %}
+                <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                    <div class="float-left">
+                        <span class="text-muted">
+                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+                        </span>
+                    </div>
+                    {% if page_obj.has_other_pages %}
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}" 
+                                       style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
+                                </li>
+                            {% endif %}
                         {% endfor %}
-                    </tbody>
-                </table>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
-        </form>
-
-        <!-- Paginação -->
-        {% if page_obj.has_other_pages %}
-        <nav aria-label="Paginação das reservas">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}">&laquo; Primeira</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}">Anterior</a>
-                    </li>
-                {% endif %}
-
-                <li class="page-item active">
-                    <span class="page-link">
-                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
-
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}">Próxima</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if usuario_id %}&usuario_id={{ usuario_id }}{% endif %}">Última &raquo;</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-
-    {% else %}
-        <div class="alert alert-info text-center">
-            <i class="fas fa-info-circle"></i>
-            Nenhuma reserva pendente encontrada.
         </div>
-    {% endif %}
+    </div>
 
     <div class="mt-4">
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        <a href="{% url 'admin_dashboard' %}" class="btn" style="background-color: #86B5E1; color: #20597F; border: none;">
+            <i class="fas fa-arrow-left mr-1"></i> Voltar ao Dashboard
         </a>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const checkAll = document.getElementById('check-all');
@@ -183,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const unselectAllBtn = document.getElementById('unselect-all');
     const checkboxes = document.querySelectorAll('.reserva-checkbox');
 
-    // Função para marcar/desmarcar todos
     function toggleAll(checked) {
         checkboxes.forEach(checkbox => {
             checkbox.checked = checked;
@@ -191,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
         checkAll.checked = checked;
     }
 
-    // Event listeners
+
     checkAll.addEventListener('change', function() {
         toggleAll(this.checked);
     });
@@ -204,7 +445,6 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAll(false);
     });
 
-    // Atualizar checkbox "marcar todos" quando checkboxes individuais mudam
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const allChecked = Array.from(checkboxes).every(cb => cb.checked);
@@ -214,6 +454,23 @@ document.addEventListener('DOMContentLoaded', function() {
             checkAll.indeterminate = !allChecked && !noneChecked;
         });
     });
+    
+    $('.btn').hover(
+        function() {
+            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
+                $(this).css('background-color', '#16466d');
+            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
+                $(this).css('background-color', '#76a5d9');
+            }
+        },
+        function() {
+            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
+                $(this).css('background-color', '#20597F');
+            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
+                $(this).css('background-color', '#86B5E1');
+            }
+        }
+    );
 });
 </script>
 {% endblock %}
