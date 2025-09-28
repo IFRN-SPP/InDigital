@@ -1,98 +1,421 @@
 {% extends "base.html" %}
+{% block extra_css %}
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
+    
+    /* Estilo do banner */
+    .welcome-banner {
+        background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner h1 {
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 3.5rem;
+        opacity: 0.2;
+        z-index: 0;
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 4px solid var(--cor-primaria);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .info-item i {
+        color: var(--cor-primaria);
+        width: 25px;
+        margin-right: 10px;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(134, 181, 225, 0.1);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86B5E1;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+    .page-link:hover {
+        background-color: #86B5E1;
+        color: #20597F;
+        border-color: #86B5E1;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    .btn-secondary {
+        background-color: #86B5E1;
+        color: #20597F;
+        border-color: #86B5E1;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #76a5d9;
+        border-color: #76a5d9;
+        color: #20597F;
+    }
+    
+    .badge-success {
+        background-color: #28a745;
+    }
+    
+    .badge-danger {
+        background-color: #dc3545;
+    }
+    
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+    
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+    
+    .table thead {
+        background-color: var(--cor-intermediaria2);
+        color: var(--cor-primaria);
+    }
+    
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Registrar Frequência</h1>
+<div class="container-fluid">
+    <!-- Banner -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-check-square mr-2"></i>Registrar Frequência</h1>
+        <p>
+            Registre a presença dos usuários para esta disponibilidade
+        </p>
+        <div class="welcome-icon">
+            <i class="fas fa-user-check"></i>
+        </div>
+    </div>
 
-<p>
-    <strong>Horário:</strong> {{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }} |
-    <strong>Laboratório:</strong> {{ disponibilidade.laboratorio }} |
-    <strong>Data:</strong> {{ disponibilidade.data|date:"d/m/Y" }}
-</p>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Horário:</strong><br>
+                                {{ disponibilidade.horario_inicio }} às {{ disponibilidade.horario_fim }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-flask"></i>
+                            <div>
+                                <strong>Laboratório:</strong><br>
+                                {{ disponibilidade.laboratorio }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <div>
+                                <strong>Data:</strong><br>
+                                {{ disponibilidade.data|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% if page_obj %}
-<table>
-    <tr>
-        <th>#</th>
-        <th>Usuário</th>
-        <th>Status Atual</th>
-        <th>Presença</th>
-    </tr>
-    {% for reserva in page_obj %}
-    <tr>
-        <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
-        <td>{{ reserva.usuario.username }}</td>
-        <td>
-            {% if reserva.status_frequencia == 'P' %}
-                <span class="badge bg-success">Presente</span>
-            {% elif reserva.status_frequencia == 'F' %}
-                <span class="badge bg-danger">Faltou</span>
-            {% elif reserva.status_frequencia == 'N' %}
-                <span class="badge bg-warning">Não Registrado</span>
-            {% else %}
-                <span class="badge bg-secondary">Pendente</span>
-            {% endif %}
-        </td>
-        <td>
-            <form method="post" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="reserva_id" value="{{ reserva.id }}">
-                <button name="status" value="P" class="btn btn-success btn-sm">✅ Presente</button>
-                <button name="status" value="F" class="btn btn-danger btn-sm">❌ Faltou</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-users mr-2"></i>Lista de Reservas
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge" style="background-color: #20597F; color: white; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if page_obj %}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%; border-color: #20597F;">#</th>
+                                    <th style="width: 25%; border-color: #20597F;">Usuário</th>
+                                    <th style="width: 20%; border-color: #20597F;">Status Atual</th>
+                                    <th style="width: 47%; border-color: #20597F;" class="text-center">Registrar Presença</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reserva in page_obj %}
+                                <tr>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        {{ page_obj.start_index|add:forloop.counter0 }}
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ reserva.usuario.username }}</strong>
+                                        {% if reserva.usuario.get_full_name %}
+                                            <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        {% if reserva.status_frequencia == 'P' %}
+                                            <span class="badge badge-success status-badge">
+                                                <i class="fas fa-check mr-1"></i> Presente
+                                            </span>
+                                        {% elif reserva.status_frequencia == 'F' %}
+                                            <span class="badge badge-danger status-badge">
+                                                <i class="fas fa-times mr-1"></i> Faltou
+                                            </span>
+                                        {% elif reserva.status_frequencia == 'N' %}
+                                            <span class="badge badge-warning status-badge">
+                                                <i class="fas fa-question mr-1"></i> Não Registrado
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-secondary status-badge">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;" class="text-center">
+                                        <form method="post" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="reserva_id" value="{{ reserva.id }}">
+                                            <div class="btn-group" role="group">
+                                                <button name="status" value="P" 
+                                                        class="btn btn-success"
+                                                        title="Marcar como Presente">
+                                                    <i class="fas fa-check mr-1"></i> Presente
+                                                </button>
+                                                <button name="status" value="F" 
+                                                        class="btn btn-danger"
+                                                        title="Marcar como Faltou">
+                                                    <i class="fas fa-times mr-1"></i> Faltou
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-<!-- Paginação -->
-{% if page_obj.has_other_pages %}
-    <nav aria-label="Navegação de páginas" style="margin-top: 20px;">
-        <ul class="pagination justify-content-center">
-            
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1" aria-label="Primeira">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% endif %}
+                {% if page_obj.has_other_pages %}
+                <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                    <div class="float-left">
+                        <span class="text-muted">
+                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+                        </span>
+                    </div>
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
 
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}" 
+                                       style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
                 {% endif %}
-            {% endfor %}
+                
+                {% else %}
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-4x mb-3" style="color: #86B5E1;"></i>
+                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
+                        <p class="text-muted">
+                            Não há reservas para este horário e laboratório.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
-            {% endif %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'listar_disponibilidades_monitor' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Voltar para Disponibilidades
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-        </ul>
-    </nav>
-{% endif %}
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    
+    $('.btn').hover(
+        function() {
+            if ($(this).hasClass('btn-secondary')) {
+                $(this).css('background-color', '#76a5d9');
+                $(this).css('border-color', '#76a5d9');
+            }
+        },
+        function() {
+            if ($(this).hasClass('btn-secondary')) {
+                $(this).css('background-color', '#86B5E1');
+                $(this).css('border-color', '#86B5E1');
+            }
+        }
+    );
 
-{% else %}
-<p>Nenhuma reserva encontrada para este horário.</p>
-{% endif %}
-
-<a href="{% url 'listar_disponibilidades_monitor' %}" class="btn btn-secondary mt-3">← Voltar para Disponibilidades</a>
+    
+    $('form').on('submit', function(e) {
+        const button = $(this).find('button[type="submit"]:focus');
+        const status = button.val();
+        const userName = $(this).closest('tr').find('strong').text();
+        
+        let message = '';
+        if (status === 'P') {
+            message = `Tem certeza que deseja marcar ${userName} como PRESENTE?`;
+        } else if (status === 'F') {
+            message = `Tem certeza que deseja marcar ${userName} como FALTOU?`;
+        }
+        
+        if (message && !confirm(message)) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
 {% endblock %}

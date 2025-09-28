@@ -1,13 +1,243 @@
 {% extends 'base.html' %}
 
-{% block content %}
-  <h2>Editar Usuário</h2>
-  
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% block extra_css %}
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
     
-    <button type="submit">Salvar Alterações</button>
-    <a href="{% url 'listar_usuarios' %}">Cancelar</a>
-  </form>
+    .card {
+        border: 1px solid #86B5E1;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        background-color: #20597F;
+        color: white;
+        border-bottom: 1px solid #86B5E1;
+        font-weight: 600;
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86B5E1;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+    .form-label {
+        color: #20597F;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .btn-primary {
+        background-color: #20597F;
+        border-color: #20597F;
+        padding: 10px 25px;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466c;
+        border-color: #16466c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
+    }
+    
+    .btn-secondary {
+        background-color: #86B5E1;
+        border-color: #86B5E1;
+        color: #20597F;
+        padding: 10px 25px;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #76a5d9;
+        border-color: #76a5d9;
+        color: #20597F;
+        transform: translateY(-1px);
+    }
+    
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        border: 1px solid #86B5E1;
+        border-radius: 6px;
+        padding: 10px 12px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #20597F;
+        border-color: #20597F;
+    }
+    
+    .form-check-input:focus {
+        border-color: #86B5E1;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+   
+    form p {
+        margin-bottom: 1.5rem;
+    }
+    
+    form label {
+        display: block;
+        color: #20597F;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="file"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #86B5E1;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+        border-color: #20597F;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+        outline: none;
+    }
+    
+    .help-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 4px;
+    }
+    
+    .errorlist {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 4px;
+        padding-left: 0;
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-edit mr-2"></i>Editar Usuário
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {{ form.as_p }}
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Salvar Alterações
+                            </button>
+                            <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+   
+    $('form input, form select, form textarea').addClass('form-control');
+    $('form label').addClass('form-label');
+    
+
+    $('input[name="username"]').before('<i class="fas fa-user input-icon"></i>');
+    $('input[name="email"]').before('<i class="fas fa-envelope input-icon"></i>');
+    $('input[name="first_name"]').before('<i class="fas fa-id-card input-icon"></i>');
+    $('input[name="last_name"]').before('<i class="fas fa-id-card input-icon"></i>');
+    
+ 
+    $('input[type="checkbox"]').addClass('form-check-input');
+    $('input[type="radio"]').addClass('form-check-input');
+    $('input[type="checkbox"]').parent().addClass('form-check');
+    $('input[type="radio"]').parent().addClass('form-check');
+    $('input[type="checkbox"]').parent().prepend('<label class="form-check-label"></label>');
+    $('input[type="radio"]').parent().prepend('<label class="form-check-label"></label>');
+    
+  
+    $('.btn').hover(
+        function() {
+            if ($(this).hasClass('btn-primary')) {
+                $(this).css('transform', 'translateY(-1px)');
+            } else if ($(this).hasClass('btn-secondary')) {
+                $(this).css('transform', 'translateY(-1px)');
+            }
+        },
+        function() {
+            $(this).css('transform', 'translateY(0)');
+        }
+    );
+    
+
+    $('form').on('submit', function(e) {
+        var isValid = true;
+        $('form .form-control').each(function() {
+            if ($(this).prop('required') && !$(this).val()) {
+                $(this).addClass('is-invalid');
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+                $(this).addClass('is-valid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            if (!$('.alert-danger').length) {
+                $('form').prepend('<div class="alert alert-danger">Por favor, preencha todos os campos obrigatórios.</div>');
+            }
+        }
+    });
+    
+    
+    $('form .form-control').on('input', function() {
+        $(this).removeClass('is-invalid');
+        $('.alert-danger').remove();
+    });
+});
+</script>
 {% endblock %}

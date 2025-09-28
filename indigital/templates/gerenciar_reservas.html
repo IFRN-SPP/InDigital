@@ -1,29 +1,270 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
+    
+    /* Estilo do banner */
+    .welcome-banner {
+        background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner h1 {
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 3.5rem;
+        opacity: 0.2;
+        z-index: 0;
+    }
+    
+    /* Cards */
+    .action-card {
+        border: 1px solid #86B5E1;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        height: 100%;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(32, 89, 127, 0.15);
+        border-color: #20597F;
+    }
+    
+    .action-card .card-body {
+        padding: 30px 20px;
+        text-align: center;
+    }
+    
+    .action-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #20597F;
+    }
+    
+    .action-card .card-title {
+        color: #20597F;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .action-card .card-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+    
+    .action-btn {
+        background-color: #20597F;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .action-btn:hover {
+        background-color: #16466c;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
+    }
+    
+    .action-btn-success {
+        background-color: #28a745;
+    }
+    
+    .action-btn-success:hover {
+        background-color: #218838;
+    }
+    
+    .action-btn-info {
+        background-color: #86B5E1;
+        color: #20597F;
+    }
+    
+    .action-btn-info:hover {
+        background-color: #76a5d9;
+        color: #20597F;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="container-mreservas">
-        <h2 class="titulo">Gerenciamento de Reservas</h2>
-        <p class="descricao">Aqui você pode listar ou criar novas reservas de forma rápida e eficiente.</p>
-        
-        <div class="table-reservas">
-            <div class="buttons-mreservas">
-                <a href="{% url 'listar_disponibilidades' %}" class="botao-mreserva">
-                    <i class="fas fa-list"></i>Disponibilidades
-                </a>
-                <a href="{% url 'criar_disponibilidade' %}" class="botao-mreserva botao-criar">
-                    <i class="fas fa-plus-circle"></i> Criar Disponibilidade
-                </a>
-                <a href="{% url 'listar_laboratorios' %}" class="botao-mreserva botao-criar">
-                    <i class="fas fa-list"></i>Laboratórios
-                </a>
-                <a href="{% url 'criar_laboratorio' %}" class="botao-mreserva botao-criar">
-                    <i class="fas fa-plus-circle"></i> Criar Laboratório
-                </a>
-                <a href="{% url 'reservas_do_dia' %}" class="botao-mreserva">
-                    <i class="fas fa-calendar-day"></i> Reservas do Dia
-                </a>
+<div class="container-fluid">
+    <!-- Banner -->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-calendar-check mr-2"></i>Gerenciar Reservas</h1>
+        <p>Administre todas as reservas e disponibilidades do sistema</p>
+        <div class="welcome-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Disponibilidades -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card action-card">
+                <div class="card-body">
+                    <div class="action-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h5 class="card-title">Disponibilidades</h5>
+                    <p class="card-text">Visualize e gerencie todas as disponibilidades cadastradas no sistema</p>
+                    <a href="{% url 'listar_disponibilidades' %}" class="action-btn">
+                        <i class="fas fa-arrow-right mr-1"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criar Disponibilidade -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card action-card">
+                <div class="card-body">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5 class="card-title">Criar Disponibilidade</h5>
+                    <p class="card-text">Adicione novas disponibilidades para monitores e laboratórios</p>
+                    <a href="{% url 'criar_disponibilidade' %}" class="action-btn action-btn-success">
+                        <i class="fas fa-plus mr-1"></i> Criar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laboratórios -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card action-card">
+                <div class="card-body">
+                    <div class="action-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h5 class="card-title">Laboratórios</h5>
+                    <p class="card-text">Visualize e gerencie todos os laboratórios cadastrados</p>
+                    <a href="{% url 'listar_laboratorios' %}" class="action-btn">
+                        <i class="fas fa-arrow-right mr-1"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criar Laboratório -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card action-card">
+                <div class="card-body">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5 class="card-title">Criar Laboratório</h5>
+                    <p class="card-text">Adicione novos laboratórios ao sistema</p>
+                    <a href="{% url 'criar_laboratorio' %}" class="action-btn action-btn-success">
+                        <i class="fas fa-plus mr-1"></i> Criar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas do Dia -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card action-card">
+                <div class="card-body">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <h5 class="card-title">Reservas do Dia</h5>
+                    <p class="card-text">Visualize todas as reservas agendadas para hoje</p>
+                    <a href="{% url 'reservas_do_dia' %}" class="action-btn action-btn-info">
+                        <i class="fas fa-eye mr-1"></i> Visualizar
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+
+    $('.action-card').hover(
+        function() {
+            $(this).css('transform', 'translateY(-5px)');
+        },
+        function() {
+            $(this).css('transform', 'translateY(0)');
+        }
+    );
+    
+    $('.action-btn').hover(
+        function() {
+            $(this).css('transform', 'translateY(-2px)');
+        },
+        function() {
+            $(this).css('transform', 'translateY(0)');
+        }
+    );
+});
+</script>
+{% endblock %}
