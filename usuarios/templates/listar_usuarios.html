@@ -119,7 +119,7 @@
         box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
     }
     
-    /* Estilos específicos para a página de usuários */
+    
     .stats-card {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -172,7 +172,7 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Banner de Boas-Vindas -->
+    <!-- Banner -->
     <div class="welcome-banner">
         <h1><i class="fas fa-users mr-2"></i>Gerenciar Usuários</h1>
         <p>Administre todos os usuários do sistema</p>
@@ -250,7 +250,7 @@
         </div>
     </div>
 
-    <!-- Resultados -->
+    
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
@@ -433,10 +433,10 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    // Inicializa tooltips
+    
     $('[data-toggle="tooltip"]').tooltip();
     
-    // Adiciona hover effects nos botões
+    
     $('.btn').hover(
         function() {
             if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
