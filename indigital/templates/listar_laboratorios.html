@@ -1,161 +1,351 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
+    
+    /* Estilo do banner */
+    .welcome-banner {
+        background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .welcome-banner h1 {
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 3.5rem;
+        opacity: 0.2;
+        z-index: 0;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(134, 181, 225, 0.1);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #86B5E1;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+    .page-link:hover {
+        background-color: #86B5E1;
+        color: #20597F;
+        border-color: #86B5E1;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
+    }
+    
+    .laboratory-card {
+        border: 1px solid #86B5E1;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .laboratory-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(32, 89, 127, 0.15);
+    }
+    
+    .laboratory-card .card-header {
+        background-color: #20597F;
+        color: white;
+        border-bottom: none;
+        font-weight: 600;
+    }
+    
+    .laboratory-card .card-body {
+        padding: 20px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Título centralizado -->
-<div class="titulo-container">
-    <h2>Laboratórios</h2>
-</div>
+<div class="container-fluid">
+    <!-- Banner-->
+    <div class="welcome-banner">
+        <h1><i class="fas fa-flask mr-2"></i>Gerenciar Laboratórios</h1>
+        <p>Administre todos os laboratórios do sistema</p>
+        <div class="welcome-icon">
+            <i class="fas fa-flask"></i>
+        </div>
+    </div>
 
-<!-- Botão para adicionar laboratório -->
-<div class="mb-3">
-  <a href="{% url 'criar_laboratorio' %}" class="btn btn-success">
-    <i class="fas fa-plus"></i> Adicionar Laboratório
-  </a>
-</div>
-
-<!-- Filtros -->
-<div class="card mb-4">
-  <div class="card-header">
-    <h5 class="mb-0">
-      <i class="fas fa-filter"></i> Filtros
-    </h5>
-  </div>
-  <div class="card-body">
-    <form method="get" class="row g-3">
-      <div class="col-md-4">
-        <label for="num_laboratorio" class="form-label">Número do Laboratório:</label>
-        <input type="text" id="num_laboratorio" name="num_laboratorio" class="form-control" 
-               value="{{ num_laboratorio|default:'' }}" placeholder="Buscar por número">
-      </div>
-      <div class="col-md-4">
-        <label for="capacidade_min" class="form-label">Capacidade Mínima:</label>
-        <input type="number" id="capacidade_min" name="capacidade_min" class="form-control" 
-               value="{{ capacidade_min|default:'' }}" placeholder="Ex: 20" min="1">
-      </div>
-      <div class="col-md-4">
-        <label for="capacidade_max" class="form-label">Capacidade Máxima:</label>
-        <input type="number" id="capacidade_max" name="capacidade_max" class="form-control" 
-               value="{{ capacidade_max|default:'' }}" placeholder="Ex: 50" min="1">
-      </div>
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-search"></i> Filtrar
-        </button>
-        <a href="{% url 'listar_laboratorios' %}" class="btn btn-secondary">
-          <i class="fas fa-times"></i> Limpar Filtros
-        </a>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Resultados -->
-<div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">
-      <i class="fas fa-flask"></i> Laboratórios
-    </h5>
-    <span class="badge bg-primary">{{ page_obj.paginator.count }} laboratório{{ page_obj.paginator.count|pluralize:"s" }}</span>
-  </div>
-  <div class="card-body">
-    {% if page_obj %}
-      <div class="row">
-        {% for laboratorio in page_obj %}
-          <div >
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">
-                  <i class="fas fa-flask"></i> Laboratório {{ laboratorio.num_laboratorio }}
-                </h5>
-                <p class="card-text">
-                  <i class="fas fa-users"></i> <strong>Capacidade:</strong> {{ laboratorio.capacidade }} pessoas
-                </p>
-              </div>
-              <div class="card-footer">
-                <div class="btn-group w-100" role="group">
-                  {% if perms.indigital.editar_laboratorio %}
-                    <a href="{% url 'editar_laboratorio' laboratorio.id %}" 
-                       class="btn btn-outline-primary" 
-                       title="Editar laboratório">
-                      <i class="fas fa-edit"></i> Editar
-                    </a>
-                  {% endif %}
-                  {% if perms.indigital.excluir_laboratorio %}
-                    <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
-                       class="btn btn-outline-danger" 
-                       title="Excluir laboratório"
-                       onclick="return confirm('Tem certeza que deseja excluir este laboratório?')">
-                      <i class="fas fa-trash"></i> Excluir
-                    </a>
-                  {% endif %}
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header" style="background-color: #20597F; color: white;">
+                    <h3 class="card-title">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
                 </div>
-              </div>
+                <div class="card-body">
+                    <form method="get" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="num_laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Número do Laboratório:</label>
+                                    <input type="text" id="num_laboratorio" name="num_laboratorio" class="form-control form-control-sm" 
+                                           value="{{ num_laboratorio|default:'' }}" placeholder="Buscar por número"
+                                           style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="capacidade_min" class="form-label" style="color: #20597F; font-weight: 600;">Capacidade Mínima:</label>
+                                    <input type="number" id="capacidade_min" name="capacidade_min" class="form-control form-control-sm" 
+                                           value="{{ capacidade_min|default:'' }}" placeholder="Ex: 20" min="1"
+                                           style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="capacidade_max" class="form-label" style="color: #20597F; font-weight: 600;">Capacidade Máxima:</label>
+                                    <input type="number" id="capacidade_max" name="capacidade_max" class="form-control form-control-sm" 
+                                           value="{{ capacidade_max|default:'' }}" placeholder="Ex: 50" min="1"
+                                           style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
+                                <a href="{% url 'listar_laboratorios' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                                </a>
+                                <a href="{% url 'criar_laboratorio' %}" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar Laboratório
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-          </div>
-        {% empty %}
-          <div class="col-12">
-            <div class="text-center text-muted py-4">
-              <i class="fas fa-flask fa-3x mb-3"></i>
-              <p class="mb-0">Nenhum laboratório encontrado com os filtros aplicados.</p>
-              <small>Tente ajustar os filtros ou <a href="{% url 'listar_laboratorios' %}">limpar os filtros</a> para ver todos os laboratórios.</small>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="text-center text-muted py-4">
-        <i class="fas fa-flask fa-3x mb-3"></i>
-        <p class="mb-0">Nenhum laboratório encontrado.</p>
-      </div>
-    {% endif %}
-  </div>
-</div>
+        </div>
+    </div>
 
-<!-- Paginação -->
-{% if page_obj.has_other_pages %}
-    <nav aria-label="Navegação de páginas" class="mt-4">
-        <ul class="pagination justify-content-center">
-            
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Primeira">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Anterior">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% endif %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-list mr-2"></i>Lista de Laboratórios
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} laboratório{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="row">
+                            {% for laboratorio in page_obj %}
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card laboratory-card">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-flask mr-2"></i>Laboratório {{ laboratorio.num_laboratorio }}
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                <i class="fas fa-users mr-2" style="color: #20597F;"></i> 
+                                                <strong>Capacidade:</strong> {{ laboratorio.capacidade }} pessoas
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <div class="btn-group w-100" role="group">
+                                                {% if perms.indigital.editar_laboratorio %}
+                                                    <a href="{% url 'editar_laboratorio' laboratorio.id %}" 
+                                                       class="btn btn-sm" 
+                                                       title="Editar laboratório"
+                                                       style="background-color: #20597F; color: white; border: none;">
+                                                        <i class="fas fa-edit"></i> Editar
+                                                    </a>
+                                                {% endif %}
+                                                {% if perms.indigital.excluir_laboratorio %}
+                                                    <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
+                                                       class="btn btn-sm" 
+                                                       title="Excluir laboratório"
+                                                       style="background-color: #dc3545; color: white; border: none;"
+                                                       onclick="return confirm('Tem certeza que deseja excluir este laboratório?')">
+                                                        <i class="fas fa-trash"></i> Excluir
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-flask fa-4x mb-3" style="color: #86B5E1;"></i>
+                            <h4 style="color: #20597F;">Nenhum laboratório encontrado</h4>
+                            <p class="text-muted">
+                                {% if num_laboratorio or capacidade_min or capacidade_max %}
+                                    Tente ajustar os filtros ou <a href="{% url 'listar_laboratorios' %}" style="color: #20597F;">limpar os filtros</a> para ver todos os laboratórios.
+                                {% else %}
+                                    Não há laboratórios cadastrados no sistema.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if page_obj %}
+                <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                    <div class="float-left">
+                        <span class="text-muted">
+                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+                        </span>
+                    </div>
+                    {% if page_obj.has_other_pages %}
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
 
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}">{{ num }}</a>
-                    </li>
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                       style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    {% endif %}
+                </div>
                 {% endif %}
-            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Próxima">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" aria-label="Última">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
-            {% endif %}
+{% block extra_js %}
+<script>
+$(document).ready(function() {
 
-        </ul>
-    </nav>
-{% endif %}
+    $('.btn').hover(
+        function() {
+            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
+                $(this).css('background-color', '#16466d');
+            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
+                $(this).css('background-color', '#76a5d9');
+            } else if ($(this).css('background-color') === 'rgb(220, 53, 69)') {
+                $(this).css('background-color', '#c82333');
+            } else if ($(this).css('background-color') === 'rgb(40, 167, 69)') {
+                $(this).css('background-color', '#218838');
+            }
+        },
+        function() {
+            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
+                $(this).css('background-color', '#20597F');
+            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
+                $(this).css('background-color', '#86B5E1');
+            } else if ($(this).css('background-color') === 'rgb(200, 35, 51)') {
+                $(this).css('background-color', '#dc3545');
+            } else if ($(this).css('background-color') === 'rgb(33, 136, 56)') {
+                $(this).css('background-color', '#28a745');
+            }
+        }
+    );
+});
+</script>
 {% endblock %}
