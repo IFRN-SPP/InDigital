@@ -23,7 +23,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Esconder o sidebar e navbar na página de login */
+    
     .main-sidebar,
     .main-header {
         display: none !important;
@@ -125,7 +125,7 @@
         opacity: 0.7;
     }
 
-    /* Ajustar o footer para página de login */
+    
     .main-footer {
         background-color: var(--primary-color);
         color: white;
@@ -183,13 +183,13 @@
 
 {% block extra_js %}
 <script>
-    // Garantir que o menu lateral não interfira na página de login
+    
     document.addEventListener('DOMContentLoaded', function() {
-        // Remover qualquer classe de sidebar que possa estar ativa
+        
         document.body.classList.remove('sidebar-open');
         document.body.classList.remove('sidebar-collapse');
         
-        // Esconder qualquer overlay de sidebar
+        
         const sidebarOverlay = document.querySelector('.sidebar-overlay');
         if (sidebarOverlay) {
             sidebarOverlay.style.display = 'none';
