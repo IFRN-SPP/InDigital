@@ -139,7 +139,7 @@
                 <div class="col-md-3">
                     <strong><i class="fas fa-user-tie mr-2" style="color: #20597F;"></i> Monitor:</strong><br>
                     {% if disponibilidade.monitor %}
-                        <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.username }}</span>
+                        <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.suap_nome_completo }}</span>
                     {% else %}
                         <span class="text-muted">Sem monitor</span>
                     {% endif %}
@@ -234,7 +234,7 @@
                                 <tr>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.usuario.username }}
+                                        {{ reserva.usuario.suap_nome_completo }}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
@@ -257,7 +257,7 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-calendar-plus mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.data_reserva|date:"d/m/Y H:i" }}
+                                        {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -275,11 +275,6 @@
                 
                 {% if reservas_page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    <div class="float-left">
-                        <span class="text-muted">
-                            Mostrando {{ reservas_page_obj.start_index }} a {{ reservas_page_obj.end_index }} de {{ reservas_page_obj.paginator.count }} registros
-                        </span>
-                    </div>
                     {% if reservas_page_obj.has_other_pages %}
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if reservas_page_obj.has_previous %}
@@ -443,12 +438,6 @@
                 {% endif %}
             </div>
         </div>
-    </div>
-
-    <div class="mt-4 text-center">
-        <a href="{% url 'listar_disponibilidades' %}" class="btn" style="background-color: #86B5E1; color: #20597F; border: none; padding: 10px 25px;">
-            <i class="fas fa-arrow-left mr-2"></i> Voltar para Disponibilidades
-        </a>
     </div>
 </div>
 {% endblock %}

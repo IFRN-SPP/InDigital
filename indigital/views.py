@@ -692,7 +692,7 @@ def fila_espera(request):
             messages.error(request, "Data de fim inválida.")
     
     if usuario_nome:
-        filas = filas.filter(usuario__username__icontains=usuario_nome)
+        filas = filas.filter(usuario__suap_nome_completo__icontains=usuario_nome)
     
     if monitor_id and monitor_id != 'todos':
         filas = filas.filter(disponibilidade__monitor_id=monitor_id)
@@ -878,7 +878,7 @@ def usuarios_da_reserva(request, disponibilidade_id):
     
     # Aplicar filtros nas reservas se fornecidos
     if usuario_nome:
-        reservas = reservas.filter(usuario__username__icontains=usuario_nome)
+        reservas = reservas.filter(usuario__suap_nome_completo__icontains=usuario_nome)
     
     if status_frequencia and status_frequencia != 'todos':
         reservas = reservas.filter(status_frequencia=status_frequencia)

@@ -281,7 +281,7 @@
                                             <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
                                         </td>
                                         <td style="border-color: #86B5E1; vertical-align: middle;">
-                                            <strong>{{ reserva.usuario.username }}</strong>
+                                            <strong>{{ reserva.usuario.suap_id }}</strong>
                                             <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
                                         </td>
                                         <td style="border-color: #86B5E1; vertical-align: middle;">
@@ -294,12 +294,12 @@
                                         </td>
                                         <td style="border-color: #86B5E1; vertical-align: middle;">
                                             <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.horario_inicio }} - {{ reserva.disponibilidade.horario_fim }}
+                                            {{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}
                                         </td>
                                         <td style="border-color: #86B5E1; vertical-align: middle;">
                                             {% if reserva.disponibilidade.monitor %}
                                                 <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                                {{ reserva.disponibilidade.monitor.username }}
+                                                {{ reserva.disponibilidade.monitor.suap_nome_completo }}
                                             {% else %}
                                                 <span class="text-muted">
                                                     <i class="fas fa-user-slash mr-1"></i>
@@ -352,11 +352,6 @@
                 
                 {% if page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    <div class="float-left">
-                        <span class="text-muted">
-                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
-                        </span>
-                    </div>
                     {% if page_obj.has_other_pages %}
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}

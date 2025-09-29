@@ -121,10 +121,10 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="usuario_nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome do Usuário:</label>
-                                    <input type="text" name="usuario_nome" id="usuario_nome" 
-                                           class="form-control form-control-sm" placeholder="Digite o nome do usuário"
-                                           value="{{ usuario_nome }}" style="border-color: #86B5E1;">
+                                    <label for="usuario_nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome:</label>
+                                    <input type="text" id="usuario_nome" name="usuario_nome" class="form-control form-control-sm" 
+                                           value="{{ usuario_nome|default:'' }}" placeholder="Buscar por nome"
+                                           style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -209,7 +209,7 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ fila.usuario.username }}
+                                        {{ fila.usuario.suap_nome_completo }}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
@@ -278,11 +278,6 @@
                 
                 {% if page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    <div class="float-left">
-                        <span class="text-muted">
-                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
-                        </span>
-                    </div>
                     {% if page_obj.has_other_pages %}
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}
