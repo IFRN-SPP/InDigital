@@ -1,5 +1,6 @@
 from django import forms
 from .models import Disponibilidade, Laboratorio
+from usuarios.models import User
 
 class DisponibilidadeForm(forms.ModelForm):
     class Meta:
@@ -21,6 +22,9 @@ class DisponibilidadeForm(forms.ModelForm):
         self.fields['data'].widget = forms.DateInput(attrs={'type': 'date'})
         self.fields['horario_inicio'].widget = forms.TimeInput(attrs={'type': 'time'})
         self.fields['horario_fim'].widget = forms.TimeInput(attrs={'type': 'time'})
+        
+        self.fields['monitor'].queryset = User.objects.filter(perfil='monitor')
+        self.fields['monitor'].label_from_instance = lambda obj: f"{obj.get_nome_completo()}"
 
 class LaboratorioForm(forms.ModelForm):
     class Meta:

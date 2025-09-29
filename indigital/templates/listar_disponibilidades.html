@@ -155,7 +155,7 @@
                                         <option value="todos" {% if not monitor_id or monitor_id == 'todos' %}selected{% endif %}>Todos os monitores</option>
                                         {% for monitor in monitores %}
                                             <option value="{{ monitor.id }}" {% if monitor_id == monitor.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ monitor.username }}
+                                                {{ monitor.get_nome_completo }}
                                             </option>
                                         {% endfor %}
                                     </select>
@@ -232,7 +232,7 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.monitor.username|default:"<span class='text-muted'>Não definido</span>" }}
+                                        {{ reserva.monitor.get_nome_completo|default:"<span class='text-muted'>Não definido</span>" }}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <span class="badge badge-pill" 
