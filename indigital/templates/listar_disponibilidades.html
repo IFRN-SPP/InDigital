@@ -12,7 +12,6 @@
         --cor-intermediaria3: #20597F;
     }
     
-    /* Estilo do banner */
     .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -20,75 +19,73 @@
         border-radius: 10px;
         margin-bottom: 25px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .welcome-banner::before {
-        content: '';
-        position: absolute;
-        top: -20px;
-        right: -20px;
-        width: 120px;
-        height: 120px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 50%;
-    }
-    
-    .welcome-banner::after {
-        content: '';
-        position: absolute;
-        bottom: -30px;
-        left: -30px;
-        width: 150px;
-        height: 150px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 50%;
-    }
-    
-    .welcome-banner h1 {
-        font-weight: 700;
-        font-size: 2.2rem;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .welcome-banner p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .welcome-icon {
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 3.5rem;
-        opacity: 0.2;
-        z-index: 0;
     }
     
     .table-hover tbody tr:hover {
         background-color: rgba(134, 181, 225, 0.1);
     }
     
-    .form-control:focus, .form-select:focus {
-        border-color: #86B5E1;
+    /* Estilos do modal */
+    .modal-content {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+        background-color: #20597F;
+        color: white;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 2px solid #86B5E1;
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 25px;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 15px 20px;
+    }
+    
+    .btn-primary {
+        background-color: #20597F;
+        border-color: #20597F;
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466c;
+        border-color: #16466c;
+    }
+    
+    .form-control {
+        border: 1px solid #86B5E1;
+        border-radius: 6px;
+        padding: 10px 12px;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        border-color: #20597F;
         box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
     }
     
-    .page-link:hover {
-        background-color: #86B5E1;
+    .form-label {
         color: #20597F;
-        border-color: #86B5E1;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
     }
-    
-    .pagination .page-item.active .page-link {
-        background-color: var(--cor-primaria);
-        border-color: var(--cor-primaria);
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+
+    .form-field {
+        margin-bottom: 1rem;
     }
 </style>
 {% endblock %}
@@ -99,9 +96,6 @@
     <div class="welcome-banner">
         <h1><i class="fas fa-calendar-alt mr-2"></i>Gerenciar Disponibilidades</h1>
         <p>Administre todas as disponibilidades do sistema</p>
-        <div class="welcome-icon">
-            <i class="fas fa-calendar-alt"></i>
-        </div>
     </div>
 
     <!-- Filtros -->
@@ -112,19 +106,14 @@
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form method="get" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                    <select name="laboratorio" id="laboratorio" class="form-control form-control-sm" style="border-color: #86B5E1;">
+                                    <label for="laboratorio" class="form-label">Laboratório:</label>
+                                    <select name="laboratorio" id="laboratorio" class="form-control form-control-sm">
                                         <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
                                             <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
@@ -136,22 +125,22 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <label for="data_inicio" class="form-label">Data Início:</label>
                                     <input type="date" id="data_inicio" name="data_inicio" class="form-control form-control-sm" 
-                                           value="{{ data_inicio|default:'' }}" style="border-color: #86B5E1;">
+                                           value="{{ data_inicio|default:'' }}">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <label for="data_fim" class="form-label">Data Fim:</label>
                                     <input type="date" id="data_fim" name="data_fim" class="form-control form-control-sm" 
-                                           value="{{ data_fim|default:'' }}" style="border-color: #86B5E1;">
+                                           value="{{ data_fim|default:'' }}">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="monitor" class="form-label" style="color: #20597F; font-weight: 600;">Monitor:</label>
-                                    <select name="monitor" id="monitor" class="form-control form-control-sm" style="border-color: #86B5E1;">
+                                    <label for="monitor" class="form-label">Monitor:</label>
+                                    <select name="monitor" id="monitor" class="form-control form-control-sm">
                                         <option value="todos" {% if not monitor_id or monitor_id == 'todos' %}selected{% endif %}>Todos os monitores</option>
                                         {% for monitor in monitores %}
                                             <option value="{{ monitor.id }}" {% if monitor_id == monitor.id|stringformat:"s" %}selected{% endif %}>
@@ -163,13 +152,13 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="vagas_min" class="form-label" style="color: #20597F; font-weight: 600;">Vagas Mín.:</label>
+                                    <label for="vagas_min" class="form-label">Vagas Mín.:</label>
                                     <input type="number" id="vagas_min" name="vagas_min" class="form-control form-control-sm" 
-                                           value="{{ vagas_min|default:'' }}" placeholder="Ex: 5" min="0" style="border-color: #86B5E1;">
+                                           value="{{ vagas_min|default:'' }}" placeholder="Ex: 5" min="0">
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mt-3">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
                                     <i class="fas fa-search mr-1"></i> Filtrar
@@ -177,9 +166,10 @@
                                 <a href="{% url 'listar_disponibilidades' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
-                                <a href="{% url 'criar_disponibilidade' %}" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;">
-                                    <i class="fas fa-plus mr-1"></i> Adicionar Disponibilidade
-                                </a>
+                                <button type="button" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;" 
+                                        data-bs-toggle="modal" data-bs-target="#modalCriarDisponibilidade">
+                                    <i class="fas fa-plus mr-1"></i> Criar Disponibilidade
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -195,11 +185,9 @@
                     <h3 class="card-title mb-0">
                         <i class="fas fa-list mr-2"></i>Lista de Disponibilidades
                     </h3>
-                    <div class="card-tools">
-                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} disponibilidade{{ page_obj.paginator.count|pluralize:"s" }}
-                        </span>
-                    </div>
+                    <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                        {{ page_obj.paginator.count }} disponibilidade{{ page_obj.paginator.count|pluralize:"s" }}
+                    </span>
                 </div>
                 <div class="card-body p-0">
                     {% if page_obj %}
@@ -207,68 +195,59 @@
                         <table class="table table-hover">
                             <thead style="background-color: #86B5E1; color: #20597F;">
                                 <tr>
-                                    <th style="width: 5%; border-color: #20597F;">#</th>
-                                    <th style="width: 20%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 20%; border-color: #20597F;">Monitor</th>
-                                    <th style="width: 10%; border-color: #20597F;">Vagas</th>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;" class="text-center">Ações</th>
+                                    <th>#</th>
+                                    <th>Horário</th>
+                                    <th>Laboratório</th>
+                                    <th>Monitor</th>
+                                    <th>Vagas</th>
+                                    <th>Data</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in page_obj %}
                                 <tr>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="text-muted">{{ reserva.id }}</span>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td>{{ reserva.id }}</td>
+                                    <td>
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td>
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
                                         {{ reserva.laboratorio.num_laboratorio }}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td>
                                         <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.monitor.get_nome_completo|default:"<span class='text-muted'>Não definido</span>" }}
+                                        {{ reserva.monitor.get_nome_completo|default:"Não definido" }}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td>
                                         <span class="badge badge-pill" 
                                             style="{% if reserva.vagas > 0 %}background-color: #28a745;{% else %}background-color: #dc3545;{% endif %} color: white;">
                                             {{ reserva.vagas }} vaga{{ reserva.vagas|pluralize:"s" }}
                                         </span>
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td>
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.data|date:"d/m/Y" }}
                                     </td>
-                                    <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td class="text-center">
                                         <div class="btn-group btn-group-sm">
-                                            {% if perms.indigital.editar_reserva %}
-                                                <a href="{% url 'editar_disponibilidade' reserva.id %}" 
-                                                   class="btn" 
-                                                   title="Editar disponibilidade"
-                                                   data-toggle="tooltip"
-                                                   style="background-color: #20597F; color: white; border: none;">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            {% endif %}
-                                            {% if perms.indigital.excluir_reserva %}
-                                                <a href="{% url 'excluir_disponibilidade' reserva.id %}" 
-                                                   class="btn" 
-                                                   title="Excluir disponibilidade"
-                                                   data-toggle="tooltip"
-                                                   style="background-color: #dc3545; color: white; border: none;"
-                                                   onclick="return confirm('Tem certeza que deseja excluir esta disponibilidade?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            {% endif %}
+                                            <a href="{% url 'editar_disponibilidade' reserva.id %}" 
+                                               class="btn" 
+                                               title="Editar"
+                                               style="background-color: #20597F; color: white; border: none;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'excluir_disponibilidade' reserva.id %}" 
+                                               class="btn" 
+                                               title="Excluir"
+                                               style="background-color: #dc3545; color: white; border: none;"
+                                               onclick="return confirm('Tem certeza que deseja excluir?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
                                             <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
                                                class="btn" 
                                                title="Ver usuários"
-                                               data-toggle="tooltip"
                                                style="background-color: #86B5E1; color: #20597F; border: none;">
                                                 <i class="fas fa-users"></i>
                                             </a>
@@ -283,103 +262,181 @@
                     <div class="text-center py-5">
                         <i class="fas fa-calendar-alt fa-4x mb-3" style="color: #86B5E1;"></i>
                         <h4 style="color: #20597F;">Nenhuma disponibilidade encontrada</h4>
-                        <p class="text-muted">
-                            {% if laboratorio_id or data_inicio or data_fim or monitor_id or vagas_min %}
-                                Tente ajustar os filtros ou <a href="{% url 'listar_disponibilidades' %}" style="color: #20597F;">limpar os filtros</a> para ver todas as disponibilidades.
-                            {% else %}
-                                Não há disponibilidades cadastradas no sistema.
-                            {% endif %}
-                        </p>
                     </div>
                     {% endif %}
                 </div>
-                {% if page_obj %}
-                <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    {% if page_obj.has_other_pages %}
-                    <ul class="pagination pagination-sm m-0 float-right">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
-                                </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if monitor_id %}&monitor={{ monitor_id }}{% endif %}{% if vagas_min %}&vagas_min={{ vagas_min }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    {% endif %}
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalCriarDisponibilidade" tabindex="-1" aria-labelledby="modalCriarDisponibilidadeLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCriarDisponibilidadeLabel">
+                    <i class="fas fa-plus-circle mr-2"></i>Criar Nova Disponibilidade
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'listar_disponibilidades' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-field">
+                        <label for="id_laboratorio" class="form-label">
+                            <i class="fas fa-flask mr-1"></i>Laboratório
+                        </label>
+                        <select name="laboratorio" id="id_laboratorio" class="form-control" required>
+                            <option value="">Selecione um laboratório</option>
+                            {% for lab in laboratorios %}
+                                <option value="{{ lab.id }}" {% if form.laboratorio.value == lab.id %}selected{% endif %}>
+                                    {{ lab.num_laboratorio }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.laboratorio.errors %}
+                            <div class="error-message">
+                                {% for error in form.laboratorio.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="id_monitor" class="form-label">
+                            <i class="fas fa-user-cog mr-1"></i>Monitor
+                        </label>
+                        <select name="monitor" id="id_monitor" class="form-control" required>
+                            <option value="">Selecione um monitor</option>
+                            {% for monitor in monitores %}
+                                <option value="{{ monitor.id }}" {% if form.monitor.value == monitor.id %}selected{% endif %}>
+                                    {{ monitor.get_nome_completo }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.monitor.errors %}
+                            <div class="error-message">
+                                {% for error in form.monitor.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="id_data" class="form-label">
+                            <i class="fas fa-calendar mr-1"></i>Data
+                        </label>
+                        <input type="date" name="data" id="id_data" class="form-control" 
+                               value="{{ form.data.value|default:'' }}" required>
+                        {% if form.data.errors %}
+                            <div class="error-message">
+                                {% for error in form.data.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field">
+                                <label for="id_horario_inicio" class="form-label">
+                                    <i class="fas fa-clock mr-1"></i>Horário Início
+                                </label>
+                                <input type="time" name="horario_inicio" id="id_horario_inicio" class="form-control" 
+                                       value="{{ form.horario_inicio.value|default:'' }}" required>
+                                {% if form.horario_inicio.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.horario_inicio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field">
+                                <label for="id_horario_fim" class="form-label">
+                                    <i class="fas fa-clock mr-1"></i>Horário Fim
+                                </label>
+                                <input type="time" name="horario_fim" id="id_horario_fim" class="form-control" 
+                                       value="{{ form.horario_fim.value|default:'' }}" required>
+                                {% if form.horario_fim.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.horario_fim.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo Vagas -->
+                    <div class="form-field">
+                        <label for="id_vagas" class="form-label">
+                            <i class="fas fa-users mr-1"></i>Vagas
+                        </label>
+                        <input type="number" name="vagas" id="id_vagas" class="form-control" 
+                               value="{{ form.vagas.value|default:'1' }}" min="1" max="50" required>
+                        {% if form.vagas.errors %}
+                            <div class="error-message">
+                                {% for error in form.vagas.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times mr-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-2"></i>Salvar Disponibilidade
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-
-    $('[data-toggle="tooltip"]').tooltip();
     
-
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            } else if ($(this).css('background-color') === 'rgb(220, 53, 69)') {
-                $(this).css('background-color', '#c82333');
-            } else if ($(this).css('background-color') === 'rgb(40, 167, 69)') {
-                $(this).css('background-color', '#218838');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            } else if ($(this).css('background-color') === 'rgb(200, 35, 51)') {
-                $(this).css('background-color', '#dc3545');
-            } else if ($(this).css('background-color') === 'rgb(33, 136, 56)') {
-                $(this).css('background-color', '#28a745');
-            }
+    $('input[name="horario_inicio"], input[name="horario_fim"]').on('change', function() {
+        var inicio = $('input[name="horario_inicio"]').val();
+        var fim = $('input[name="horario_fim"]').val();
+        
+        if (inicio && fim && inicio >= fim) {
+            alert('O horário de fim deve ser posterior ao horário de início!');
+            $('input[name="horario_fim"]').val('');
         }
-    );
+    });
+
+    {% if form.errors %}
+    $(document).ready(function() {
+        $('#modalCriarDisponibilidade').modal('show');
+    });
+    {% endif %}
+
+    var today = new Date().toISOString().split('T')[0];
+    $('#id_data').attr('min', today);
 });
 </script>
 {% endblock %}
