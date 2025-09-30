@@ -358,15 +358,14 @@
                 
                 <div class="profile-content">
                     <div class="profile-header">
-                        <img src="{{ usuario.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar">
+                        <img src="{{ usuario.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar"
+                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ usuario.get_nome_completo|urlencode }}&size=120&background=6c757d&color=ffffff';"
+                             loading="lazy">
                         <div class="profile-info">
                             <h3>{{ usuario.get_nome_completo }}</h3>
                             <p>Email: {{ usuario.email }}</p>
                             <p>Vínculo: {{ usuario.vinculo }}</p>
-                            <p>Matrícula: {{ usuario.suap_id }}</p>
-                            {% if usuario.suap_foto_url and not usuario.foto_perfil %}
-                            <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
-                            {% endif %}
+                            <p>Matrícula: {{ usuario.suap_id }}</p>                          
                         </div>
                     </div>
                     

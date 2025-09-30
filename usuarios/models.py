@@ -24,8 +24,11 @@ class User(AbstractUser):
         if self.foto_perfil:
             return self.foto_perfil.url
         elif self.suap_foto_url:
-            return self.suap_foto_url
-        return "https://via.placeholder.com/120"
+            # Decodificar &amp; para & na URL do SUAP
+            import html
+            return html.unescape(self.suap_foto_url)
+        # URL de um ícone padrão usando FontAwesome
+        return "https://via.placeholder.com/120/6c757d/ffffff?text=👤"
     
     def get_nome_completo(self):
         if self.suap_nome_completo:
@@ -34,5 +37,3 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
-    
-    
