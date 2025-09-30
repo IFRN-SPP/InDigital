@@ -160,24 +160,6 @@ def index(request):
     return render(request, "index.html", context)
 
 # crud de disponibilidade
-
-@login_required
-@admin_required
-def criar_disponibilidade(request):
-    laboratorios = Laboratorio.objects.all()
-    if request.method == "POST":
-        form = DisponibilidadeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Disponibilidade cadastrada com sucesso!')
-            return redirect('listar_disponibilidades')
-        else:
-            messages.error(request, 'Erro ao cadastrar nova disponibilidade!')
-    else:
-        form = DisponibilidadeForm()
-    
-    return render(request, "criar_disponibilidade.html", {'form' : form, "laboratorios": laboratorios})
-
 @login_required
 @admin_required
 def editar_disponibilidade(request, reserva_id):
@@ -204,6 +186,18 @@ def editar_disponibilidade(request, reserva_id):
 @login_required
 @admin_required
 def listar_disponibilidades(request):
+    if request.method == 'POST':
+        # Processa o formulário de criação de disponibilidade
+        form = DisponibilidadeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Disponibilidade criada com sucesso!")
+            return redirect('listar_disponibilidades')  # Redireciona após salvar
+        else:
+            messages.error(request, "Erro ao criar disponibilidade. Verifique os dados do formulário.")
+    else:
+        form = DisponibilidadeForm()
+
     disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('-data', 'horario_inicio')
     
     # Filtros opcionais
@@ -258,6 +252,7 @@ def listar_disponibilidades(request):
         'data_fim': data_fim,
         'monitor_id': monitor_id,
         'vagas_min': vagas_min,
+        'form': form,
     }
     
     return render(request, "listar_disponibilidades.html", context)
