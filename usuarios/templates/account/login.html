@@ -7,14 +7,12 @@
 {% block content %}
 <div id="loginContainer">
     <div class="wrap">
-        <!-- Lado Esquerdo - Imagem -->
         <div class="hidden-mobile">
             <img src="{% static 'assets/img/indigital.png' %}" 
                  alt="Logo InDigital" 
                  class="img-fluid">
         </div>
-        
-        <!-- Lado Direito - Formulário -->
+
         <div class="login-wrap">
             <h2>Login</h2>
             
@@ -47,10 +45,8 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Adiciona classe para estilos específicos do login
+
         document.body.classList.add('login-page');
-        
-        // Remove completamente qualquer influência do sidebar
         document.body.classList.remove('sidebar-open');
         document.body.classList.remove('sidebar-collapse');
         document.body.classList.remove('sidebar-collapsed');
@@ -58,7 +54,6 @@
         document.body.classList.remove('sidebar-mini');
         document.body.classList.remove('layout-fixed');
         
-        // Reset radical de estilos
         const contentWrapper = document.querySelector('.content-wrapper');
         if (contentWrapper) {
             contentWrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important;';

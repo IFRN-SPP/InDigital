@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-/* ===== VARIÁVEIS ===== */
+/* cores */
 :root {
     --cor-primaria: #20597F;
     --cor-secundaria: #20597F;
@@ -11,7 +11,6 @@
     --sidebar-collapsed-width: 78px;
 }
 
-/* ===== ESTILOS GLOBAIS ===== */
 * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;
@@ -35,7 +34,7 @@ a:hover {
     color: var(--cor-primaria); 
 }
 
-/* ===== LAYOUT PRINCIPAL ===== */
+/* layout principal */
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -44,7 +43,7 @@ a:hover {
     overflow-x: hidden;
 }
 
-/* ===== HEADER ===== */
+/* header */
 .custom-header {
     background-color: var(--cor-primaria);
     color: #fff;
@@ -69,13 +68,12 @@ a:hover {
     width: 100%;
 }
 
-/* Header com sidebar colapsado */
 body.sidebar-collapsed .custom-header .container-fluid,
 body.sidebar-collapse .custom-header .container-fluid {
     padding-left: var(--sidebar-collapsed-width);
 }
 
-/* ===== SIDEBAR ===== */
+/* menu */
 .custom-sidebar {
     width: var(--sidebar-width);
     background-color: #343a40;
@@ -89,7 +87,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     transition: width 0.3s ease;
 }
 
-/* Estados do sidebar */
 .custom-sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
 }
@@ -98,7 +95,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     transform: translateX(0);
 }
 
-/* Brand do sidebar */
 .custom-brand {
     display: flex;
     align-items: center;
@@ -120,7 +116,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     display: inline-block;
 }
 
-/* Seções do menu */
 .custom-menu-section {
     padding: 0.8rem 1rem 0.5rem 1rem;
     font-size: 0.75rem;
@@ -132,7 +127,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     overflow: hidden;
 }
 
-/* Itens do menu */
 .custom-menu-item {
     display: flex;
     align-items: flex-start;
@@ -172,7 +166,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     hyphens: auto;
 }
 
-/* ===== BOTÃO DO SIDEBAR ===== */
 .sidebar-toggle-btn {
     position: absolute;
     top: 15px;
@@ -197,7 +190,7 @@ body.sidebar-collapse .custom-header .container-fluid {
     transform: scale(1.05);
 }
 
-/* ===== CONTEÚDO PRINCIPAL ===== */
+/* conteudo principal */
 .content-wrapper,
 #customContent {
     margin-left: 0 !important;
@@ -224,7 +217,7 @@ body.sidebar-collapse .custom-header .container-fluid {
     width: 100% !important;
 }
 
-/* ===== FOOTER ===== */
+/* footer */
 .main-footer {
     background-color: #ffffff;
     color: #000;
@@ -251,7 +244,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     width: 100%;
 }
 
-/* ===== OVERLAY MOBILE ===== */
 .mobile-overlay {
     display: none;
     position: fixed;
@@ -267,7 +259,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     display: block;
 }
 
-/* ===== COMPONENTES ===== */
 .btn-primary {
     background-color: var(--cor-secundaria);
     border-color: var(--cor-secundaria);
@@ -278,9 +269,6 @@ body.sidebar-collapse .custom-header .container-fluid {
     border-color: var(--cor-intermediaria3);
 }
 
-/* ===== ESTADOS DO SIDEBAR COLAPSADO ===== */
-
-/* Sidebar colapsado */
 body.sidebar-collapsed .content-wrapper,
 body.sidebar-collapse .content-wrapper,
 .content-wrapper.collapsed,
@@ -288,7 +276,6 @@ body.sidebar-collapse .content-wrapper,
     padding-left: var(--sidebar-collapsed-width) !important;
 }
 
-/* Esconder textos quando colapsado */
 body.sidebar-collapsed .custom-menu-item,
 body.sidebar-collapse .custom-menu-item,
 .custom-sidebar.collapsed .custom-menu-item {
@@ -311,7 +298,6 @@ body.sidebar-collapse .custom-menu-section,
     display: none !important;
 }
 
-/* Restaurar ícones */
 body.sidebar-collapsed .custom-menu-item i,
 body.sidebar-collapse .custom-menu-item i,
 .custom-sidebar.collapsed .custom-menu-item i {
@@ -320,21 +306,18 @@ body.sidebar-collapse .custom-menu-item i,
     margin-top: 0 !important;
 }
 
-/* Botão quando colapsado */
 body.sidebar-collapsed .sidebar-toggle-btn,
 body.sidebar-collapse .sidebar-toggle-btn,
 .custom-sidebar.collapsed .sidebar-toggle-btn {
     right: 8px !important;
 }
 
-/* Linha do brand quando colapsado */
 body.sidebar-collapsed .custom-brand,
 body.sidebar-collapse .custom-brand,
 .custom-sidebar.collapsed .custom-brand {
     border-bottom: none !important;
 }
 
-/* Botões no menu colapsado */
 .custom-sidebar.collapsed button.custom-menu-item,
 body.sidebar-collapsed button.custom-menu-item {
     font-size: 0 !important;
@@ -342,7 +325,6 @@ body.sidebar-collapsed button.custom-menu-item {
     padding-right: 0.35rem !important;
 }
 
-/* Footer colapsado */
 body.sidebar-collapsed .main-footer,
 body.sidebar-collapse .main-footer,
 .main-footer.collapsed,
@@ -359,9 +341,8 @@ body.sidebar-collapse .main-footer .container,
     position: relative !important;
 }
 
-/* ===== RESPONSIVIDADE ===== */
 @media (max-width: 768px) {
-    /* Sidebar mobile */
+
     .custom-sidebar {
         transform: translateX(-250px) !important;
         width: var(--sidebar-width);
@@ -370,8 +351,7 @@ body.sidebar-collapse .main-footer .container,
     .custom-sidebar.mobile-open {
         transform: translateX(0) !important;
     }
-    
-    /* Conteúdo mobile */
+
     .content-wrapper,
     #customContent {
         padding-left: 0 !important;
@@ -385,7 +365,6 @@ body.sidebar-collapse .main-footer .container,
         padding-right: 15px !important;
     }
     
-    /* Header mobile */
     .custom-header {
         padding: 0.8rem 1rem;
         min-height: 60px;
@@ -396,7 +375,6 @@ body.sidebar-collapse .main-footer .container,
         padding-right: 15px;
     }
     
-    /* Footer mobile */
     .main-footer {
         padding: 20px 0 !important;
         margin-left: 0 !important;
@@ -409,7 +387,6 @@ body.sidebar-collapse .main-footer .container,
         max-width: 100% !important;
     }
     
-    /* Botão mobile */
     .sidebar-toggle-btn {
         position: fixed;
         top: 15px;
@@ -417,7 +394,6 @@ body.sidebar-collapse .main-footer .container,
         background: rgba(0, 0, 0, 0.7);
     }
     
-    /* Mostrar elementos no mobile quando aberto */
     .custom-sidebar.mobile-open .custom-brand span,
     .custom-sidebar.mobile-open .custom-menu-section,
     .custom-sidebar.mobile-open .custom-menu-item span {
@@ -444,7 +420,6 @@ body.sidebar-collapse .main-footer .container,
     }
 }
 
-/* ===== COMPATIBILIDADE ADMINLTE ===== */
 .main-sidebar.collapsed,
 .custom-sidebar.collapsed {
     width: var(--sidebar-collapsed-width) !important;
@@ -456,7 +431,6 @@ body.sidebar-collapse .main-footer .container,
     position: relative;
 }
 
-/* ===== CENTRALIZAÇÃO GARANTIDA ===== */
 body .content-wrapper .container-fluid,
 body .main-footer .container {
     margin-left: auto !important;
@@ -464,7 +438,6 @@ body .main-footer .container {
     transform: none !important;
 }
 
-/* Garantir altura do conteúdo */
 .content {
     width: 100%;
     max-width: 1200px;
@@ -476,9 +449,8 @@ body .main-footer .container {
     transition: none !important;
 }
 
-/* ===== ESTILOS DA TELA DE LOGIN ===== */
+/* login */
 
-/* Reset completo para página de login */
 body.login-page {
     background: linear-gradient(135deg, #f8f9fa 0%, #86B5E1 100%) !important;
     min-height: 100vh;
@@ -489,7 +461,6 @@ body.login-page {
     justify-content: center;
 }
 
-/* Esconde todos os elementos do layout principal */
 body.login-page .main-sidebar,
 body.login-page .main-header,
 body.login-page .custom-sidebar,
@@ -499,7 +470,6 @@ body.login-page .main-footer {
     display: none !important;
 }
 
-/* CORREÇÃO RADICAL: Reseta completamente o wrapper no login */
 body.login-page .wrapper {
     background: transparent !important;
     min-height: 100vh !important;
@@ -512,7 +482,6 @@ body.login-page .wrapper {
     max-width: 100% !important;
 }
 
-/* CORREÇÃO CRÍTICA: Content-wrapper completamente resetado */
 body.login-page .content-wrapper {
     margin: 0 !important;
     padding: 0 !important;
@@ -525,7 +494,6 @@ body.login-page .content-wrapper {
     flex: none !important;
 }
 
-/* Container principal do login - PERFEITAMENTE CENTRALIZADO */
 #loginContainer {
     width: 100%;
     max-width: 1000px;
@@ -536,7 +504,6 @@ body.login-page .content-wrapper {
     justify-content: center;
 }
 
-/* Wrapper do login */
 #loginContainer .wrap {
     width: 100%;
     background: #f8f9fa;
@@ -548,7 +515,6 @@ body.login-page .content-wrapper {
     overflow: hidden;
 }
 
-/* Lado esquerdo (imagem) */
 #loginContainer .hidden-mobile {
     flex: 1;
     display: flex;
@@ -564,7 +530,6 @@ body.login-page .content-wrapper {
     filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
 }
 
-/* Lado direito (formulário) */
 #loginContainer .login-wrap {
     flex: 1;
     padding: 3rem;
@@ -615,7 +580,6 @@ body.login-page .content-wrapper {
     font-size: 0.9rem;
 }
 
-/* CORREÇÃO EXTREMA: Remove qualquer herança de padding/margin */
 body.login-page .container-fluid,
 body.login-page .container,
 body.login-page .row,
@@ -625,7 +589,6 @@ body.login-page .col-md-6 {
     max-width: none !important;
 }
 
-/* Responsividade do login */
 @media (max-width: 768px) {
     body.login-page {
         padding: 10px;
@@ -663,35 +626,5 @@ body.login-page .col-md-6 {
     
     #loginContainer h2 {
         font-size: 1.5rem;
-    }
-}
-
-/* Responsividade do login */
-@media (max-width: 768px) {
-    body.login-page .content-wrapper {
-        min-height: calc(100vh - 60px);
-    }
-    
-    #loginContainer {
-        padding: 1rem;
-    }
-    
-    #loginContainer .wrap {
-        flex-direction: column;
-        margin: 1rem;
-    }
-    
-    #loginContainer .hidden-mobile {
-        width: 100%;
-        padding: 1.5rem;
-        min-height: 200px;
-    }
-
-    #loginContainer .hidden-mobile img {
-        max-width: 150px;
-    }
-
-    #loginContainer .login-wrap {
-        padding: 1.5rem;
     }
 }

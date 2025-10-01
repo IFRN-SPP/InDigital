@@ -8,7 +8,6 @@ urlpatterns = [
     path('disponibilidade/<int:reserva_id>/editar', views.editar_disponibilidade, name='editar_disponibilidade'),
     path('disponibilidade/<int:reserva_id>/excluir', views.excluir_disponibilidade, name="excluir_disponibilidade"),
     path('listar/laboratorios/', views.listar_laboratorios, name='listar_laboratorios'),
-    path('criar/laboratorio/', views.criar_laboratorio, name='criar_laboratorio'),
     path('laboratorio/<int:laboratorio_id>/editar', views.editar_laboratorio, name='editar_laboratorio'),
     path('laboratorio/<int:laboratorio_id>/excluir', views.excluir_laboratorio, name="excluir_laboratorio"),
     path('horarios/', views.horarios, name='horarios'),
@@ -34,4 +33,5 @@ urlpatterns = [
     path('aprovar/reserva/<int:reserva_id>/', views.aprovar_reserva, name='aprovar_reserva'),
     path('rejeitar/reserva/<int:reserva_id>/', views.rejeitar_reserva, name='rejeitar_reserva'),
     path('aprovar/multiplas/reservas/', views.aprovar_multiplas_reservas, name='aprovar_multiplas_reservas'),
+    path('laboratorios/', views.listar_laboratorios, name='listar_laboratorios'),
 ]

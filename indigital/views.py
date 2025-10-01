@@ -259,14 +259,15 @@ def criar_laboratorio(request):
     if request.method == "POST":
         form = LaboratorioForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Laboratório cadastrado com sucesso!')
+            laboratorio = form.save()
+            messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
             return redirect('listar_laboratorios')
         else:
             messages.error(request, 'Erro ao cadastrar laboratório!')
     else:
         form = LaboratorioForm()
-    return render(request, "criar_laboratorio.html", {'form' : form})
+    
+    return render(request, "criar_laboratorio.html", {'form': form})
 
 @login_required
 @admin_required
@@ -291,24 +292,38 @@ def editar_laboratorio(request, laboratorio_id):
 @login_required
 @admin_required
 def listar_laboratorios(request):
+    if request.method == 'POST':
+        form = LaboratorioForm(request.POST)
+        if form.is_valid():
+            laboratorio = form.save()
+            messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
+            return redirect('listar_laboratorios')
+        else:
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
+    else:
+        form = LaboratorioForm()
+
+    # Filtra os laboratórios
     laboratorios_list = Laboratorio.objects.all().order_by('num_laboratorio')
-    # Filtros 
     num_laboratorio = request.GET.get('num_laboratorio')
     capacidade_min = request.GET.get('capacidade_min')
     capacidade_max = request.GET.get('capacidade_max')
-    # Aplicar filtros
+    
     if num_laboratorio:
         laboratorios_list = laboratorios_list.filter(num_laboratorio__icontains=num_laboratorio)
+    
     if capacidade_min:
         try:
             laboratorios_list = laboratorios_list.filter(capacidade__gte=int(capacidade_min))
         except ValueError:
             messages.error(request, "Capacidade mínima deve ser um número.")
+    
     if capacidade_max:
         try:
             laboratorios_list = laboratorios_list.filter(capacidade__lte=int(capacidade_max))
         except ValueError:
             messages.error(request, "Capacidade máxima deve ser um número.")
+    
     # Paginação
     paginator = Paginator(laboratorios_list, 12)
     page_number = request.GET.get('page')
@@ -316,10 +331,12 @@ def listar_laboratorios(request):
     
     context = {
         'page_obj': page_obj,
+        'form': form, 
         'num_laboratorio': num_laboratorio,
         'capacidade_min': capacidade_min,
         'capacidade_max': capacidade_max,
     }
+    
     return render(request, 'listar_laboratorios.html', context)
 
 @login_required
