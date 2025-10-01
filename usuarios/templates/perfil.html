@@ -365,7 +365,10 @@
                             <h3>{{ usuario.get_nome_completo }}</h3>
                             <p>Email: {{ usuario.email }}</p>
                             <p>Vínculo: {{ usuario.vinculo }}</p>
-                            <p>Matrícula: {{ usuario.suap_id }}</p>                          
+                            <p>Matrícula: {{ usuario.suap_id }}</p> 
+                            {% if usuario.suap_foto_url and not usuario.foto_perfil %}
+                            <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
+                            {% endif %}                         
                         </div>
                     </div>
                     
