@@ -11,7 +11,7 @@
         --cor-intermediaria3: #20597F;
     }
     
-    /* Estilo do banner */
+    /* estilo do banner */
     .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -112,12 +112,78 @@
     .laboratory-card .card-body {
         padding: 20px;
     }
+
+    /* estilos do modal */
+    .modal-content {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+        background-color: #20597F;
+        color: white;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 2px solid #86B5E1;
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 25px;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 15px 20px;
+    }
+    
+    .btn-primary {
+        background-color: #20597F;
+        border-color: #20597F;
+    }
+    
+    .btn-primary:hover {
+        background-color: #16466c;
+        border-color: #16466c;
+    }
+    
+    .form-control {
+        border: 1px solid #86B5E1;
+        border-radius: 6px;
+        padding: 10px 12px;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        border-color: #20597F;
+        box-shadow: 0 0 0 0.2rem rgba(134, 181, 225, 0.25);
+    }
+    
+    .form-label {
+        color: #20597F;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+
+    .form-field {
+        margin-bottom: 1rem;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Banner-->
     <div class="welcome-banner">
         <h1><i class="fas fa-flask mr-2"></i>Gerenciar Laboratórios</h1>
         <p>Administre todos os laboratórios do sistema</p>
@@ -176,9 +242,10 @@
                                 <a href="{% url 'listar_laboratorios' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
-                                <a href="{% url 'criar_laboratorio' %}" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;">
+                                <button type="button" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;" 
+                                        data-bs-toggle="modal" data-bs-target="#modalCriarLaboratorio">
                                     <i class="fas fa-plus mr-1"></i> Adicionar Laboratório
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -311,11 +378,101 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalCriarLaboratorio" tabindex="-1" aria-labelledby="modalCriarLaboratorioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCriarLaboratorioLabel">
+                    <i class="fas fa-plus-circle mr-2"></i>Criar Novo Laboratório
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'listar_laboratorios' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-field">
+                        <label for="id_num_laboratorio" class="form-label">
+                            <i class="fas fa-hashtag mr-1"></i>Número do Laboratório *
+                        </label>
+                        <input type="text" name="num_laboratorio" id="id_num_laboratorio" class="form-control {% if form.num_laboratorio.errors %}is-invalid{% endif %}" 
+                               value="{{ form.num_laboratorio.value|default:'' }}" placeholder="Ex: L001, LAB-01" required maxlength="10">
+                        {% if form.num_laboratorio.errors %}
+                            <div class="error-message">
+                                {% for error in form.num_laboratorio.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="id_capacidade" class="form-label">
+                            <i class="fas fa-users mr-1"></i>Capacidade *
+                        </label>
+                        <input type="number" name="capacidade" id="id_capacidade" class="form-control {% if form.capacidade.errors %}is-invalid{% endif %}" 
+                               value="{{ form.capacidade.value|default:'30' }}" min="1" max="1000" required>
+                        {% if form.capacidade.errors %}
+                            <div class="error-message">
+                                {% for error in form.capacidade.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">Número máximo de pessoas que o laboratório suporta</small>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times mr-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-2"></i>Salvar Laboratório
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
+    $('#modalCriarLaboratorio').on('show.bs.modal', function () {
+        $(this).find('select, input, textarea').addClass('form-control');
+    });
+
+    $('#id_capacidade').on('change', function() {
+        var capacidade = $(this).val();
+        
+        if (capacidade && (capacidade < 1 || capacidade > 1000)) {
+            $(this).addClass('is-invalid');
+            if (!$('.alert-capacidade').length) {
+                $(this).after('<div class="alert alert-danger alert-capacidade mt-2">A capacidade deve ser um número entre 1 e 1000.</div>');
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('.alert-capacidade').remove();
+        }
+    });
+
+    {% if form.errors %}
+    $(document).ready(function() {
+        $('#modalCriarLaboratorio').modal('show');
+    });
+    {% endif %}
 
     $('.btn').hover(
         function() {
@@ -341,6 +498,13 @@ $(document).ready(function() {
             }
         }
     );
+
+    $('#modalCriarLaboratorio').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+        $(this).find('.form-control').removeClass('is-invalid is-valid');
+        $(this).find('.error-message').empty();
+        $(this).find('.alert').remove();
+    });
 });
 </script>
 {% endblock %}

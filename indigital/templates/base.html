@@ -6,18 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}InDigital{% endblock title %}</title>
 
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'assets/favicon.ico' %}"/>
+    
+    <!-- CSS -->
     <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-
-    <style>
-        .custom-brand span {
-            font-weight: 700 !important; /* Fonte mais grossa */
-        }
-    </style>
 
     {% block extra_css %}{% endblock extra_css %}
 </head>
@@ -29,63 +26,64 @@
 
         <div class="mobile-overlay" id="mobileOverlay"></div>
 
-        <!-- Sidebar -->
         {% if user.is_authenticated %}
-            <aside class="custom-sidebar" id="customSidebar">
-                <a href="{% url 'index' %}" class="custom-brand"><span>InDigital</span></a>
+            <aside class="custom-sidebar main-sidebar" id="customSidebar">
+                <button class="sidebar-toggle-btn" id="menuToggleSidebar" aria-label="Alternar menu" aria-controls="customSidebar" aria-expanded="true">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <a href="{% url 'index' %}" class="custom-brand">
+                    <span>InDigital</span>
+                </a>
+
                 <div class="custom-menu">
-                    <!-- Menu items -->
                     {% if user.perfil == 'administrador' or user.is_superuser %}
-                        <a href="{% url 'admin_dashboard' %}" class="custom-menu-item"><i class="fas fa-home"></i> Início</a>
+                        <a href="{% url 'admin_dashboard' %}" class="custom-menu-item"><i class="fas fa-home"></i> <span>Início</span></a>
                         <div class="custom-menu-section">ADMINISTRAÇÃO</div>
-                        <a href="{% url 'reservas_pendentes' %}" class="custom-menu-item"><i class="fas fa-check-circle"></i> Aprovar Reservas</a>
-                        <a href="{% url 'reservas_do_dia' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> Reservas do Dia</a>
-                        <a href="{% url 'listar_disponibilidades' %}" class="custom-menu-item"><i class="fas fa-clock"></i> Gerenciar Disponibilidades</a>
-                        <a href="{% url 'listar_laboratorios' %}" class="custom-menu-item"><i class="fas fa-laptop"></i> Gerenciar Laboratórios</a>
-                        <a href="{% url 'listar_usuarios' %}" class="custom-menu-item"><i class="fas fa-user"></i> Gerenciar Usuários</a>
-                        <a href="{% url 'listar_monitores' %}" class="custom-menu-item"><i class="fas fa-users"></i> Gerenciar Monitores</a>
-                        <a href="{% url 'fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> Gerenciar Fila de Espera</a>
+                        <a href="{% url 'reservas_pendentes' %}" class="custom-menu-item"><i class="fas fa-check-circle"></i> <span>Aprovar Reservas</span></a>
+                        <a href="{% url 'reservas_do_dia' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> <span>Reservas do Dia</span></a>
+                        <a href="{% url 'listar_disponibilidades' %}" class="custom-menu-item"><i class="fas fa-clock"></i> <span>Gerenciar Disponibilidades</span></a>
+                        <a href="{% url 'listar_laboratorios' %}" class="custom-menu-item"><i class="fas fa-laptop"></i> <span>Gerenciar Laboratórios</span></a>
+                        <a href="{% url 'listar_usuarios' %}" class="custom-menu-item"><i class="fas fa-user"></i> <span>Gerenciar Usuários</span></a>
+                        <a href="{% url 'listar_monitores' %}" class="custom-menu-item"><i class="fas fa-users"></i> <span>Gerenciar Monitores</span></a>
+                        <a href="{% url 'fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> <span>Gerenciar Fila de Espera</span></a>
                     {% elif user.perfil == 'monitor' %}
-                        <a href="{% url 'monitor_dashboard' %}" class="custom-menu-item"><i class="fas fa-home"></i> Início</a>
-                        <a href="{% url 'horarios' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> Disponibilidades</a>
-                        <a href="{% url 'minhas_reservas' %}" class="custom-menu-item"><i class="fas fa-users"></i> Minhas Reservas</a>
-                        <a href="{% url 'historico_reservas' %}" class="custom-menu-item"><i class="fas fa-history"></i> Histórico de Reservas</a>
-                        <a href="{% url 'minha_fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> Fila de Espera</a>
+                        <a href="{% url 'monitor_dashboard' %}" class="custom-menu-item"><i class="fas fa-home"></i> <span>Início</span></a>
+                        <a href="{% url 'horarios' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> <span>Disponibilidades</span></a>
+                        <a href="{% url 'minhas_reservas' %}" class="custom-menu-item"><i class="fas fa-users"></i> <span>Minhas Reservas</span></a>
+                        <a href="{% url 'historico_reservas' %}" class="custom-menu-item"><i class="fas fa-history"></i> <span>Histórico de Reservas</span></a>
+                        <a href="{% url 'minha_fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> <span>Fila de Espera</span></a>
                         <div class="custom-menu-section">MONITORAÇÃO</div>
-                        <a href="{% url 'listar_disponibilidades_monitor' %}" class="custom-menu-item"><i class="fas fa-clipboard-check"></i> Registrar Frequências</a>
+                        <a href="{% url 'listar_disponibilidades_monitor' %}" class="custom-menu-item"><i class="fas fa-clipboard-check"></i> <span>Registrar Frequências</span></a>
                     {% else %}
-                        <a href="{% url 'index' %}" class="custom-menu-item"><i class="fas fa-home"></i> Início</a>
-                        <a href="{% url 'horarios' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> Disponibilidades</a>
-                        <a href="{% url 'minhas_reservas' %}" class="custom-menu-item"><i class="fas fa-users"></i> Minhas Reservas</a>
-                        <a href="{% url 'historico_reservas' %}" class="custom-menu-item"><i class="fas fa-history"></i> Histórico de Reservas</a>
-                        <a href="{% url 'minha_fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> Fila de Espera</a>
+                        <a href="{% url 'index' %}" class="custom-menu-item"><i class="fas fa-home"></i> <span>Início</span></a>
+                        <a href="{% url 'horarios' %}" class="custom-menu-item"><i class="fas fa-calendar-check"></i> <span>Disponibilidades</span></a>
+                        <a href="{% url 'minhas_reservas' %}" class="custom-menu-item"><i class="fas fa-users"></i> <span>Minhas Reservas</span></a>
+                        <a href="{% url 'historico_reservas' %}" class="custom-menu-item"><i class="fas fa-history"></i> <span>Histórico de Reservas</span></a>
+                        <a href="{% url 'minha_fila_espera' %}" class="custom-menu-item"><i class="fas fa-hourglass-half"></i> <span>Fila de Espera</span></a>
                     {% endif %}
 
                     <div class="custom-menu-section">USUÁRIO</div>
-                    <a href="{% url 'perfil' %}" class="custom-menu-item"><i class="fas fa-user"></i> Perfil</a>
+                    <a href="{% url 'perfil' %}" class="custom-menu-item"><i class="fas fa-user"></i> <span>Perfil</span></a>
                     <form method="post" action="{% url 'account_logout' %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="custom-menu-item" style="background:none; border:none; width:100%; text-align:left; color:inherit;">
-                            <i class="fas fa-sign-out-alt"></i> Sair
+                            <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
                         </button>
                     </form>
                 </div>
             </aside>
         {% endif %}
 
-        
         <header class="custom-header" id="customHeader">
             <div class="container-fluid d-flex justify-content-between align-items-center">
-                <button class="btn btn-sm btn-outline-light" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div></div>
                 <span class="d-none d-md-inline text-white">Olá, {{ request.user.first_name }}!</span>
             </div>
         </header>
 
     {% endif %}
 
-    
     <div class="content-wrapper" id="customContent">
         {% if messages %}
             <div class="container mt-3">
@@ -106,8 +104,10 @@
     </div>
 
     {% if not request.resolver_match.url_name == 'account_login' and not request.resolver_match.url_name == 'suap_login' %}
-    <footer class="main-footer text-center py-3">
-        <strong>Copyright © InDigital {% now 'Y' %}</strong>
+    <footer class="main-footer py-3">
+        <div class="container">
+            <strong class="d-block text-center">Copyright © InDigital {% now 'Y' %}</strong>
+        </div>
     </footer>
     {% endif %}
 
@@ -119,32 +119,64 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('menuToggle');
+    const toggles = document.querySelectorAll('#menuToggle, #menuToggleSidebar, .menu-toggle-btn, .sidebar-toggle-btn');
     const sidebar = document.getElementById('customSidebar');
     const content = document.getElementById('customContent');
     const header = document.getElementById('customHeader');
     const mobileOverlay = document.getElementById('mobileOverlay');
+    const body = document.body;
 
-    menuToggle.addEventListener('click', function() {
-        if(window.innerWidth <= 768){
-            sidebar.classList.toggle('mobile-open');
-            mobileOverlay.classList.toggle('active');
-        } else {
-            sidebar.classList.toggle('collapsed');
-            content.classList.toggle('collapsed');
-            header.classList.toggle('collapsed');
+    toggles.forEach(btn => {
+        if (btn) {
+            btn.setAttribute('aria-controls', 'customSidebar');
+            btn.setAttribute('aria-expanded', 'true');
         }
     });
 
-    mobileOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('mobile-open');
-        mobileOverlay.classList.remove('active');
+    function toggleSidebar() {
+        if (window.innerWidth <= 768) {
+ 
+            if (sidebar) sidebar.classList.toggle('mobile-open');
+            if (mobileOverlay) mobileOverlay.classList.toggle('active');
+            body.classList.toggle('sidebar-open');
+
+            const opened = sidebar && sidebar.classList.contains('mobile-open');
+            toggles.forEach(btn => btn && btn.setAttribute('aria-expanded', opened ? 'true' : 'false'));
+        } else {
+
+            if (sidebar) sidebar.classList.toggle('collapsed');
+            if (content) content.classList.toggle('collapsed');
+            if (header) header.classList.toggle('collapsed');
+            
+            body.classList.toggle('sidebar-collapsed');
+            body.classList.toggle('sidebar-collapse');
+
+            const collapsed = sidebar && sidebar.classList.contains('collapsed');
+            toggles.forEach(btn => btn && btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true'));
+        }
+    }
+
+    toggles.forEach(btn => {
+        if (btn) btn.addEventListener('click', function(e) { 
+            e.preventDefault(); 
+            toggleSidebar(); 
+        });
     });
 
-    window.addEventListener('resize', function() {
-        if(window.innerWidth > 768){
-            sidebar.classList.remove('mobile-open');
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', function() {
+            if (sidebar) sidebar.classList.remove('mobile-open');
             mobileOverlay.classList.remove('active');
+            body.classList.remove('sidebar-open');
+            toggles.forEach(btn => btn && btn.setAttribute('aria-expanded', 'false'));
+        });
+    }
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            if (mobileOverlay) mobileOverlay.classList.remove('active');
+            body.classList.remove('sidebar-open');
         }
     });
 });
