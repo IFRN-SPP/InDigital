@@ -1,180 +1,43 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 {% load allauth account socialaccount %}
 
 {% block title %}Login - InDigital{% endblock %}
 
-{% block extra_css %}
-<style>
-    :root {
-        --low-color: #f8f9fa;
-        --primary-color: #20597F;
-        --secondary-color: #86B5E1;
-        --deep-color: #ffffff;
-        --contrast-color: #20597F;
-    }
-
-    body {
-        background: linear-gradient(135deg, #f8f9fa 0%, #86B5E1 100%);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    
-    .main-sidebar,
-    .main-header {
-        display: none !important;
-    }
-
-    .content-wrapper {
-        margin-left: 0 !important;
-        margin-top: 0 !important;
-    }
-
-    .wrapper {
-        background: linear-gradient(135deg, #f8f9fa 0%, #86B5E1 100%);
-    }
-
-    #loginContainer {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-        min-height: 100vh;
-    }
-
-    #loginContainer .wrap {
-        width: 100%;
-        max-width: 1000px;
-        overflow: hidden;
-        background: var(--low-color);
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-    }
-
-    #loginContainer .hidden-mobile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        min-height: 400px;
-    }
-
-    #loginContainer .login-wrap {
-        padding: 2rem;
-        width: 100%;
-    }
-
-    @media (max-width: 768px) {
-        #loginContainer .wrap {
-            flex-direction: column;
-            margin: 1rem;
-        }
-        
-        #loginContainer .hidden-mobile {
-            width: 100%;
-            padding: 1.5rem;
-            min-height: 200px;
-        }
-
-        #loginContainer .login-wrap {
-            padding: 1.5rem;
-        }
-    }
-
-    #loginContainer h2 {
-        color: var(--primary-color);
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-    }
-
-    #loginContainer .text-center h5 {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    #loginContainer .text-center p {
-        color: var(--contrast-color);
-        opacity: 0.8;
-    }
-
-    #loginContainer .btn-success {
-        background-color: var(--primary-color);
-        border: none;
-        border-radius: 30px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    #loginContainer .btn-success:hover {
-        background-color: #16425c;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    #loginContainer .text-center small {
-        color: var(--contrast-color);
-        opacity: 0.7;
-    }
-
-    
-    .main-footer {
-        background-color: var(--primary-color);
-        color: white;
-        text-align: center;
-        margin-top: auto;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="content-wrapper" style="background: transparent;">
-    <div id="loginContainer">
-        <div class="wrap">
-            <div class="col-md-6 hidden-mobile">
-                <img src="{% static 'assets/img/indigital.png' %}" 
-                     alt="Logo" 
-                     class="img-fluid"
-                     style="max-width: 250px; height: auto;">
+<div id="loginContainer">
+    <div class="wrap">
+        <!-- Lado Esquerdo - Imagem -->
+        <div class="hidden-mobile">
+            <img src="{% static 'assets/img/indigital.png' %}" 
+                 alt="Logo InDigital" 
+                 class="img-fluid">
+        </div>
+        
+        <!-- Lado Direito - Formulário -->
+        <div class="login-wrap">
+            <h2>Login</h2>
+            
+            <div class="text-center mb-4">
+                <h5>Acesso ao Sistema</h5>
+                <p>Utilize sua conta do SUAP para acessar o sistema</p>
             </div>
-                     
-            <div class="col-md-6 login-wrap">
-                <div class="d-flex">
-                    <div class="mb-3 mx-auto">
-                        <h2 class="m-0">Login</h2>
-                    </div>
+            
+            <form method="POST" class="signin-form"> 
+                {% csrf_token %}
+                <div class="text-center mb-4">
+                    <a href="{% provider_login_url 'suap' %}" 
+                       class="btn btn-success btn-md px-4 py-2">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Entrar com SUAP
+                    </a>
                 </div>
+            </form>
 
-                <!-- FORMULÁRIO -->
-                <form method="POST" class="signin-form"> 
-                    {% csrf_token %}
-                    <div class="text-center mb-4">
-                        <h5 class="fw-bold">Acesso ao Sistema</h5>
-                        <p>Utilize sua conta do SUAP para acessar o sistema</p>
-                    </div>
-                    
-                    <div class="text-center mb-4">
-                        <a href="{% provider_login_url 'suap' %}" 
-                           class="btn btn-success btn-md px-4 py-2">
-                            <i class="fas fa-user-graduate me-2"></i>
-                            Entrar com SUAP
-                        </a>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <small class="d-block mb-2 text-muted">
-                            Sistema integrado com SUAP - Instituto Federal
-                        </small>
-                    </div>
-                </form>
+            <div class="text-center mt-4">
+                <small class="d-block mb-2 text-muted">
+                    Sistema integrado com SUAP - Instituto Federal
+                </small>
             </div>
         </div>
     </div>
@@ -183,16 +46,27 @@
 
 {% block extra_js %}
 <script>
-    
     document.addEventListener('DOMContentLoaded', function() {
+        // Adiciona classe para estilos específicos do login
+        document.body.classList.add('login-page');
         
+        // Remove completamente qualquer influência do sidebar
         document.body.classList.remove('sidebar-open');
         document.body.classList.remove('sidebar-collapse');
+        document.body.classList.remove('sidebar-collapsed');
+        document.body.classList.remove('hold-transition');
+        document.body.classList.remove('sidebar-mini');
+        document.body.classList.remove('layout-fixed');
         
+        // Reset radical de estilos
+        const contentWrapper = document.querySelector('.content-wrapper');
+        if (contentWrapper) {
+            contentWrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important;';
+        }
         
-        const sidebarOverlay = document.querySelector('.sidebar-overlay');
-        if (sidebarOverlay) {
-            sidebarOverlay.style.display = 'none';
+        const wrapper = document.querySelector('.wrapper');
+        if (wrapper) {
+            wrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: 100vh !important;';
         }
     });
 </script>
