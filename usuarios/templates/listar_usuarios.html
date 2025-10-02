@@ -103,7 +103,6 @@
         z-index: 0;
     }
     
-    /* Botão primário */
     .btn-primary {
         background-color: var(--cor-primaria) !important;
         border-color: var(--cor-primaria) !important;
@@ -166,6 +165,85 @@
     .pagination .page-item.active .page-link {
         background-color: var(--cor-primaria);
         border-color: var(--cor-primaria);
+    }
+
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px; /* ESPAÇAMENTO DIMINUÍDO (era 12px) */
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    
+    .action-btn {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; 
+        height: 32px; 
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-edit {
+        background-color: #20597F;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #16466c;
+        color: white;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+        color: white;
+    }
+
+    .btn-monitor {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-monitor:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    .btn-remove-monitor {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-remove-monitor:hover {
+        background-color: #e0a800;
+        color: #000;
+    }
+
+    .btn-reservas {
+        background-color: #86B5E1;
+        color: #20597F;
+    }
+
+    .btn-reservas:hover {
+        background-color: #75a5d1;
+        color: #20597F;
     }
 </style>
 {% endblock %}
@@ -303,46 +381,47 @@
                                         </span>
                                     </td>
                                     <td class="text-center" style="border-color: #86B5E1;">
-                                        <div class="btn-group btn-group-sm">
+                                        <div class="action-buttons">
+                                            <!-- Botão Editar -->
                                             <a href="{% url 'editar_usuario' usuario.id %}" 
-                                               class="btn" 
+                                               class="action-btn btn-edit" 
                                                title="Editar usuário"
-                                               data-toggle="tooltip"
-                                               style="background-color: #20597F; color: white; border: none;">
+                                               data-toggle="tooltip">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+
+                                            <!-- Botão Deletar -->
                                             <a href="{% url 'deletar_usuario' usuario.id %}" 
-                                               class="btn" 
+                                               class="action-btn btn-delete" 
                                                title="Deletar usuário"
                                                data-toggle="tooltip"
-                                               style="background-color: #dc3545; color: white; border: none;"
                                                onclick="return confirm('Tem certeza que deseja deletar este usuário?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                             
+                                            <!-- Botão Definir como Monitor -->
                                             {% if usuario.perfil != 'monitor' and not usuario.is_superuser %}
                                                 <a href="{% url 'tornar_monitor' usuario.id %}" 
-                                                   class="btn" 
+                                                   class="action-btn btn-monitor" 
                                                    title="Definir como Monitor"
-                                                   data-toggle="tooltip"
-                                                   style="background-color: #28a745; color: white; border: none;">
+                                                   data-toggle="tooltip">
                                                     <i class="fas fa-user-cog"></i>
                                                 </a>
                                             {% elif usuario.perfil == 'monitor' %}
+                                                <!-- Botão Remover Monitor -->
                                                 <a href="{% url 'remover_monitor' usuario.id %}" 
-                                                   class="btn" 
+                                                   class="action-btn btn-remove-monitor" 
                                                    title="Remover Monitor"
-                                                   data-toggle="tooltip"
-                                                   style="background-color: #ffc107; color: #000; border: none;">
+                                                   data-toggle="tooltip">
                                                     <i class="fas fa-user-minus"></i>
                                                 </a>
                                             {% endif %}
                                             
+                                            <!-- Botão Ver Reservas -->
                                             <a href="{% url 'reservas_por_usuario' usuario.id %}" 
-                                               class="btn" 
+                                               class="action-btn btn-reservas" 
                                                title="Ver Reservas"
-                                               data-toggle="tooltip"
-                                               style="background-color: #86B5E1; color: #20597F; border: none;">
+                                               data-toggle="tooltip">
                                                 <i class="fas fa-calendar-alt"></i>
                                             </a>
                                         </div>
@@ -427,24 +506,6 @@
 $(document).ready(function() {
     
     $('[data-toggle="tooltip"]').tooltip();
-    
-    
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            }
-        }
-    );
 });
 </script>
 {% endblock %}
