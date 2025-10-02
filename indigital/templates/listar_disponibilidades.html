@@ -87,6 +87,67 @@
     .form-field {
         margin-bottom: 1rem;
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px; /* Aumentei o espaçamento entre os botões */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        padding: 6px 8px; /* Tamanho original */
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; /* Largura fixa para manter consistência */
+        height: 32px; /* Altura fixa */
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-edit {
+        background-color: #20597F;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #16466c;
+        color: white;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+        color: white;
+    }
+
+    .btn-users {
+        background-color: #86B5E1;
+        color: #20597F;
+    }
+
+    .btn-users:hover {
+        background-color: #75a5d1;
+        color: #20597F;
+    }
+
+    /* Remove os divisores já que agora temos espaçamento */
+    .action-divider {
+        display: none;
+    }
 </style>
 {% endblock %}
 
@@ -231,24 +292,26 @@
                                         {{ reserva.data|date:"d/m/Y" }}
                                     </td>
                                     <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
+                                        <div class="action-buttons">
+                                            
                                             <a href="{% url 'editar_disponibilidade' reserva.id %}" 
-                                               class="btn" 
-                                               title="Editar"
-                                               style="background-color: #20597F; color: white; border: none;">
+                                               class="action-btn btn-edit" 
+                                               title="Editar disponibilidade">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+
+                                            
                                             <a href="{% url 'excluir_disponibilidade' reserva.id %}" 
-                                               class="btn" 
-                                               title="Excluir"
-                                               style="background-color: #dc3545; color: white; border: none;"
-                                               onclick="return confirm('Tem certeza que deseja excluir?')">
+                                               class="action-btn btn-delete" 
+                                               title="Excluir disponibilidade"
+                                               onclick="return confirm('Tem certeza que deseja excluir esta disponibilidade?')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
+
+                                            
                                             <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
-                                               class="btn" 
-                                               title="Ver usuários"
-                                               style="background-color: #86B5E1; color: #20597F; border: none;">
+                                               class="action-btn btn-users" 
+                                               title="Ver usuários inscritos">
                                                 <i class="fas fa-users"></i>
                                             </a>
                                         </div>
@@ -270,145 +333,10 @@
     </div>
 </div>
 
+<!-- Modal -->
 <div class="modal fade" id="modalCriarDisponibilidade" tabindex="-1" aria-labelledby="modalCriarDisponibilidadeLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalCriarDisponibilidadeLabel">
-                    <i class="fas fa-plus-circle mr-2"></i>Criar Nova Disponibilidade
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'listar_disponibilidades' %}">
-                    {% csrf_token %}
-                    
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    <div class="form-field">
-                        <label for="id_laboratorio" class="form-label">
-                            <i class="fas fa-flask mr-1"></i>Laboratório
-                        </label>
-                        <select name="laboratorio" id="id_laboratorio" class="form-control" required>
-                            <option value="">Selecione um laboratório</option>
-                            {% for lab in laboratorios %}
-                                <option value="{{ lab.id }}" {% if form.laboratorio.value == lab.id %}selected{% endif %}>
-                                    {{ lab.num_laboratorio }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        {% if form.laboratorio.errors %}
-                            <div class="error-message">
-                                {% for error in form.laboratorio.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-field">
-                        <label for="id_monitor" class="form-label">
-                            <i class="fas fa-user-cog mr-1"></i>Monitor
-                        </label>
-                        <select name="monitor" id="id_monitor" class="form-control" required>
-                            <option value="">Selecione um monitor</option>
-                            {% for monitor in monitores %}
-                                <option value="{{ monitor.id }}" {% if form.monitor.value == monitor.id %}selected{% endif %}>
-                                    {{ monitor.get_nome_completo }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        {% if form.monitor.errors %}
-                            <div class="error-message">
-                                {% for error in form.monitor.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-field">
-                        <label for="id_data" class="form-label">
-                            <i class="fas fa-calendar mr-1"></i>Data
-                        </label>
-                        <input type="date" name="data" id="id_data" class="form-control" 
-                               value="{{ form.data.value|default:'' }}" required>
-                        {% if form.data.errors %}
-                            <div class="error-message">
-                                {% for error in form.data.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-field">
-                                <label for="id_horario_inicio" class="form-label">
-                                    <i class="fas fa-clock mr-1"></i>Horário Início
-                                </label>
-                                <input type="time" name="horario_inicio" id="id_horario_inicio" class="form-control" 
-                                       value="{{ form.horario_inicio.value|default:'' }}" required>
-                                {% if form.horario_inicio.errors %}
-                                    <div class="error-message">
-                                        {% for error in form.horario_inicio.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-field">
-                                <label for="id_horario_fim" class="form-label">
-                                    <i class="fas fa-clock mr-1"></i>Horário Fim
-                                </label>
-                                <input type="time" name="horario_fim" id="id_horario_fim" class="form-control" 
-                                       value="{{ form.horario_fim.value|default:'' }}" required>
-                                {% if form.horario_fim.errors %}
-                                    <div class="error-message">
-                                        {% for error in form.horario_fim.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Campo Vagas -->
-                    <div class="form-field">
-                        <label for="id_vagas" class="form-label">
-                            <i class="fas fa-users mr-1"></i>Vagas
-                        </label>
-                        <input type="number" name="vagas" id="id_vagas" class="form-control" 
-                               value="{{ form.vagas.value|default:'1' }}" min="1" max="50" required>
-                        {% if form.vagas.errors %}
-                            <div class="error-message">
-                                {% for error in form.vagas.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times mr-2"></i>Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-2"></i>Salvar Disponibilidade
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>
