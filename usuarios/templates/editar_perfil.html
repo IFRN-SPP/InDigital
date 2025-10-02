@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block extra_css %}
 <style>
@@ -11,93 +12,6 @@
         --cor-intermediaria3: #20597F;
     }
 
-    body {
-        font-family: 'Source Sans 3', sans-serif;
-        background-color: #f4f6f9;
-    }
-    
-    .small-box {
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
-    }
-    
-    .small-box:hover {
-        transform: translateY(-5px);
-    }
-    
-    .small-box .inner h4 {
-        font-size: 1.5rem;
-        margin-bottom: 5px;
-    }
-    
-    .small-box .inner p {
-        font-size: 1.2rem;
-        margin: 0;
-    }
-    
-    .card {
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        border: none;
-    }
-    
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eaecef;
-        font-weight: 600;
-    }
-    
-    .app-sidebar {
-        background: linear-gradient(180deg, var(--cor-primaria) 0%, var(--cor-primaria) 100%) !important;
-    }
-    
-    .sidebar-brand .brand-text {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: #fff;
-    }
-    
-    .app-footer {
-        background-color: #f8f9fa;
-        border-top: 1px solid #dee2e6;
-        padding: 10px 0;
-        text-align: center;
-    }
-    
-    /* Correção para o layout do AdminLTE */
-    .wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    
-    .content-wrapper {
-        flex: 1;
-        margin-left: 250px;
-        transition: margin-left 0.3s ease-in-out;
-    }
-    
-    .sidebar-collapsed .content-wrapper {
-        margin-left: 78px;
-    }
-    
-    .main-sidebar {
-        width: 250px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        z-index: 1038;
-        transition: width 0.3s ease-in-out;
-    }
-    
-    .sidebar-collapsed .main-sidebar {
-        width: 78px;
-    }
-    
     /* Estilo do banner */
     .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
@@ -157,48 +71,6 @@
         z-index: 0;
     }
 
-    /* cores padrão dos elementos */
-    .bg-info {
-        background-color: #20597F !important;
-        color: white !important;
-    }
-    
-    .bg-success {
-        background-color: #86B5E1 !important;
-        color: white !important;
-    }
-    
-    .bg-warning {
-        background-color: #20597F !important;
-        color: white !important;
-    }
-    
-    .bg-danger {
-        background-color: #86B5E1 !important;
-        color: white !important;
-    }
-    
-    .main-header .navbar-nav .nav-link {
-        color: var(--cor-primaria);
-    }
-    
-    .main-header .navbar-nav .nav-link:hover {
-        color: var(--cor-intermediaria2);
-    }
-    
-    .breadcrumb-item.active {
-        color: var(--cor-primaria);
-    }
-    
-    .pagination .page-item.active .page-link {
-        background-color: var(--cor-primaria);
-        border-color: var(--cor-primaria);
-    }
-    
-    .pagination .page-link {
-        color: var(--cor-primaria);
-    }
-    
     /* Estilos específicos para a página de perfil */
     .profile-header {
         display: flex;
@@ -242,15 +114,6 @@
         border-bottom: 1px solid #eaecef;
     }
     
-    .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #eaecef;
-    }
-    
     .avatar-upload {
         display: flex;
         align-items: center;
@@ -265,12 +128,6 @@
         border: 2px solid #dee2e6;
     }
     
-    .avatar-upload-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
     /* Botão primário */
     .btn-primary {
         background-color: var(--cor-primaria) !important;
@@ -281,26 +138,20 @@
         background-color: #16466c !important;
         border-color: #16466c !important;
     }
-    
+
+    /* Card header com cor primária */
+    .card-primary .card-header {
+        background-color: var(--cor-primaria) !important;
+        border-bottom: none;
+        color: white;
+    }
+
+    .card-primary .card-title {
+        color: white;
+        font-weight: 600;
+    }
+
     @media (max-width: 767.98px) {
-        .content-wrapper {
-            margin-left: 0;
-        }
-        
-        .main-sidebar {
-            width: 250px;
-            transform: translateX(-250px);
-        }
-        
-        .sidebar-open .main-sidebar {
-            transform: translateX(0);
-        }
-        
-        .sidebar-collapsed .main-sidebar {
-            width: 250px;
-            transform: translateX(-250px);
-        }
-        
         .welcome-banner {
             text-align: center;
         }
@@ -323,143 +174,194 @@
             flex-direction: column;
             align-items: flex-start;
         }
-        
-        .form-actions {
-            flex-direction: column;
-        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <section class="content">
-            <div class="container-fluid">
-                <div class="welcome-banner">
-                    <h1>Editar Perfil</h1>
-                    <p>Atualize suas informações pessoais</p>
-                    <div class="welcome-icon">
-                        <i class="fas fa-user-edit"></i>
+    <div class="container-fluid">
+        <!-- Banner igual ao da página de perfil -->
+        <div class="welcome-banner">
+            <h1>Editar Perfil</h1>
+            <p>Atualize suas informações pessoais</p>
+            <div class="welcome-icon">
+                <i class="fas fa-user-edit"></i>
+            </div>
+        </div>
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <div class="card-title">Editar Informações Pessoais</div>
                     </div>
-                </div>
-                
-                <div class="profile-header">
-                    <img src="{{ user.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar">
-                    <div class="profile-info">
-                        <h3>{{ user.get_nome_completo }}</h3>
-                        <p>Email: {{ user.email }}</p>
-                        <p>Vínculo: {{ user.vinculo }}</p>
-                        {% if user.suap_id %}
-                        <p>Matrícula: {{ user.suap_id }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">Informações Pessoais</div>
-                            </div>
-                            
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="card-body">
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-camera me-2"></i>Foto de Perfil
+                                </h5>
                                 
-                                <div class="card-body">
-                                    <div class="form-section">
-                                        <div class="form-section-title">
-                                            <i class="fas fa-camera me-2"></i>Foto de Perfil
+                                <div class="avatar-upload">
+                                    <img src="{{ user.get_foto_perfil_url }}" alt="Preview do avatar" class="avatar-preview" id="avatarPreview"
+                                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.get_nome_completo|urlencode }}&size=80&background=6c757d&color=ffffff';">
+                                    
+                                    <div class="flex-grow-1">
+                                        {% if user.suap_foto_url and not user.foto_perfil %}
+                                        <div class="alert alert-info mb-3">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Foto atual importada do SUAP. Faça upload de uma nova foto para substituir.
                                         </div>
-                                        <div class="avatar-upload">
-                                            <img src="{{ user.get_foto_perfil_url }}" alt="Preview do avatar" class="avatar-preview" id="avatarPreview">
-                                            
-                                            <div class="flex-grow-1">
-                                                {% if user.suap_foto_url and not user.foto_perfil %}
-                                                <div class="alert alert-info mb-2">
-                                                    <small>
-                                                        <i class="fas fa-info-circle"></i> 
-                                                        Foto atual importada do SUAP. Faça upload de uma nova foto para substituir.
-                                                    </small>
-                                                </div>
-                                                {% endif %}
-                                                
-                                                <div class="mb-3">
-                                                    <label for="{{ form.foto_perfil.id_for_label }}" class="form-label">Alterar Foto</label>
-                                                    {{ form.foto_perfil }}
-                                                    {% if form.foto_perfil.errors %}
-                                                        <div class="text-danger">{{ form.foto_perfil.errors }}</div>
-                                                    {% endif %}
-                                                    <div class="form-text">
-                                                        Formatos suportados: JPG, PNG. Tamanho máximo: 2MB.
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                
-                                    <div class="form-section">
-                                        <div class="form-section-title">
-                                            <i class="fas fa-user me-2"></i>Informações Básicas
+                                        {% endif %}
+                                        
+                                        <div class="input-group mb-3">
+                                            <input type="file" class="form-control" id="{{ form.foto_perfil.id_for_label }}" 
+                                                   name="{{ form.foto_perfil.name }}" accept="image/*">
+                                            <label class="input-group-text" for="{{ form.foto_perfil.id_for_label }}">
+                                                <i class="fas fa-upload"></i>
+                                            </label>
                                         </div>
                                         
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Nome</label>
-                                                    {{ form.first_name }}
-                                                    {% if form.first_name.errors %}
-                                                        <div class="text-danger">{{ form.first_name.errors }}</div>
-                                                    {% endif %}
-                                                </div>
+                                        {% if form.foto_perfil.errors %}
+                                            <div class="alert alert-danger">
+                                                {{ form.foto_perfil.errors }}
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
-                                                    {{ form.last_name }}
-                                                    {% if form.last_name.errors %}
-                                                        <div class="text-danger">{{ form.last_name.errors }}</div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {% endif %}
                                         
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
-                                                    {{ form.email }}
-                                                    {% if form.email.errors %}
-                                                        <div class="text-danger">{{ form.email.errors }}</div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle"></i>
+                                            Formatos suportados: JPG, PNG. Tamanho máximo: 2MB.
                                         </div>
-                                    </div>
-
-                                    <div class="form-actions">
-                                        <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">Cancelar</a>
-                                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-user me-2"></i>Informações Básicas
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                                <i class="fas fa-signature me-1"></i>Nome
+                                            </label>
+                                            <input type="text" class="form-control" id="{{ form.first_name.id_for_label }}"
+                                                   name="{{ form.first_name.name }}" value="{{ form.first_name.value|default:'' }}"
+                                                   placeholder="Digite seu nome">
+                                            {% if form.first_name.errors %}
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ form.first_name.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                                <i class="fas fa-signature me-1"></i>Sobrenome
+                                            </label>
+                                            <input type="text" class="form-control" id="{{ form.last_name.id_for_label }}"
+                                                   name="{{ form.last_name.name }}" value="{{ form.last_name.value|default:'' }}"
+                                                   placeholder="Digite seu sobrenome">
+                                            {% if form.last_name.errors %}
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ form.last_name.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                                <i class="fas fa-envelope me-1"></i>E-mail
+                                            </label>
+                                            <input type="email" class="form-control" id="{{ form.email.id_for_label }}"
+                                                   name="{{ form.email.name }}" value="{{ form.email.value|default:'' }}"
+                                                   placeholder="Digite seu e-mail">
+                                            {% if form.email.errors %}
+                                                <div class="alert alert-danger mt-2">
+                                                    {{ form.email.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-id-card me-1"></i>Status da Conta
+                                            </label>
+                                            <div class="form-control" style="background-color: #f8f9fa;">
+                                                {% if user.is_active %}
+                                                    <span class="badge badge-success">Ativa</span>
+                                                {% else %}
+                                                    <span class="badge badge-danger">Inativa</span>
+                                                {% endif %}
+                                                - Desde {{ user.date_joined|date:"d/m/Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <a href="{% url 'perfil' %}" class="btn btn-outline-secondary mr-2">
+                                        <i class="fas fa-times me-1"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Salvar Alterações
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
-</div>
+</section>
 {% endblock content %}
 
 {% block extra_js %}
 <script>
-    document.getElementById('id_foto_perfil').addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('avatarPreview').src = e.target.result;
-            }
-            reader.readAsDataURL(e.target.files[0]);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview da imagem ao selecionar arquivo
+        const fileInput = document.getElementById('{{ form.foto_perfil.id_for_label }}');
+        const avatarPreview = document.getElementById('avatarPreview');
+        
+        if (fileInput && avatarPreview) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        avatarPreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+        
+        // Validação de tamanho de arquivo
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileSize = file.size / 1024 / 1024; // MB
+                    if (fileSize > 2) {
+                        alert('O arquivo é muito grande. Por favor, selecione uma imagem menor que 2MB.');
+                        e.target.value = '';
+                    }
+                }
+            });
         }
     });
 </script>
