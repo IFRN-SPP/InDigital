@@ -38,6 +38,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                         <span class="d-none d-md-inline">Olá, {{ request.user.first_name }}!</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -79,6 +80,35 @@
                                 </a>
                             </li>
                             
+                            <!-- Funcionalidades do Aluno para Admin -->
+                            <li class="nav-item">
+                                <a href="{% url 'horarios' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-calendar-check"></i>
+                                    <p>Disponibilidades</p>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="{% url 'minhas_reservas' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>Minhas Reservas</p>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="{% url 'historico_reservas' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-history"></i>
+                                    <p>Histórico de Reservas</p>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="{% url 'minha_fila_espera' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-hourglass-half"></i>
+                                    <p>Fila de Espera</p>
+                                </a>
+                            </li>
+                            
                             <li class="nav-header">ADMINISTRAÇÃO</li>
                             
                             <li class="nav-item">
@@ -115,14 +145,6 @@
                                     <p>Gerenciar Usuários</p>
                                 </a>
                             </li>
-                            
-                            <li class="nav-item">
-                                <a href="{% url 'listar_monitores' %}" class="nav-link">
-                                    <i class="nav-icon fas fa-users"></i>
-                                    <p>Gerenciar Monitores</p>
-                                </a>
-                            </li>
-                            
                             <li class="nav-item">
                                 <a href="{% url 'fila_espera' %}" class="nav-link">
                                     <i class="nav-icon fas fa-hourglass-half"></i>
@@ -138,6 +160,7 @@
                                 </a>
                             </li>
                             
+                            <!-- Funcionalidades do Aluno para Monitor -->
                             <li class="nav-item">
                                 <a href="{% url 'horarios' %}" class="nav-link">
                                     <i class="nav-icon fas fa-calendar-check"></i>
@@ -176,6 +199,7 @@
                             </li>
                             
                         {% else %}
+                            <!-- Menu do Aluno -->
                             <li class="nav-item">
                                 <a href="{% url 'index' %}" class="nav-link">
                                     <i class="nav-icon fas fa-home"></i>
@@ -212,6 +236,7 @@
                             </li>
                         {% endif %}
 
+                        <!-- Menu Usuário (comum a todos) -->
                         <li class="nav-header">USUÁRIO</li>
                         
                         <li class="nav-item">
