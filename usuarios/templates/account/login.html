@@ -18,9 +18,44 @@
             
             <div class="text-center mb-4">
                 <h5>Acesso ao Sistema</h5>
-                <p>Utilize sua conta do SUAP para acessar o sistema</p>
+                <p>Utilize sua conta do SUAP ou credenciais locais</p>
             </div>
             
+            <form method="POST" class="signin-form">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="username" class="form-label">Usuário</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           placeholder="Digite seu usuário" 
+                           required>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Digite sua senha" 
+                           required>
+                </div>
+                
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-md px-4 py-2 custom-primary-btn">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Entrar
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider my-4">
+                <span class="divider-text">ou</span>
+            </div>
+
             <form method="POST" class="signin-form"> 
                 {% csrf_token %}
                 <div class="text-center mb-4">
@@ -33,6 +68,12 @@
             </form>
 
             <div class="text-center mt-4">
+                <p class="mb-2">
+                    Não tem uma conta? 
+                    <a href="{% url 'cadastro' %}" class="text-decoration-none">
+                        <strong>Cadastre-se aqui</strong>
+                    </a>
+                </p>
                 <small class="d-block mb-2 text-muted">
                     Sistema integrado com SUAP - Instituto Federal
                 </small>
@@ -65,4 +106,66 @@
         }
     });
 </script>
+
+<style>
+    :root {
+        --cor-primaria: #20597F;
+        --cor-secundaria: #20597F;
+        --cor-intermediaria1: #20597F;
+        --cor-intermediaria2: #86B5E1;
+        --cor-intermediaria3: #20597F;
+    }
+    
+    .custom-primary-btn {
+        background-color: var(--cor-primaria) !important;
+        border-color: var(--cor-primaria) !important;
+        color: white !important;
+    }
+    
+    .custom-primary-btn:hover {
+        background-color: #1a4a6b !important;
+        border-color: #1a4a6b !important;
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .divider-text {
+        padding: 0 1rem;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .form-group {
+        text-align: left;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+    
+    .form-control {
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        border-color: var(--cor-intermediaria2) !important;
+        box-shadow: 0 0 0 0.25rem rgba(134, 181, 225, 0.25) !important;
+    }
+</style>
 {% endblock %}

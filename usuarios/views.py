@@ -6,6 +6,8 @@ from django.contrib import messages
 from .models import User
 from functools import wraps
 from django.core.paginator import Paginator
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
 
 @login_required
 def dashboard_redirect(request):
@@ -42,6 +44,25 @@ def cadastro(request):
     else:
         form = CadastroForm()
     return render(request, 'cadastro.html', {'form': form})
+
+
+def custom_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Bem-vindo(a) de volta, {user.first_name}!')
+                return redirect('index')
+        else:
+            messages.error(request, 'Usuário ou senha inválidos.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'account/login.html', {'form': form})
 
 @login_required
 def perfil(request):
