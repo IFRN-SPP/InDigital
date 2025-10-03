@@ -71,7 +71,6 @@
         z-index: 0;
     }
 
-    /* Estilos específicos para a página de perfil */
     .profile-header {
         display: flex;
         align-items: center;
@@ -127,8 +126,13 @@
         object-fit: cover;
         border: 2px solid #dee2e6;
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
     
-    /* Botão primário */
     .btn-primary {
         background-color: var(--cor-primaria) !important;
         border-color: var(--cor-primaria) !important;
@@ -150,6 +154,31 @@
         color: white;
         font-weight: 600;
     }
+
+    .password-toggle {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+    }
+    
+    .password-field {
+        position: relative;
+    }
+    
+    .password-strength {
+        height: 4px;
+        border-radius: 2px;
+        margin-top: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .strength-weak { background-color: #dc3545; width: 25%; }
+    .strength-fair { background-color: #fd7e14; width: 50%; }
+    .strength-good { background-color: #ffc107; width: 75%; }
+    .strength-strong { background-color: #198754; width: 100%; }
 
     @media (max-width: 767.98px) {
         .welcome-banner {
@@ -174,6 +203,14 @@
             flex-direction: column;
             align-items: flex-start;
         }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .action-buttons .btn {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
@@ -181,20 +218,22 @@
 {% block content %}
 <section class="content">
     <div class="container-fluid">
-        <!-- Banner igual ao da página de perfil -->
         <div class="welcome-banner">
             <h1>Editar Perfil</h1>
-            <p>Atualize suas informações pessoais</p>
+            <p>Atualize suas informações pessoais e senha</p>
             <div class="welcome-icon">
                 <i class="fas fa-user-edit"></i>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <div class="card-title">Editar Informações Pessoais</div>
+                        <div class="card-title">Editar Informações Pessoais e Senha</div>
                     </div>
                     
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" id="profileForm">
                         {% csrf_token %}
                         
                         <div class="card-body">
@@ -311,16 +350,55 @@
                                 </div>
                             </div>
 
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a href="{% url 'perfil' %}" class="btn btn-outline-secondary mr-2">
-                                        <i class="fas fa-times me-1"></i>Cancelar
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-1"></i>Salvar Alterações
-                                    </button>
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-key me-2"></i>Alterar Senha
+                                </h5>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Preencha os campos abaixo apenas se desejar alterar sua senha. Caso contrário, deixe em branco.
                                 </div>
+
+                                <div class="row">
+    <div class="col-md-6">
+        <div class="mb-3 password-field">
+            <label for="new_password1" class="form-label">
+                <i class="fas fa-key me-1"></i>Nova Senha
+            </label>
+            <input type="password" class="form-control" id="new_password1"
+                   name="new_password1" placeholder="Digite a nova senha">
+            <span class="password-toggle" onclick="togglePassword('new_password1')">
+                <i class="fas fa-eye"></i>
+            </span>
+            <div class="password-strength" id="passwordStrength"></div>
+            <small class="form-text text-muted" id="passwordFeedback"></small>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="mb-3 password-field">
+            <label for="new_password2" class="form-label">
+                <i class="fas fa-key me-1"></i>Confirmar Nova Senha
+            </label>
+            <input type="password" class="form-control" id="new_password2"
+                   name="new_password2" placeholder="Digite a nova senha novamente">
+            <span class="password-toggle" onclick="togglePassword('new_password2')">
+                <i class="fas fa-eye"></i>
+            </span>
+            <div class="mt-2" id="passwordMatch"></div>
+        </div>
+    </div>
+</div>
+
+                        <div class="card-footer">
+                            <div class="action-buttons">
+                                <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Salvar Todas as Alterações
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -334,7 +412,6 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Preview da imagem ao selecionar arquivo
         const fileInput = document.getElementById('{{ form.foto_perfil.id_for_label }}');
         const avatarPreview = document.getElementById('avatarPreview');
         
@@ -350,7 +427,6 @@
             });
         }
         
-        // Validação de tamanho de arquivo
         if (fileInput) {
             fileInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
@@ -363,6 +439,95 @@
                 }
             });
         }
+
+        const newPassword1 = document.getElementById('new_password1');
+        const newPassword2 = document.getElementById('new_password2');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const passwordFeedback = document.getElementById('passwordFeedback');
+        const passwordMatch = document.getElementById('passwordMatch');
+
+        if (newPassword1) {
+            newPassword1.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+            });
+        }
+
+        if (newPassword2) {
+            newPassword2.addEventListener('input', function() {
+                checkPasswordMatch();
+            });
+        }
     });
+
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = field.nextElementSibling.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    function checkPasswordStrength(password) {
+        const strengthBar = document.getElementById('passwordStrength');
+        const feedback = document.getElementById('passwordFeedback');
+        
+        let strength = 0;
+        let feedbackText = '';
+        
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+        if (password.match(/\d/)) strength++;
+        if (password.match(/[^a-zA-Z\d]/)) strength++;
+        
+        switch(strength) {
+            case 0:
+            case 1:
+                strengthBar.className = 'password-strength strength-weak';
+                feedbackText = 'Senha fraca';
+                feedback.className = 'form-text text-danger';
+                break;
+            case 2:
+                strengthBar.className = 'password-strength strength-fair';
+                feedbackText = 'Senha razoável';
+                feedback.className = 'form-text text-warning';
+                break;
+            case 3:
+                strengthBar.className = 'password-strength strength-good';
+                feedbackText = 'Senha boa';
+                feedback.className = 'form-text text-info';
+                break;
+            case 4:
+                strengthBar.className = 'password-strength strength-strong';
+                feedbackText = 'Senha forte';
+                feedback.className = 'form-text text-success';
+                break;
+        }
+        
+        feedback.textContent = feedbackText;
+    }
+
+    function checkPasswordMatch() {
+        const password1 = document.getElementById('new_password1').value;
+        const password2 = document.getElementById('new_password2').value;
+        const matchDiv = document.getElementById('passwordMatch');
+        
+        if (password2 === '') {
+            matchDiv.innerHTML = '';
+            return;
+        }
+        
+        if (password1 === password2) {
+            matchDiv.innerHTML = '<small class="text-success"><i class="fas fa-check me-1"></i>Senhas coincidem</small>';
+        } else {
+            matchDiv.innerHTML = '<small class="text-danger"><i class="fas fa-times me-1"></i>Senhas não coincidem</small>';
+        }
+    }
 </script>
 {% endblock %}
