@@ -1274,3 +1274,4 @@ def aprovar_multiplas_reservas(request):
         if sem_vagas > 0:
             messages.warning(request, f"{sem_vagas} reserva(s) não puderam ser aprovadas por falta de vagas.")
     return redirect('reservas_pendentes')
+

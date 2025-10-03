@@ -262,7 +262,13 @@
     {% if not request.resolver_match.url_name == 'account_login' and not request.resolver_match.url_name == 'suap_login' and not request.resolver_match.url_name == 'cadastro' %}
     <footer class="main-footer">
         <div class="container">
-            <strong class="d-block text-center">Copyright © InDigital {% now 'Y' %}</strong>
+            <strong class="d-block text-center">
+                <i class="fas fa-laptop-code me-1"></i>
+                Sistema InDigital &copy; {% now 'Y' %} - Instituto Federal
+            </strong>
+            <small class="d-block text-center text-muted mt-1">
+                Desenvolvido para gestão de laboratórios de informática
+            </small>
         </div>
     </footer>
     {% endif %}
