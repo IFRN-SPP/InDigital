@@ -144,7 +144,6 @@
         color: #20597F;
     }
 
-    /* Remove os divisores já que agora temos espaçamento */
     .action-divider {
         display: none;
     }
@@ -337,6 +336,26 @@
 <div class="modal fade" id="modalCriarDisponibilidade" tabindex="-1" aria-labelledby="modalCriarDisponibilidadeLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCriarDisponibilidadeLabel">
+                    <i class="fas fa-plus-circle mr-2"></i>Criar Nova Disponibilidade
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formCriarDisponibilidade" method="post" action="{% url 'criar_disponibilidade' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ form|crispy }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Criar Disponibilidade
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -346,8 +365,51 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
+    console.log('Document ready - JavaScript carregado');
     
-    $('input[name="horario_inicio"], input[name="horario_fim"]').on('change', function() {
+    $(document).on('submit', '#formCriarDisponibilidade', function(e) {
+        e.preventDefault(); 
+        console.log('Formulário submetido');
+        
+        var form = $(this);
+        var modal = $('#modalCriarDisponibilidade');
+        var formData = form.serialize();
+        
+        console.log('Enviando dados para:', form.attr('action'));
+        console.log('Dados:', formData);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                console.log('Resposta recebida:', response);
+                
+                if (response.success) {
+                    console.log('Sucesso - fechando modal e recarregando');
+                    modal.modal('hide');
+                    
+                   
+                    location.reload();
+                } else {
+                    console.log('Erros de validação - atualizando formulário');
+                    modal.find('.modal-content').html(response.form_html);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Erro na requisição:', error);
+                console.log('Status:', status);
+                console.log('Resposta:', xhr.responseText);
+                alert('Erro ao criar disponibilidade. Tente novamente.');
+            }
+        });
+    });
+
+    // Validação de horários
+    $(document).on('change', 'input[name="horario_inicio"], input[name="horario_fim"]', function() {
         var inicio = $('input[name="horario_inicio"]').val();
         var fim = $('input[name="horario_fim"]').val();
         
@@ -358,13 +420,14 @@ $(document).ready(function() {
     });
 
     {% if form.errors %}
+    console.log('Erros no formulário - abrindo modal');
     $(document).ready(function() {
         $('#modalCriarDisponibilidade').modal('show');
     });
     {% endif %}
 
     var today = new Date().toISOString().split('T')[0];
-    $('#id_data').attr('min', today);
+    $('input[name="data"]').attr('min', today);
 });
 </script>
 {% endblock %}

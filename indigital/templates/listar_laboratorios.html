@@ -389,7 +389,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{% url 'listar_laboratorios' %}">
+                <form id="formCriarLaboratorio" method="POST" action="{% url 'criar_laboratorio' %}">
                     {% csrf_token %}
                     
                     {% if form.non_field_errors %}
@@ -450,11 +450,51 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    $('#modalCriarLaboratorio').on('show.bs.modal', function () {
-        $(this).find('select, input, textarea').addClass('form-control');
+    console.log('Document ready - Laboratórios JavaScript carregado');
+    
+    $(document).on('submit', '#formCriarLaboratorio', function(e) {
+        e.preventDefault(); 
+        console.log('Formulário de laboratório submetido');
+        
+        var form = $(this);
+        var modal = $('#modalCriarLaboratorio');
+        var formData = form.serialize();
+        
+        console.log('Enviando dados para:', form.attr('action'));
+        console.log('Dados:', formData);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                console.log('Resposta recebida:', response);
+                
+                if (response.success) {
+                    console.log('✅ Sucesso - fechando modal e recarregando');
+                    modal.modal('hide');
+                    
+                    location.reload();
+                } else {
+                    console.log('❌ Erros de validação');
+                    modal.find('.modal-body').html(response.form_html);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('=== ERRO NA REQUISIÇÃO ===');
+                console.log('Status:', status);
+                console.log('Error:', error);
+                console.log('Response Text:', xhr.responseText);
+                
+                alert('Erro ao criar laboratório. Tente novamente.');
+            }
+        });
     });
 
-    $('#id_capacidade').on('change', function() {
+    $(document).on('change', '#id_capacidade', function() {
         var capacidade = $(this).val();
         
         if (capacidade && (capacidade < 1 || capacidade > 1000)) {
@@ -469,35 +509,11 @@ $(document).ready(function() {
     });
 
     {% if form.errors %}
+    console.log('Erros no formulário - abrindo modal');
     $(document).ready(function() {
         $('#modalCriarLaboratorio').modal('show');
     });
     {% endif %}
-
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            } else if ($(this).css('background-color') === 'rgb(220, 53, 69)') {
-                $(this).css('background-color', '#c82333');
-            } else if ($(this).css('background-color') === 'rgb(40, 167, 69)') {
-                $(this).css('background-color', '#218838');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            } else if ($(this).css('background-color') === 'rgb(200, 35, 51)') {
-                $(this).css('background-color', '#dc3545');
-            } else if ($(this).css('background-color') === 'rgb(33, 136, 56)') {
-                $(this).css('background-color', '#28a745');
-            }
-        }
-    );
 
     $('#modalCriarLaboratorio').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();

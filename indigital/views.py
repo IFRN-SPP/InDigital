@@ -9,6 +9,8 @@ from .forms import DisponibilidadeForm, LaboratorioForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 @login_required
 def dashboard_redirect(request):
@@ -175,51 +177,50 @@ def editar_disponibilidade(request, reserva_id):
 @login_required
 @admin_required
 def listar_disponibilidades(request):
-    if request.method == 'POST':
-        # Processa o formulário de criação de disponibilidade
-        form = DisponibilidadeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Disponibilidade criada com sucesso!")
-            return redirect('listar_disponibilidades') 
-        else:
-            messages.error(request, "Erro ao criar disponibilidade. Verifique os dados do formulário.")
-    else:
-        form = DisponibilidadeForm()
+    form = DisponibilidadeForm()
+    
     disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('-data', 'horario_inicio')
+    
     # Filtros
     laboratorio_id = request.GET.get('laboratorio')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     monitor_id = request.GET.get('monitor')
     vagas_min = request.GET.get('vagas_min')
+    
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
+    
     if data_inicio:
         try:
             data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
         except ValueError:
             messages.error(request, "Data de início inválida.")
+    
     if data_fim:
         try:
             data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
             disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
+    
     if monitor_id and monitor_id != 'todos':
         disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
+    
     if vagas_min:
         try:
             disponibilidades = disponibilidades.filter(vagas__gte=int(vagas_min))
         except ValueError:
             messages.error(request, "Número mínimo de vagas deve ser um número.")
+    
     # Paginação
     paginator = Paginator(disponibilidades, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    # Filtros
+    
+    # Filtros para o template
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
     monitores = User.objects.filter(perfil='monitor').order_by('username')
     
@@ -232,8 +233,9 @@ def listar_disponibilidades(request):
         'data_fim': data_fim,
         'monitor_id': monitor_id,
         'vagas_min': vagas_min,
-        'form': form,
+        'form': form, 
     }
+    
     return render(request, "listar_disponibilidades.html", context)
 
 @login_required
@@ -252,22 +254,35 @@ def excluir_disponibilidade(request, reserva_id):
     else:
         return render(request, "excluir_disponibilidade.html", {'reserva': disponibilidade})
 
-# crud laboratorio
 @login_required
 @admin_required
-def criar_laboratorio(request):
-    if request.method == "POST":
-        form = LaboratorioForm(request.POST)
+def criar_disponibilidade(request):
+    if request.method == 'POST':
+        form = DisponibilidadeForm(request.POST)
         if form.is_valid():
-            laboratorio = form.save()
-            messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
-            return redirect('listar_laboratorios')
+            disponibilidade = form.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            messages.success(request, "Disponibilidade criada com sucesso!")
+            return redirect('listar_disponibilidades')
         else:
-            messages.error(request, 'Erro ao cadastrar laboratório!')
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'form_html': form_html})
+            
+            messages.error(request, "Erro ao criar disponibilidade!")
+            return redirect('listar_disponibilidades')
     else:
-        form = LaboratorioForm()
-    
-    return render(request, "criar_laboratorio.html", {'form': form})
+        form = DisponibilidadeForm()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+            return HttpResponse(form_html)
+        
+        return redirect('listar_disponibilidades')
 
 @login_required
 @admin_required
@@ -292,16 +307,7 @@ def editar_laboratorio(request, laboratorio_id):
 @login_required
 @admin_required
 def listar_laboratorios(request):
-    if request.method == 'POST':
-        form = LaboratorioForm(request.POST)
-        if form.is_valid():
-            laboratorio = form.save()
-            messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
-            return redirect('listar_laboratorios')
-        else:
-            messages.error(request, 'Por favor, corrija os erros abaixo.')
-    else:
-        form = LaboratorioForm()
+    form = LaboratorioForm()
 
     # Filtra os laboratórios
     laboratorios_list = Laboratorio.objects.all().order_by('num_laboratorio')
@@ -338,6 +344,37 @@ def listar_laboratorios(request):
     }
     
     return render(request, 'listar_laboratorios.html', context)
+
+
+@login_required
+@admin_required
+def criar_laboratorio(request):
+    if request.method == 'POST':
+        form = LaboratorioForm(request.POST)
+        if form.is_valid():
+            laboratorio = form.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            
+            messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
+            return redirect('listar_laboratorios')
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'form_html': form_html})
+            
+            messages.error(request, 'Erro ao criar laboratório!')
+            return redirect('listar_laboratorios')
+    
+    else:
+        form = LaboratorioForm()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
+            return HttpResponse(form_html)
+        
+        return redirect('listar_laboratorios')
 
 @login_required
 @admin_required
