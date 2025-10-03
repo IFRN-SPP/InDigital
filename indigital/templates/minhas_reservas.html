@@ -195,6 +195,18 @@
     .table-hover tbody tr.table-light:hover {
         background-color: rgba(248, 249, 250, 0.1);
     }
+
+    .btn-cancelar-reserva {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    border-radius: 3px;
+}
+
+.btn-cancelar-reserva .fas {
+    font-size: 0.7rem;
+    margin-right: 2px;
+}
 </style>
 {% endblock %}
 
@@ -376,17 +388,17 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
-                                            <a href="{% url 'cancelar_reserva' reserva.id %}" 
-                                               class="btn btn-sm btn-outline-danger"
-                                               onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">
-                                                <i class="fas fa-times mr-1"></i> Cancelar
-                                            </a>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
+                                    <<td style="border-color: #86B5E1; vertical-align: middle;">
+    {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
+        <a href="{% url 'cancelar_reserva' reserva.id %}" 
+           class="btn btn-sm btn-outline-danger btn-cancelar-reserva"
+           onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">
+            <i class="fas fa-times mr-1"></i> Cancelar
+        </a>
+    {% else %}
+        <span class="text-muted">-</span>
+    {% endif %}
+</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

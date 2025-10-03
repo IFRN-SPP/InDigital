@@ -88,6 +88,22 @@
         background-color: var(--cor-primaria);
         border-color: var(--cor-primaria);
     }
+    
+    /* Modal customizado */
+    .custom-modal .modal-content {
+        border: 2px solid #86B5E1;
+        border-radius: 10px;
+    }
+    
+    .custom-modal .modal-header {
+        background-color: #20597F;
+        color: white;
+        border-bottom: 1px solid #86B5E1;
+    }
+    
+    .custom-modal .modal-footer {
+        border-top: 1px solid #86B5E1;
+    }
 </style>
 {% endblock %}
 
@@ -201,7 +217,7 @@
                             </thead>
                             <tbody>
                                 {% for fila in page_obj %}
-                                <tr>
+                                <tr id="fila-{{ fila.id }}">
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <span class="badge" style="background-color: #20597F; color: white;">
                                             {{ page_obj.start_index|add:forloop.counter0 }}º
@@ -236,24 +252,20 @@
                                     </td>
                                     <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
                                         <div class="btn-group btn-group-sm">
-                                            <form method="post" action="{% url 'promover_fila' fila.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn" 
-                                                        title="Promover para reserva"
-                                                        onclick="return confirm('Tem certeza que deseja promover este usuário para reserva?')"
-                                                        style="background-color: #28a745; color: white; border: none;">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                </button>
-                                            </form>
-                                            <form method="post" action="{% url 'remover_fila' fila.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn" 
-                                                        title="Remover da fila"
-                                                        onclick="return confirm('Tem certeza que deseja remover este usuário da fila?')"
-                                                        style="background-color: #dc3545; color: white; border: none;">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-promover" 
+                                                    title="Promover para reserva"
+                                                    style="background-color: #28a745; color: white; border: none; margin-right: 4px;"
+                                                    data-fila-id="{{ fila.id }}"
+                                                    data-usuario-nome="{{ fila.usuario.suap_nome_completo }}">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-remover" 
+                                                    title="Remover da fila"
+                                                    style="background-color: #dc3545; color: white; border: none;"
+                                                    data-fila-id="{{ fila.id }}"
+                                                    data-usuario-nome="{{ fila.usuario.suap_nome_completo }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -330,12 +342,33 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade custom-modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
- 
+    let currentFilaId = null;
+    let currentAction = null;
+    const csrfToken = '{{ csrf_token }}';
+
     $('.btn').hover(
         function() {
             if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
@@ -360,6 +393,106 @@ $(document).ready(function() {
             }
         }
     );
+
+    $('.btn-promover').on('click', function() {
+        currentFilaId = $(this).data('fila-id');
+        const usuarioNome = $(this).data('usuario-nome');
+        currentAction = 'promover';
+        
+        $('#confirmModalBody').html(`Tem certeza que deseja promover <strong>${usuarioNome}</strong> para reserva?`);
+        $('#confirmModalLabel').html('Promover para Reserva');
+        $('#confirmAction')
+            .removeClass('btn-danger')
+            .addClass('btn-success')
+            .html('<i class="fas fa-arrow-up mr-1"></i> Promover');
+        
+        $('#confirmModal').modal('show');
+    });
+
+    $('.btn-remover').on('click', function() {
+        currentFilaId = $(this).data('fila-id');
+        const usuarioNome = $(this).data('usuario-nome');
+        currentAction = 'remover';
+        
+        $('#confirmModalBody').html(`Tem certeza que deseja remover <strong>${usuarioNome}</strong> da fila de espera?`);
+        $('#confirmModalLabel').html('Remover da Fila');
+        $('#confirmAction')
+            .removeClass('btn-success')
+            .addClass('btn-danger')
+            .html('<i class="fas fa-trash mr-1"></i> Remover');
+        
+        $('#confirmModal').modal('show');
+    });
+
+   
+    $('#confirmAction').on('click', function() {
+        if (!currentFilaId || !currentAction) return;
+
+        const $button = $(this);
+        const originalText = $button.html();
+        
+        
+        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Processando...');
+
+        let url, successMessage;
+        
+        if (currentAction === 'promover') {
+            url = '{% url "promover_fila" 0 %}'.replace('0', currentFilaId);
+            successMessage = 'Usuário promovido para reserva com sucesso!';
+        } else {
+            url = '{% url "remover_fila" 0 %}'.replace('0', currentFilaId);
+            successMessage = 'Usuário removido da fila com sucesso!';
+        }
+
+        // Fazer requisição AJAX
+        $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success: function(response) {
+                $('#confirmModal').modal('hide');
+                
+                
+                showAlert(successMessage, 'success');
+                
+                
+                $(`#fila-${currentFilaId}`).fadeOut(300, function() {
+                    $(this).remove();
+                    if ($('tbody tr').length === 0) {
+                        location.reload();
+                    }
+                });
+            },
+            error: function(xhr) {
+                $('#confirmModal').modal('hide');
+                showAlert('Erro ao processar a solicitação. Tente novamente.', 'error');
+                $button.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        $('body').append(alertHtml);
+        
+        setTimeout(() => {
+            $('.alert').alert('close');
+        }, 5000);
+    }
+
+    $('#confirmModal').on('hidden.bs.modal', function() {
+        currentFilaId = null;
+        currentAction = null;
+        $('#confirmAction').prop('disabled', false).html('Confirmar');
+    });
 });
 </script>
 {% endblock %}
