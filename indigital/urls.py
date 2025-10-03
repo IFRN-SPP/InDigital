@@ -36,5 +36,6 @@ urlpatterns = [
     path('laboratorios/', views.listar_laboratorios, name='listar_laboratorios'),
     path('criar-disponibilidade/', views.criar_disponibilidade, name='criar_disponibilidade'),
     path('criar-laboratorio/', views.criar_laboratorio, name='criar_laboratorio'),
+    path('editar-laboratorio/<int:laboratorio_id>/', views.editar_laboratorio, name='editar_laboratorio'),
     
 ]

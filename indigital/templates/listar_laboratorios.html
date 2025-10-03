@@ -287,12 +287,14 @@
                                         <div class="card-footer bg-transparent">
                                             <div class="btn-group w-100" role="group">
                                                 {% if perms.indigital.editar_laboratorio %}
-                                                    <a href="{% url 'editar_laboratorio' laboratorio.id %}" 
-                                                       class="btn btn-sm" 
-                                                       title="Editar laboratório"
-                                                       style="background-color: #20597F; color: white; border: none;">
+                                                    <!-- BOTÃO CORRIGIDO AQUI -->
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-editar-laboratorio" 
+                                                            style="background-color: #20597F; color: white; border: none;"
+                                                            data-laboratorio-id="{{ laboratorio.id }}"
+                                                            title="Editar laboratório">
                                                         <i class="fas fa-edit"></i> Editar
-                                                    </a>
+                                                    </button>
                                                 {% endif %}
                                                 {% if perms.indigital.excluir_laboratorio %}
                                                     <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
@@ -379,6 +381,7 @@
     </div>
 </div>
 
+<!-- Modal Criar Laboratório -->
 <div class="modal fade" id="modalCriarLaboratorio" tabindex="-1" aria-labelledby="modalCriarLaboratorioLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -445,6 +448,23 @@
     </div>
 </div>
 
+<!-- Modal Editar Laboratório -->
+<div class="modal fade" id="modalEditarLaboratorio" tabindex="-1" aria-labelledby="modalEditarLaboratorioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarLaboratorioLabel">
+                    <i class="fas fa-edit mr-2"></i>Editar Laboratório
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalEditarLaboratorioBody">
+                <!-- Conteúdo será carregado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -454,7 +474,7 @@ $(document).ready(function() {
     
     $(document).on('submit', '#formCriarLaboratorio', function(e) {
         e.preventDefault(); 
-        console.log('Formulário de laboratório submetido');
+        console.log('Formulário de criação submetido');
         
         var form = $(this);
         var modal = $('#modalCriarLaboratorio');
@@ -474,42 +494,143 @@ $(document).ready(function() {
                 console.log('Resposta recebida:', response);
                 
                 if (response.success) {
-                    console.log('✅ Sucesso - fechando modal e recarregando');
+                    console.log(' Sucesso - fechando modal e recarregando');
                     modal.modal('hide');
-                    
                     location.reload();
                 } else {
-                    console.log('❌ Erros de validação');
+                    console.log(' Erros de validação');
                     modal.find('.modal-body').html(response.form_html);
                 }
             },
             error: function(xhr, status, error) {
-                console.log('=== ERRO NA REQUISIÇÃO ===');
+                console.log(' ERRO NA REQUISIÇÃO ');
                 console.log('Status:', status);
                 console.log('Error:', error);
                 console.log('Response Text:', xhr.responseText);
-                
                 alert('Erro ao criar laboratório. Tente novamente.');
             }
         });
     });
 
-    $(document).on('change', '#id_capacidade', function() {
+    $(document).on('click', '.btn-editar-laboratorio', function(e) {
+        e.preventDefault();
+        var laboratorioId = $(this).data('laboratorio-id');
+        console.log('Abrindo modal de edição para laboratório ID:', laboratorioId);
+        
+        var modal = $('#modalEditarLaboratorio');
+        var modalBody = $('#modalEditarLaboratorioBody');
+        
+        modalBody.html(`
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando formulário...</p>
+            </div>
+        `);
+        
+        modal.modal('show');
+        
+        var url = '{% url "editar_laboratorio" 0 %}'.replace('0', laboratorioId);
+        console.log('URL da requisição:', url);
+        
+        $.ajax({
+            url: url,
+            type: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                console.log('Formulário de edição carregado com sucesso');
+                modalBody.html(response);
+            },
+            error: function(xhr, status, error) {
+                console.log('=== ERRO AO CARREGAR FORMULÁRIO ===');
+                console.log('Status:', status);
+                console.log('Error:', error);
+                console.log('Status Code:', xhr.status);
+                console.log('Response Text:', xhr.responseText);
+                
+                modalBody.html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Erro ${xhr.status}:</strong> Não foi possível carregar o formulário.
+                        <div class="mt-3">
+                            <p><strong>Detalhes:</strong> ${error}</p>
+                            <p>Verifique se a URL está correta e se a view suporta requisições AJAX.</p>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Fechar
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "editar_laboratorio" 0 %}'.replace('0', '${laboratorioId}')">
+                                Abrir página normal
+                            </button>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+    });
+
+    $(document).on('submit', '#formEditarLaboratorio', function(e) {
+        e.preventDefault();
+        console.log('Formulário de edição submetido');
+        
+        var form = $(this);
+        var modal = $('#modalEditarLaboratorio');
+        var formData = form.serialize();
+        
+        console.log('Enviando dados para:', form.attr('action'));
+        console.log('Dados:', formData);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                console.log('Resposta recebida:', response);
+                
+                if (response.success) {
+                    console.log(' Edição bem-sucedida - fechando modal e recarregando');
+                    modal.modal('hide');
+                    location.reload();
+                } else {
+                    console.log(' Erros de validação na edição');
+                    $('#modalEditarLaboratorioBody').html(response.form_html);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('ERRO AO SALVAR EDIÇÃO');
+                console.log('Status:', status);
+                console.log('Error:', error);
+                console.log('Status Code:', xhr.status);
+                console.log('Response Text:', xhr.responseText);
+                
+                alert('Erro ao editar laboratório. Status: ' + xhr.status + '. Verifique o console para detalhes.');
+            }
+        });
+    });
+
+    $(document).on('change', '#id_capacidade, #modalEditarLaboratorio #id_capacidade', function() {
         var capacidade = $(this).val();
         
         if (capacidade && (capacidade < 1 || capacidade > 1000)) {
             $(this).addClass('is-invalid');
-            if (!$('.alert-capacidade').length) {
+            if (!$(this).next('.alert-capacidade').length) {
                 $(this).after('<div class="alert alert-danger alert-capacidade mt-2">A capacidade deve ser um número entre 1 e 1000.</div>');
             }
         } else {
             $(this).removeClass('is-invalid');
-            $('.alert-capacidade').remove();
+            $(this).next('.alert-capacidade').remove();
         }
     });
 
     {% if form.errors %}
-    console.log('Erros no formulário - abrindo modal');
+    console.log('Erros no formulário - abrindo modal de criação');
     $(document).ready(function() {
         $('#modalCriarLaboratorio').modal('show');
     });
@@ -521,6 +642,13 @@ $(document).ready(function() {
         $(this).find('.error-message').empty();
         $(this).find('.alert').remove();
     });
+
+    $('#modalEditarLaboratorio').on('hidden.bs.modal', function () {
+        $(this).find('.modal-body').html('');
+    });
+
+    console.log('Botões de edição encontrados:', $('.btn-editar-laboratorio').length);
+    console.log('URL base editar:', '{% url "editar_laboratorio" 0 %}');
 });
 </script>
 {% endblock %}
