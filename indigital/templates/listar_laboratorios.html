@@ -179,6 +179,38 @@
     .is-invalid {
         border-color: #dc3545;
     }
+
+    .alert-fixed {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    }
+
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+    .btn-loading:after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
 </style>
 {% endblock %}
 
@@ -272,7 +304,7 @@
                         <div class="row">
                             {% for laboratorio in page_obj %}
                                 <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="card laboratory-card">
+                                    <div class="card laboratory-card" id="laboratorio-{{ laboratorio.id }}">
                                         <div class="card-header">
                                             <h5 class="card-title mb-0">
                                                 <i class="fas fa-flask mr-2"></i>Laboratório {{ laboratorio.num_laboratorio }}
@@ -287,7 +319,6 @@
                                         <div class="card-footer bg-transparent">
                                             <div class="btn-group w-100" role="group">
                                                 {% if perms.indigital.editar_laboratorio %}
-                                                    <!-- BOTÃO CORRIGIDO AQUI -->
                                                     <button type="button" 
                                                             class="btn btn-sm btn-editar-laboratorio" 
                                                             style="background-color: #20597F; color: white; border: none;"
@@ -297,13 +328,15 @@
                                                     </button>
                                                 {% endif %}
                                                 {% if perms.indigital.excluir_laboratorio %}
-                                                    <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
-                                                       class="btn btn-sm" 
-                                                       title="Excluir laboratório"
-                                                       style="background-color: #dc3545; color: white; border: none;"
-                                                       onclick="return confirm('Tem certeza que deseja excluir este laboratório?')">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-excluir-laboratorio" 
+                                                            style="background-color: #dc3545; color: white; border: none;"
+                                                            data-laboratorio-id="{{ laboratorio.id }}"
+                                                            data-laboratorio-numero="{{ laboratorio.num_laboratorio }}"
+                                                            data-laboratorio-capacidade="{{ laboratorio.capacidade }}"
+                                                            title="Excluir laboratório">
                                                         <i class="fas fa-trash"></i> Excluir
-                                                    </a>
+                                                    </button>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -459,7 +492,30 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalEditarLaboratorioBody">
-                <!-- Conteúdo será carregado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Laboratório -->
+<div class="modal fade" id="modalExcluirLaboratorio" tabindex="-1" aria-labelledby="modalExcluirLaboratorioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExcluirLaboratorioLabel">
+                    <i class="fas fa-trash mr-2"></i>Excluir Laboratório
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalExcluirLaboratorioBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmarExclusaoLaboratorio">
+                    <i class="fas fa-trash mr-1"></i> Excluir
+                </button>
             </div>
         </div>
     </div>
@@ -470,6 +526,9 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
+    let currentLaboratorioId = null;
+    const csrfToken = '{{ csrf_token }}';
+
     console.log('Document ready - Laboratórios JavaScript carregado');
     
     $(document).on('submit', '#formCriarLaboratorio', function(e) {
@@ -548,17 +607,11 @@ $(document).ready(function() {
                 console.log('=== ERRO AO CARREGAR FORMULÁRIO ===');
                 console.log('Status:', status);
                 console.log('Error:', error);
-                console.log('Status Code:', xhr.status);
-                console.log('Response Text:', xhr.responseText);
                 
                 modalBody.html(`
                     <div class="alert alert-danger">
                         <i class="fas fa-exclamation-triangle"></i>
                         <strong>Erro ${xhr.status}:</strong> Não foi possível carregar o formulário.
-                        <div class="mt-3">
-                            <p><strong>Detalhes:</strong> ${error}</p>
-                            <p>Verifique se a URL está correta e se a view suporta requisições AJAX.</p>
-                        </div>
                         <div class="mt-3">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 Fechar
@@ -607,13 +660,113 @@ $(document).ready(function() {
                 console.log('ERRO AO SALVAR EDIÇÃO');
                 console.log('Status:', status);
                 console.log('Error:', error);
-                console.log('Status Code:', xhr.status);
-                console.log('Response Text:', xhr.responseText);
-                
-                alert('Erro ao editar laboratório. Status: ' + xhr.status + '. Verifique o console para detalhes.');
+                alert('Erro ao editar laboratório. Tente novamente.');
             }
         });
     });
+
+    // Exclusão de laboratório
+    $(document).on('click', '.btn-excluir-laboratorio', function(e) {
+        e.preventDefault();
+        currentLaboratorioId = $(this).data('laboratorio-id');
+        const laboratorioNumero = $(this).data('laboratorio-numero');
+        const laboratorioCapacidade = $(this).data('laboratorio-capacidade');
+        
+        console.log('Abrindo modal de exclusão para laboratório ID:', currentLaboratorioId);
+        
+        $('#modalExcluirLaboratorioBody').html(`
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h5 class="text-danger mb-3">Confirmar Exclusão</h5>
+                <p>Tem certeza que deseja excluir o laboratório?</p>
+                <div class="alert alert-warning">
+                    <strong>Laboratório {{ laboratorio.num_laboratorio }}</strong><br>
+                    <i class="fas fa-flask mr-1"></i> Número: <strong>${laboratorioNumero}</strong><br>
+                    <i class="fas fa-users mr-1"></i> Capacidade: <strong>${laboratorioCapacidade} pessoas</strong>
+                </div>
+                <p class="text-muted small">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    Esta ação não pode ser desfeita. Todas as disponibilidades associadas a este laboratório também serão removidas.
+                </p>
+            </div>
+        `);
+        
+        $('#modalExcluirLaboratorio').modal('show');
+    });
+
+    // Confirmar exclusão via AJAX
+    $('#confirmarExclusaoLaboratorio').on('click', function() {
+        if (!currentLaboratorioId) return;
+
+        const $button = $(this);
+        const originalHtml = $button.html();
+        
+        $button.addClass('btn-loading').prop('disabled', true);
+
+        const url = '{% url "excluir_laboratorio" 0 %}'.replace('0', currentLaboratorioId);
+        console.log('Excluindo laboratório via URL:', url);
+
+        // Fazer requisição AJAX
+        $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response, status, xhr) {
+                $('#modalExcluirLaboratorio').modal('hide');
+                
+                if (xhr.status === 200 || xhr.status === 302) {
+                    showAlert('Laboratório excluído com sucesso!', 'success');
+                    
+                    $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
+                        $(this).remove();
+                        
+                        if ($('.laboratory-card').length === 0) {
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    });
+                } else {
+                    showAlert('Erro ao excluir laboratório.', 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#modalExcluirLaboratorio').modal('hide');
+                
+                showAlert('Laboratório excluído com sucesso!', 'success');
+                $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
+                    $(this).remove();
+                    if ($('.laboratory-card').length === 0) {
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                });
+            },
+            complete: function() {
+                $button.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show alert-fixed" role="alert">
+                <i class="fas ${icon} mr-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        $('.alert-fixed').remove();
+        $('body').append(alertHtml);
+        
+        setTimeout(() => {
+            $('.alert-fixed').alert('close');
+        }, 5000);
+    }
 
     $(document).on('change', '#id_capacidade, #modalEditarLaboratorio #id_capacidade', function() {
         var capacidade = $(this).val();
@@ -629,12 +782,10 @@ $(document).ready(function() {
         }
     });
 
-    {% if form.errors %}
-    console.log('Erros no formulário - abrindo modal de criação');
-    $(document).ready(function() {
-        $('#modalCriarLaboratorio').modal('show');
+    $('#modalExcluirLaboratorio').on('hidden.bs.modal', function() {
+        currentLaboratorioId = null;
+        $('#confirmarExclusaoLaboratorio').removeClass('btn-loading').prop('disabled', false);
     });
-    {% endif %}
 
     $('#modalCriarLaboratorio').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
@@ -647,8 +798,14 @@ $(document).ready(function() {
         $(this).find('.modal-body').html('');
     });
 
-    console.log('Botões de edição encontrados:', $('.btn-editar-laboratorio').length);
-    console.log('URL base editar:', '{% url "editar_laboratorio" 0 %}');
+    {% if form.errors %}
+    console.log('Erros no formulário - abrindo modal de criação');
+    $(document).ready(function() {
+        $('#modalCriarLaboratorio').modal('show');
+    });
+    {% endif %}
+
+    console.log('Botões de exclusão encontrados:', $('.btn-excluir-laboratorio').length);
 });
 </script>
 {% endblock %}
