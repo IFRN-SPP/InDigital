@@ -118,7 +118,6 @@
         box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
     }
     
-    
     .stats-card {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -167,7 +166,6 @@
         border-color: var(--cor-primaria);
     }
 
-    
     .action-buttons {
         display: flex;
         gap: 4px;
@@ -176,7 +174,6 @@
         flex-wrap: wrap;
     }
 
-    
     .action-btn {
         padding: 6px 8px;
         border: none;
@@ -194,16 +191,6 @@
     .action-btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .btn-edit {
-        background-color: #20597F;
-        color: white;
-    }
-
-    .btn-edit:hover {
-        background-color: #16466c;
-        color: white;
     }
 
     .btn-delete {
@@ -244,6 +231,48 @@
     .btn-reservas:hover {
         background-color: #75a5d1;
         color: #20597F;
+    }
+
+    .confirmation-modal .modal-header {
+        background-color: var(--cor-primaria);
+        color: white;
+        border-bottom: none;
+    }
+
+    .confirmation-modal .modal-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .confirmation-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        padding-bottom: 2rem;
+    }
+
+    .confirmation-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-modal {
+        position: relative;
+    }
+
+    .btn-modal.loading .spinner-border {
+        display: inline-block;
+    }
+
+    .btn-modal.loading .btn-text {
+        display: none;
+    }
+
+    .user-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #dc3545;
     }
 </style>
 {% endblock %}
@@ -328,7 +357,6 @@
         </div>
     </div>
 
-    
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
@@ -358,7 +386,7 @@
                             </thead>
                             <tbody>
                                 {% for usuario in page_obj %}
-                                <tr>
+                                <tr id="usuario-{{ usuario.id }}">
                                     <td style="border-color: #86B5E1;"><span class="text-muted">{{ usuario.id }}</span></td>
                                     <td style="border-color: #86B5E1;">
                                         <strong>{{ usuario.suap_id|default:"<span class='text-muted'>Não informado</span>" }}</strong>
@@ -382,22 +410,20 @@
                                     </td>
                                     <td class="text-center" style="border-color: #86B5E1;">
                                         <div class="action-buttons">
-                                            <!-- Botão Editar -->
-                                            <a href="{% url 'editar_usuario' usuario.id %}" 
-                                               class="action-btn btn-edit" 
-                                               title="Editar usuário"
-                                               data-toggle="tooltip">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-
                                             <!-- Botão Deletar -->
-                                            <a href="{% url 'deletar_usuario' usuario.id %}" 
-                                               class="action-btn btn-delete" 
-                                               title="Deletar usuário"
-                                               data-toggle="tooltip"
-                                               onclick="return confirm('Tem certeza que deseja deletar este usuário?')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                            <button type="button" 
+                                                    class="action-btn btn-delete btn-modal-excluir"
+                                                    data-usuario-id="{{ usuario.id }}"
+                                                    data-usuario-nome="{% if usuario.first_name or usuario.last_name %}{{ usuario.first_name }} {{ usuario.last_name }}{% else %}Usuário #{{ usuario.id }}{% endif %}"
+                                                    data-usuario-email="{{ usuario.email }}"
+                                                    data-usuario-perfil="{% if usuario.is_superuser %}Superusuário{% else %}{{ usuario.get_perfil_display }}{% endif %}"
+                                                    title="Deletar usuário"
+                                                    data-toggle="tooltip">
+                                                <span class="btn-text">
+                                                    <i class="fas fa-trash"></i>
+                                                </span>
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                            </button>
                                             
                                             <!-- Botão Definir como Monitor -->
                                             {% if usuario.perfil != 'monitor' and not usuario.is_superuser %}
@@ -499,13 +525,173 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Exclusão de Usuário -->
+<div class="modal fade confirmation-modal" id="modalExcluirUsuario" tabindex="-1" aria-labelledby="modalExcluirUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExcluirUsuarioLabel">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon">
+                    <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                </div>
+                <h4 class="mb-3" style="color: #20597F;">Excluir Usuário</h4>
+                <p class="mb-2">Você está prestes a excluir o seguinte usuário:</p>
+                <div class="user-info">
+                    <p class="mb-1"><strong>Nome:</strong> <span id="modalExcluirNome"></span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span id="modalExcluirEmail"></span></p>
+                    <p class="mb-0"><strong>Perfil:</strong> <span id="modalExcluirPerfil"></span></p>
+                </div>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    Esta ação não pode ser desfeita. Todas as reservas e dados relacionados serão perdidos.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">
+                    <span class="btn-text">
+                        <i class="fas fa-trash mr-1"></i> Confirmar Exclusão
+                    </span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="modalResultado" tabindex="-1" aria-labelledby="modalResultadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalResultadoLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="resultadoIcon" class="mb-3" style="font-size: 4rem;"></div>
+                <h4 id="resultadoTitulo" class="mb-3"></h4>
+                <p id="resultadoMensagem"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">
+                    <i class="fas fa-sync-alt mr-1"></i> Atualizar Página
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    
+    let usuarioIdAtual = null;
+    const csrfToken = '{{ csrf_token }}';
+
     $('[data-toggle="tooltip"]').tooltip();
+
+    $('.btn-modal-excluir').on('click', function() {
+        usuarioIdAtual = $(this).data('usuario-id');
+        
+        $('#modalExcluirNome').text($(this).data('usuario-nome'));
+        $('#modalExcluirEmail').text($(this).data('usuario-email'));
+        $('#modalExcluirPerfil').text($(this).data('usuario-perfil'));
+        
+        $('#modalExcluirUsuario').modal('show');
+    });
+
+    $('#btnConfirmarExclusao').on('click', function() {
+        const $btn = $(this);
+        $btn.prop('disabled', true).addClass('loading');
+        
+        // Fazer requisição AJAX
+        $.ajax({
+            url: '{% url "deletar_usuario" 0 %}'.replace('0', usuarioIdAtual),
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                $('#modalExcluirUsuario').modal('hide');
+                
+                $(`#usuario-${usuarioIdAtual}`).fadeOut(300, function() {
+                    $(this).remove();
+                    
+                    const usuariosRestantes = $('tbody tr').length;
+                    if (usuariosRestantes === 0) {
+                        location.reload();
+                    } else {
+                        mostrarResultado('success', 'Usuário Excluído!', 'O usuário foi excluído com sucesso.', false);
+                    }
+                });
+            },
+            error: function(xhr) {
+                $('#modalExcluirUsuario').modal('hide');
+                let mensagem = 'Erro ao excluir usuário. Tente novamente.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    mensagem = xhr.responseJSON.error;
+                }
+                mostrarResultado('error', 'Erro na Exclusão', mensagem, true);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).removeClass('loading');
+            }
+        });
+    });
+
+    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
+        const $modal = $('#modalResultado');
+        const $icon = $('#resultadoIcon');
+        const $titulo = $('#resultadoTitulo');
+        const $mensagem = $('#resultadoMensagem');
+        const $header = $('#modalResultadoLabel');
+        const $btn = $modal.find('.btn-primary');
+
+        switch(tipo) {
+            case 'success':
+                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
+                $header.text('Sucesso');
+                break;
+            case 'error':
+                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
+                $header.text('Erro');
+                break;
+            case 'warning':
+                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
+                $header.text('Atenção');
+                break;
+        }
+
+        $titulo.text(titulo);
+        $mensagem.text(mensagem);
+        
+        if (recarregar) {
+            $btn.html('<i class="fas fa-sync-alt mr-1"></i> Atualizar Página');
+            $btn.off('click').on('click', function() {
+                location.reload();
+            });
+        } else {
+            $btn.html('<i class="fas fa-check mr-1"></i> Entendido');
+            $btn.off('click').on('click', function() {
+                $modal.modal('hide');
+            });
+        }
+        
+        $modal.modal('show');
+    }
+
+    $('#modalExcluirUsuario').on('hidden.bs.modal', function() {
+        usuarioIdAtual = null;
+        $('#btnConfirmarExclusao').prop('disabled', false).removeClass('loading');
+    });
 });
 </script>
 {% endblock %}
