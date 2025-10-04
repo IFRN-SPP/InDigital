@@ -197,16 +197,64 @@
     }
 
     .btn-cancelar-reserva {
-    padding: 2px 6px;
-    font-size: 0.75rem;
-    line-height: 1.2;
-    border-radius: 3px;
-}
+        padding: 2px 6px;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 3px;
+    }
 
-.btn-cancelar-reserva .fas {
-    font-size: 0.7rem;
-    margin-right: 2px;
-}
+    .btn-cancelar-reserva .fas {
+        font-size: 0.7rem;
+        margin-right: 2px;
+    }
+
+    .confirmation-modal .modal-header {
+        background-color: var(--cor-primaria);
+        color: white;
+        border-bottom: none;
+    }
+
+    .confirmation-modal .modal-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .confirmation-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        padding-bottom: 2rem;
+    }
+
+    .confirmation-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .btn-cancelar-modal {
+        position: relative;
+    }
+
+    .btn-cancelar-modal.loading .spinner-border {
+        display: inline-block;
+    }
+
+    .btn-cancelar-modal.loading .btn-text {
+        display: none;
+    }
+
+    .cancel-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #dc3545;
+    }
 </style>
 {% endblock %}
 
@@ -323,7 +371,7 @@
                             </thead>
                             <tbody>
                                 {% for reserva in page_obj %}
-                                <tr class="{% if reserva.disponibilidade.data < today %}table-light{% elif reserva.disponibilidade.data == today %}table-info{% endif %}">
+                                <tr class="{% if reserva.disponibilidade.data < today %}table-light{% elif reserva.disponibilidade.data == today %}table-info{% endif %}" id="reserva-{{ reserva.id }}">
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
@@ -388,24 +436,30 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <<td style="border-color: #86B5E1; vertical-align: middle;">
-    {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
-        <a href="{% url 'cancelar_reserva' reserva.id %}" 
-           class="btn btn-sm btn-outline-danger btn-cancelar-reserva"
-           onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">
-            <i class="fas fa-times mr-1"></i> Cancelar
-        </a>
-    {% else %}
-        <span class="text-muted">-</span>
-    {% endif %}
-</td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-cancelar-modal"
+                                                    data-reserva-id="{{ reserva.id }}"
+                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
+                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                                    data-reserva-status="{{ reserva.status_aprovacao }}">
+                                                <span class="btn-text">
+                                                    <i class="fas fa-times mr-1"></i> Cancelar
+                                                </span>
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     
-                   
                     {% if page_obj.has_other_pages %}
                     <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
                         <div class="float-left">
@@ -477,12 +531,78 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmação de Cancelamento -->
+<div class="modal fade confirmation-modal" id="modalCancelamento" tabindex="-1" aria-labelledby="modalCancelamentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCancelamentoLabel">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Confirmar Cancelamento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon">
+                    <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                </div>
+                <h4 class="mb-3" style="color: #20597F;">Cancelar Reserva</h4>
+                <p class="mb-2">Você está prestes a cancelar a seguinte reserva:</p>
+                <div class="cancel-info">
+                    <p class="mb-1"><strong>Laboratório:</strong> <span id="modalCancelLaboratorio"></span></p>
+                    <p class="mb-1"><strong>Data:</strong> <span id="modalCancelData"></span></p>
+                    <p class="mb-1"><strong>Horário:</strong> <span id="modalCancelHorario"></span></p>
+                    <p class="mb-0"><strong>Status:</strong> <span id="modalCancelStatus"></span></p>
+                </div>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Manter Reserva
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarCancelamento">
+                    <span class="btn-text">
+                        <i class="fas fa-trash mr-1"></i> Confirmar Cancelamento
+                    </span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="modalResultado" tabindex="-1" aria-labelledby="modalResultadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalResultadoLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="resultadoIcon" class="mb-3" style="font-size: 4rem;"></div>
+                <h4 id="resultadoTitulo" class="mb-3"></h4>
+                <p id="resultadoMensagem"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">
+                    <i class="fas fa-sync-alt mr-1"></i> Atualizar Página
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    
+    let reservaIdAtual = null;
+    const csrfToken = '{{ csrf_token }}';
+
     $('.btn').hover(
         function() {
             if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
@@ -517,6 +637,118 @@ $(document).ready(function() {
             }
         }
     );
+
+    $('.btn-cancelar-modal').on('click', function() {
+        reservaIdAtual = $(this).data('reserva-id');
+        
+        $('#modalCancelLaboratorio').text($(this).data('reserva-laboratorio'));
+        $('#modalCancelData').text($(this).data('reserva-data'));
+        $('#modalCancelHorario').text($(this).data('reserva-horario'));
+        
+        const status = $(this).data('reserva-status');
+        let statusTexto = '';
+        switch(status) {
+            case 'A':
+                statusTexto = 'Aprovada';
+                break;
+            case 'P':
+                statusTexto = 'Pendente';
+                break;
+            case 'R':
+                statusTexto = 'Rejeitada';
+                break;
+            default:
+                statusTexto = 'Desconhecido';
+        }
+        $('#modalCancelStatus').text(statusTexto);
+        
+        $('#modalCancelamento').modal('show');
+    });
+
+    $('#btnConfirmarCancelamento').on('click', function() {
+        const $btn = $(this);
+        $btn.prop('disabled', true).addClass('loading');
+        
+        // Fazer requisição AJAX
+        $.ajax({
+            url: '{% url "cancelar_reserva" 0 %}'.replace('0', reservaIdAtual),
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                $('#modalCancelamento').modal('hide');
+                
+                $(`#reserva-${reservaIdAtual}`).fadeOut(300, function() {
+                    $(this).remove();
+                    
+                    const reservasRestantes = $('tbody tr').length;
+                    if (reservasRestantes === 0) {
+                        location.reload();
+                    } else {
+                        mostrarResultado('success', 'Reserva Cancelada!', 'A reserva foi cancelada com sucesso.', false);
+                    }
+                });
+            },
+            error: function(xhr) {
+                $('#modalCancelamento').modal('hide');
+                let mensagem = 'Erro ao cancelar reserva. Tente novamente.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    mensagem = xhr.responseJSON.error;
+                }
+                mostrarResultado('error', 'Erro no Cancelamento', mensagem, true);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).removeClass('loading');
+            }
+        });
+    });
+
+    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
+        const $modal = $('#modalResultado');
+        const $icon = $('#resultadoIcon');
+        const $titulo = $('#resultadoTitulo');
+        const $mensagem = $('#resultadoMensagem');
+        const $header = $('#modalResultadoLabel');
+        const $btn = $modal.find('.btn-primary');
+
+        switch(tipo) {
+            case 'success':
+                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
+                $header.text('Sucesso');
+                break;
+            case 'error':
+                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
+                $header.text('Erro');
+                break;
+            case 'warning':
+                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
+                $header.text('Atenção');
+                break;
+        }
+
+        $titulo.text(titulo);
+        $mensagem.text(mensagem);
+        
+        if (recarregar) {
+            $btn.html('<i class="fas fa-sync-alt mr-1"></i> Atualizar Página');
+            $btn.off('click').on('click', function() {
+                location.reload();
+            });
+        } else {
+            $btn.html('<i class="fas fa-check mr-1"></i> Entendido');
+            $btn.off('click').on('click', function() {
+                $modal.modal('hide');
+            });
+        }
+        
+        $modal.modal('show');
+    }
+
+    $('#modalCancelamento').on('hidden.bs.modal', function() {
+        reservaIdAtual = null;
+        $('#btnConfirmarCancelamento').prop('disabled', false).removeClass('loading');
+    });
 });
 </script>
 {% endblock %}
