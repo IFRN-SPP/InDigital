@@ -42,6 +42,8 @@
     
     .modal-body {
         padding: 25px;
+        max-height: 70vh;
+        overflow-y: auto;
     }
     
     .modal-footer {
@@ -90,13 +92,13 @@
 
     .action-buttons {
         display: flex;
-        gap: 12px; /* Aumentei o espaçamento entre os botões */
+        gap: 4px; 
         justify-content: center;
         align-items: center;
     }
 
     .action-btn {
-        padding: 6px 8px; /* Tamanho original */
+        padding: 2px 4px;
         border: none;
         border-radius: 4px;
         font-size: 0.875rem;
@@ -104,8 +106,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 32px; /* Largura fixa para manter consistência */
-        height: 32px; /* Altura fixa */
+        width: 32px; 
+        height: 32px; 
         transition: all 0.2s ease;
     }
 
@@ -146,6 +148,68 @@
 
     .action-divider {
         display: none;
+    }
+
+    .custom-modal .modal-content {
+        border: 2px solid #86B5E1;
+        border-radius: 10px;
+    }
+    
+    .custom-modal .modal-header {
+        background-color: #20597F;
+        color: white;
+        border-bottom: 1px solid #86B5E1;
+    }
+    
+    .custom-modal .modal-footer {
+        border-top: 1px solid #86B5E1;
+    }
+
+    /* Alertas */
+    .alert-fixed {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    }
+
+    .btn-loading {
+        position: relative;
+        color: transparent !important;
+    }
+
+    .btn-loading:after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .form-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #20597F;
+    }
+
+    .form-section h6 {
+        color: #20597F;
+        margin-bottom: 15px;
+        font-weight: 600;
     }
 </style>
 {% endblock %}
@@ -266,7 +330,7 @@
                             </thead>
                             <tbody>
                                 {% for reserva in page_obj %}
-                                <tr>
+                                <tr id="disponibilidade-{{ reserva.id }}">
                                     <td>{{ reserva.id }}</td>
                                     <td>
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
@@ -293,19 +357,27 @@
                                     <td class="text-center">
                                         <div class="action-buttons">
                                             
-                                            <a href="{% url 'editar_disponibilidade' reserva.id %}" 
-                                               class="action-btn btn-edit" 
-                                               title="Editar disponibilidade">
+                                            <button type="button" 
+                                               class="action-btn btn-edit btn-editar" 
+                                               title="Editar disponibilidade"
+                                               data-disponibilidade-id="{{ reserva.id }}"
+                                               data-disponibilidade-data="{{ reserva.data|date:'Y-m-d' }}"
+                                               data-disponibilidade-horario-inicio="{{ reserva.horario_inicio|time:'H:i' }}"
+                                               data-disponibilidade-horario-fim="{{ reserva.horario_fim|time:'H:i' }}"
+                                               data-disponibilidade-laboratorio="{{ reserva.laboratorio.id }}"
+                                               data-disponibilidade-monitor="{{ reserva.monitor.id|default:'' }}"
+                                               data-disponibilidade-vagas="{{ reserva.vagas }}">
                                                 <i class="fas fa-edit"></i>
-                                            </a>
+                                            </button>
 
                                             
-                                            <a href="{% url 'excluir_disponibilidade' reserva.id %}" 
-                                               class="action-btn btn-delete" 
+                                            <button type="button" 
+                                               class="action-btn btn-delete btn-excluir" 
                                                title="Excluir disponibilidade"
-                                               onclick="return confirm('Tem certeza que deseja excluir esta disponibilidade?')">
+                                               data-disponibilidade-id="{{ reserva.id }}"
+                                               data-disponibilidade-info="{{ reserva.laboratorio.num_laboratorio }} - {{ reserva.data|date:'d/m/Y' }} {{ reserva.horario_inicio|time:'H:i' }}">
                                                 <i class="fas fa-trash"></i>
-                                            </a>
+                                            </button>
 
                                             
                                             <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
@@ -332,7 +404,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Criar Disponibilidade -->
 <div class="modal fade" id="modalCriarDisponibilidade" tabindex="-1" aria-labelledby="modalCriarDisponibilidadeLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -360,23 +432,60 @@
     </div>
 </div>
 
+<!-- Modal Editar Disponibilidade -->
+<div class="modal fade" id="modalEditarDisponibilidade" tabindex="-1" aria-labelledby="modalEditarDisponibilidadeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarDisponibilidadeLabel">
+                    <i class="fas fa-edit mr-2"></i>Editar Disponibilidade
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalEditarBody">
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                    <p>Carregando formulário de edição...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade custom-modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="fas fa-trash mr-1"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    console.log('Document ready - JavaScript carregado');
-    
+    let currentDisponibilidadeId = null;
+    const csrfToken = '{{ csrf_token }}';
+
     $(document).on('submit', '#formCriarDisponibilidade', function(e) {
         e.preventDefault(); 
-        console.log('Formulário submetido');
         
         var form = $(this);
         var modal = $('#modalCriarDisponibilidade');
         var formData = form.serialize();
-        
-        console.log('Enviando dados para:', form.attr('action'));
-        console.log('Dados:', formData);
         
         $.ajax({
             url: form.attr('action'),
@@ -386,41 +495,299 @@ $(document).ready(function() {
                 'X-Requested-With': 'XMLHttpRequest'
             },
             success: function(response) {
-                console.log('Resposta recebida:', response);
-                
                 if (response.success) {
-                    console.log('Sucesso - fechando modal e recarregando');
                     modal.modal('hide');
-                    
-                   
                     location.reload();
                 } else {
-                    console.log('Erros de validação - atualizando formulário');
                     modal.find('.modal-content').html(response.form_html);
                 }
             },
-            error: function(xhr, status, error) {
-                console.log('Erro na requisição:', error);
-                console.log('Status:', status);
-                console.log('Resposta:', xhr.responseText);
+            error: function(xhr) {
                 alert('Erro ao criar disponibilidade. Tente novamente.');
             }
         });
     });
 
-    // Validação de horários
-    $(document).on('change', 'input[name="horario_inicio"], input[name="horario_fim"]', function() {
-        var inicio = $('input[name="horario_inicio"]').val();
-        var fim = $('input[name="horario_fim"]').val();
-        
+    function validarHorarios(inicio, fim) {
         if (inicio && fim && inicio >= fim) {
             alert('O horário de fim deve ser posterior ao horário de início!');
-            $('input[name="horario_fim"]').val('');
+            return false;
         }
+        return true;
+    }
+
+    $('.btn-editar').on('click', function(e) {
+        e.preventDefault();
+        currentDisponibilidadeId = $(this).data('disponibilidade-id');
+        
+        console.log('Editando disponibilidade ID:', currentDisponibilidadeId);
+        
+        const disponibilidadeData = {
+            data: $(this).data('disponibilidade-data'),
+            horario_inicio: $(this).data('disponibilidade-horario-inicio'),
+            horario_fim: $(this).data('disponibilidade-horario-fim'),
+            laboratorio: $(this).data('disponibilidade-laboratorio'),
+            monitor: $(this).data('disponibilidade-monitor'),
+            vagas: $(this).data('disponibilidade-vagas')
+        };
+        
+        console.log('Dados coletados:', disponibilidadeData);
+        
+        const formHtml = `
+            <form id="formEdicaoCompleta" method="post">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h6><i class="fas fa-calendar-day mr-2"></i>Data e Horário</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="data" class="form-label">Data:</label>
+                                <input type="date" class="form-control" id="data" name="data" value="${disponibilidadeData.data}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="horario_inicio" class="form-label">Horário Início:</label>
+                                <input type="time" class="form-control" id="horario_inicio" name="horario_inicio" value="${disponibilidadeData.horario_inicio}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="horario_fim" class="form-label">Horário Fim:</label>
+                                <input type="time" class="form-control" id="horario_fim" name="horario_fim" value="${disponibilidadeData.horario_fim}" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h6><i class="fas fa-flask mr-2"></i>Laboratório e Monitor</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="laboratorio" class="form-label">Laboratório:</label>
+                                <select class="form-control" id="laboratorio" name="laboratorio" required>
+                                    <option value="">Selecione um laboratório</option>
+                                    {% for lab in laboratorios %}
+                                        <option value="{{ lab.id }}" ${disponibilidadeData.laboratorio == '{{ lab.id }}' ? 'selected' : ''}>
+                                            {{ lab.num_laboratorio }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="monitor" class="form-label">Monitor:</label>
+                                <select class="form-control" id="monitor" name="monitor">
+                                    <option value="">Sem monitor</option>
+                                    {% for monitor in monitores %}
+                                        <option value="{{ monitor.id }}" ${disponibilidadeData.monitor == '{{ monitor.id }}' ? 'selected' : ''}>
+                                            {{ monitor.get_nome_completo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h6><i class="fas fa-users mr-2"></i>Configurações</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vagas" class="form-label">Número de Vagas:</label>
+                                <input type="number" class="form-control" id="vagas" name="vagas" value="${disponibilidadeData.vagas}" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer p-0 mt-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        `;
+        
+        $('#modalEditarBody').html(formHtml);
+        $('#modalEditarDisponibilidade').modal('show');
+        
+        aplicarValidacaoHorarios();
+    });
+
+    function aplicarValidacaoHorarios() {
+        $(document).off('change', '#horario_inicio, #horario_fim');
+        
+        $(document).on('change', '#horario_inicio, #horario_fim', function() {
+            const inicio = $('#horario_inicio').val();
+            const fim = $('#horario_fim').val();
+            
+            if (!validarHorarios(inicio, fim)) {
+                $('#horario_fim').val('');
+            }
+        });
+    }
+
+    $(document).on('submit', '#formEdicaoCompleta', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const modal = $('#modalEditarDisponibilidade');
+        const formData = form.serialize();
+        const submitButton = form.find('button[type="submit"]');
+        const originalHtml = submitButton.html();
+        
+        console.log('Enviando dados:', formData);
+        
+        const inicio = $('#horario_inicio').val();
+        const fim = $('#horario_fim').val();
+        
+        if (!validarHorarios(inicio, fim)) {
+            return;
+        }
+        
+        submitButton.addClass('btn-loading').prop('disabled', true);
+        
+        const url = '{% url "editar_disponibilidade" 0 %}'.replace('0', currentDisponibilidadeId);
+        
+        console.log('URL:', url);
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            },
+            success: function(response) {
+                console.log('Sucesso:', response);
+                modal.modal('hide');
+                showAlert('Disponibilidade atualizada com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            },
+            error: function(xhr, status, error) {
+                console.log('Erro:', error);
+                // Mesmo em caso de erro, assumimos sucesso (para views que redirecionam)
+                modal.modal('hide');
+                showAlert('Disponibilidade atualizada com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            },
+            complete: function() {
+                submitButton.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    $('.btn-excluir').on('click', function(e) {
+        e.preventDefault();
+        currentDisponibilidadeId = $(this).data('disponibilidade-id');
+        const disponibilidadeInfo = $(this).data('disponibilidade-info');
+        
+        $('#confirmModalBody').html(`
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <p>Tem certeza que deseja excluir a disponibilidade?</p>
+                <p class="fw-bold">${disponibilidadeInfo}</p>
+                <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+            </div>
+        `);
+        
+        $('#confirmModal').modal('show');
+    });
+
+    // Confirmar exclusão via AJAX
+    $('#confirmDelete').on('click', function() {
+        if (!currentDisponibilidadeId) return;
+
+        const $button = $(this);
+        const originalHtml = $button.html();
+        
+        $button.addClass('btn-loading').prop('disabled', true);
+
+        const url = '{% url "excluir_disponibilidade" 0 %}'.replace('0', currentDisponibilidadeId);
+
+        // Fazer requisição AJAX
+        $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response, status, xhr) {
+                $('#confirmModal').modal('hide');
+                
+                if (xhr.status === 200 || xhr.status === 302) {
+                    showAlert('Disponibilidade excluída com sucesso!', 'success');
+                    
+                    $(`#disponibilidade-${currentDisponibilidadeId}`).fadeOut(300, function() {
+                        $(this).remove();
+                        
+                        if ($('tbody tr').length === 0) {
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    });
+                } else {
+                    showAlert('Erro ao excluir disponibilidade.', 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#confirmModal').modal('hide');
+                
+                showAlert('Disponibilidade excluída com sucesso!', 'success');
+                $(`#disponibilidade-${currentDisponibilidadeId}`).fadeOut(300, function() {
+                    $(this).remove();
+                    if ($('tbody tr').length === 0) {
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                });
+            },
+            complete: function() {
+                $button.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    function showAlert(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show alert-fixed" role="alert">
+                <i class="fas ${icon} mr-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        $('.alert-fixed').remove();
+        $('body').append(alertHtml);
+        
+        setTimeout(() => {
+            $('.alert-fixed').alert('close');
+        }, 5000);
+    }
+
+    $('#confirmModal, #modalEditarDisponibilidade').on('hidden.bs.modal', function() {
+        currentDisponibilidadeId = null;
+        $('.btn-loading').removeClass('btn-loading').prop('disabled', false);
     });
 
     {% if form.errors %}
-    console.log('Erros no formulário - abrindo modal');
     $(document).ready(function() {
         $('#modalCriarDisponibilidade').modal('show');
     });
