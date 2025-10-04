@@ -189,6 +189,47 @@
     .table-hover tbody tr.table-light:hover {
         background-color: rgba(248, 249, 250, 0.1);
     }
+
+    .confirmation-modal .modal-header {
+        background-color: var(--cor-primaria);
+        color: white;
+        border-bottom: none;
+    }
+
+    .confirmation-modal .modal-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .confirmation-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        padding-bottom: 2rem;
+    }
+
+    .confirmation-icon {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .btn-reservar {
+        position: relative;
+    }
+
+    .btn-reservar.loading .spinner-border {
+        display: inline-block;
+    }
+
+    .btn-reservar.loading .btn-text {
+        display: none;
+    }
 </style>
 {% endblock %}
 
@@ -353,22 +394,28 @@
                                                 {% endif %}
                                             {% elif disponibilidade.id in reservas_rejeitadas %}
                                                 {% if disponibilidade.vagas > 0 %}
-                                                    <form method="post" action="{% url 'reservar_laboratorio' disponibilidade.id %}" class="d-inline">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-success"
-                                                                onclick="return confirm('Confirma uma nova reserva para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                    <button type="button" class="btn btn-sm btn-success btn-reservar" 
+                                                            data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                            data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                            data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                            data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                        <span class="btn-text">
                                                             <i class="fas fa-check mr-1"></i> Tentar Novamente
-                                                        </button>
-                                                    </form>
+                                                        </span>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                    </button>
                                                 {% else %}
                                                     {% if disponibilidade.id not in reservas_em_fila %}
-                                                        <form method="post" action="{% url 'entrar_fila_espera' disponibilidade.id %}" class="d-inline">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-warning"
-                                                                    onclick="return confirm('Entrar na fila de espera para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                        <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
+                                                                data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                                data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                                data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                                data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                            <span class="btn-text">
                                                                 <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
-                                                            </button>
-                                                        </form>
+                                                            </span>
+                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                        </button>
                                                     {% else %}
                                                         <span class="btn btn-sm btn-secondary disabled">
                                                             <i class="fas fa-check-circle mr-1"></i> Na Fila
@@ -376,22 +423,28 @@
                                                     {% endif %}
                                                 {% endif %}
                                             {% elif disponibilidade.vagas > 0 %}
-                                                <form method="post" action="{% url 'reservar_laboratorio' disponibilidade.id %}" class="d-inline">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-success"
-                                                            onclick="return confirm('Confirma a reserva para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                <button type="button" class="btn btn-sm btn-success btn-reservar"
+                                                        data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                        data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                        data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                        data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                    <span class="btn-text">
                                                         <i class="fas fa-check mr-1"></i> Reservar
-                                                    </button>
-                                                </form>
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                </button>
                                             {% else %}
                                                 {% if disponibilidade.id not in reservas_em_fila %}
-                                                    <form method="post" action="{% url 'entrar_fila_espera' disponibilidade.id %}" class="d-inline">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-warning"
-                                                                onclick="return confirm('Entrar na fila de espera para {{ disponibilidade.data|date:"d/m/Y" }} das {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}?')">
+                                                    <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
+                                                            data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                            data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                            data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                            data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                        <span class="btn-text">
                                                             <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
-                                                        </button>
-                                                    </form>
+                                                        </span>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                    </button>
                                                 {% else %}
                                                     <span class="btn btn-sm btn-secondary disabled">
                                                         <i class="fas fa-check-circle mr-1"></i> Na Fila
@@ -409,7 +462,7 @@
                             </tbody>
                         </table>
                     </div>
- 
+
                     {% if page_obj.has_other_pages %}
                     <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
                         <ul class="pagination pagination-sm m-0 float-right">
@@ -478,12 +531,112 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmação de Reserva -->
+<div class="modal fade confirmation-modal" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReservaLabel">
+                    <i class="fas fa-calendar-check mr-2"></i>Confirmar Reserva
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h4 class="mb-3" style="color: #20597F;">Confirmação de Reserva</h4>
+                <p class="mb-2">Você está prestes a reservar o laboratório:</p>
+                <div class="reserva-info p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px;">
+                    <p class="mb-1"><strong>Laboratório:</strong> <span id="modalLaboratorio"></span></p>
+                    <p class="mb-1"><strong>Data:</strong> <span id="modalData"></span></p>
+                    <p class="mb-0"><strong>Horário:</strong> <span id="modalHorario"></span></p>
+                </div>
+                <p class="text-muted">Deseja confirmar esta reserva?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btnConfirmarReserva">
+                    <span class="btn-text">
+                        <i class="fas fa-check mr-1"></i> Confirmar Reserva
+                    </span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Fila de Espera -->
+<div class="modal fade confirmation-modal" id="modalFilaEspera" tabindex="-1" aria-labelledby="modalFilaEsperaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFilaEsperaLabel">
+                    <i class="fas fa-hourglass-half mr-2"></i>Entrar na Fila de Espera
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                </div>
+                <h4 class="mb-3" style="color: #20597F;">Fila de Espera</h4>
+                <p class="mb-2">Não há vagas disponíveis para este horário. Deseja entrar na fila de espera?</p>
+                <div class="reserva-info p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px;">
+                    <p class="mb-1"><strong>Laboratório:</strong> <span id="modalFilaLaboratorio"></span></p>
+                    <p class="mb-1"><strong>Data:</strong> <span id="modalFilaData"></span></p>
+                    <p class="mb-0"><strong>Horário:</strong> <span id="modalFilaHorario"></span></p>
+                </div>
+                <p class="text-muted">Você será notificado caso uma vaga seja liberada.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="btnConfirmarFila">
+                    <span class="btn-text">
+                        <i class="fas fa-hourglass-half mr-1"></i> Entrar na Fila
+                    </span>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="modalResultado" tabindex="-1" aria-labelledby="modalResultadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalResultadoLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="resultadoIcon" class="mb-3" style="font-size: 4rem;"></div>
+                <h4 id="resultadoTitulo" class="mb-3"></h4>
+                <p id="resultadoMensagem"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">
+                    <i class="fas fa-sync-alt mr-1"></i> Atualizar Página
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    
+    let disponibilidadeIdAtual = null;
+    const csrfToken = '{{ csrf_token }}';
+
     $('.btn').hover(
         function() {
             if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
@@ -512,6 +665,115 @@ $(document).ready(function() {
             }
         }
     );
+
+    $('.btn-reservar').on('click', function() {
+        disponibilidadeIdAtual = $(this).data('disponibilidade-id');
+        
+        $('#modalLaboratorio').text($(this).data('disponibilidade-laboratorio'));
+        $('#modalData').text($(this).data('disponibilidade-data'));
+        $('#modalHorario').text($(this).data('disponibilidade-horario'));
+        
+        $('#modalReserva').modal('show');
+    });
+
+    $('.btn-fila-espera').on('click', function() {
+        disponibilidadeIdAtual = $(this).data('disponibilidade-id');
+        
+        $('#modalFilaLaboratorio').text($(this).data('disponibilidade-laboratorio'));
+        $('#modalFilaData').text($(this).data('disponibilidade-data'));
+        $('#modalFilaHorario').text($(this).data('disponibilidade-horario'));
+        
+        $('#modalFilaEspera').modal('show');
+    });
+
+    $('#btnConfirmarReserva').on('click', function() {
+        const $btn = $(this);
+        $btn.prop('disabled', true).addClass('loading');
+        
+        // Fazer requisição AJAX
+        $.ajax({
+            url: '{% url "reservar_laboratorio" 0 %}'.replace('0', disponibilidadeIdAtual),
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                $('#modalReserva').modal('hide');
+                mostrarResultado('success', 'Reserva Confirmada!', 'Sua reserva foi realizada com sucesso e está aguardando aprovação.');
+            },
+            error: function(xhr) {
+                $('#modalReserva').modal('hide');
+                let mensagem = 'Erro ao realizar reserva. Tente novamente.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    mensagem = xhr.responseJSON.error;
+                }
+                mostrarResultado('error', 'Erro na Reserva', mensagem);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).removeClass('loading');
+            }
+        });
+    });
+
+    $('#btnConfirmarFila').on('click', function() {
+        const $btn = $(this);
+        $btn.prop('disabled', true).addClass('loading');
+        
+        // Fazer requisição AJAX
+        $.ajax({
+            url: '{% url "entrar_fila_espera" 0 %}'.replace('0', disponibilidadeIdAtual),
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                $('#modalFilaEspera').modal('hide');
+                mostrarResultado('success', 'Inscrito na Fila!', 'Você foi adicionado à fila de espera e será notificado quando uma vaga for liberada.');
+            },
+            error: function(xhr) {
+                $('#modalFilaEspera').modal('hide');
+                let mensagem = 'Erro ao entrar na fila de espera. Tente novamente.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    mensagem = xhr.responseJSON.error;
+                }
+                mostrarResultado('error', 'Erro na Fila', mensagem);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).removeClass('loading');
+            }
+        });
+    });
+
+    function mostrarResultado(tipo, titulo, mensagem) {
+        const $modal = $('#modalResultado');
+        const $icon = $('#resultadoIcon');
+        const $titulo = $('#resultadoTitulo');
+        const $mensagem = $('#resultadoMensagem');
+        const $header = $('#modalResultadoLabel');
+
+        switch(tipo) {
+            case 'success':
+                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
+                $header.text('Sucesso');
+                break;
+            case 'error':
+                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
+                $header.text('Erro');
+                break;
+            case 'warning':
+                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
+                $header.text('Atenção');
+                break;
+        }
+
+        $titulo.text(titulo);
+        $mensagem.text(mensagem);
+        $modal.modal('show');
+    }
+
+    $('#modalReserva, #modalFilaEspera').on('hidden.bs.modal', function() {
+        disponibilidadeIdAtual = null;
+    });
 });
 </script>
 {% endblock %}
