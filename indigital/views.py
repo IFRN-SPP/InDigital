@@ -1266,7 +1266,14 @@ def reservas_pendentes(request):
 def aprovar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
     disponibilidade = reserva.disponibilidade
-    
+    from django.utils import timezone
+    agora = timezone.localtime(timezone.now())
+
+    # Não permitir aprovar reservas cujo horário já passou (início já ocorreu ou término já passou)
+    if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+        messages.error(request, "Não é possível aprovar esta reserva: o horário já passou.")
+        return redirect('reservas_pendentes')
+
     if disponibilidade.vagas > 0:
         reserva.status_aprovacao = 'A'
         reserva.save()
@@ -1298,10 +1305,19 @@ def aprovar_multiplas_reservas(request):
             return redirect('reservas_pendentes')
         aprovadas = 0
         sem_vagas = 0
+        expiradas = 0
         for reserva_id in reservas_ids:
             try:
                 reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
                 disponibilidade = reserva.disponibilidade
+                from django.utils import timezone
+                agora = timezone.localtime(timezone.now())
+
+                # pular reservas cujo horário já passou
+                if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+                    expiradas += 1
+                    continue
+
                 if disponibilidade.vagas > 0:
                     reserva.status_aprovacao = 'A'
                     reserva.save()
@@ -1318,5 +1334,7 @@ def aprovar_multiplas_reservas(request):
             messages.success(request, f"{aprovadas} reserva(s) aprovada(s) com sucesso!")
         if sem_vagas > 0:
             messages.warning(request, f"{sem_vagas} reserva(s) não puderam ser aprovadas por falta de vagas.")
+        if expiradas > 0:
+            messages.warning(request, f"{expiradas} reserva(s) não puderam ser aprovadas porque o horário já passou.")
     return redirect('reservas_pendentes')
 
