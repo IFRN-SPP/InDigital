@@ -235,7 +235,8 @@ def listar_disponibilidades(request):
         'data_fim': data_fim,
         'monitor_id': monitor_id,
         'vagas_min': vagas_min,
-        'form': form, 
+        'form': form,
+        'today': date.today(),
     }
     
     return render(request, "listar_disponibilidades.html", context)
@@ -428,7 +429,7 @@ def listar_laboratorios(request):
             messages.error(request, "Capacidade máxima deve ser um número.")
     
     # Paginação
-    paginator = Paginator(laboratorios_list, 12)
+    paginator = Paginator(laboratorios_list, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -519,6 +520,14 @@ def horarios(request):
         disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
     if apenas_com_vagas == 'sim':
         disponibilidades = disponibilidades.filter(vagas__gt=0)
+    # Remover disponibilidades cujo horário de início já passou (tempo local)
+    # Convertendo queryset em lista filtrada para usar o método is_passada()
+    from django.utils import timezone
+    agora = timezone.localtime(timezone.now())
+    disponibilidades = [d for d in disponibilidades if not d.is_passada()]
+    # marcar flag para templates
+    for d in disponibilidades:
+        d.expirada = d.is_passada()
     # Paginação 
     paginator = Paginator(disponibilidades, 10) 
     page_number = request.GET.get('page')
@@ -559,12 +568,17 @@ def horarios(request):
         'monitor_id': monitor_id,
         'apenas_com_vagas': apenas_com_vagas,
         'today': date.today(),
+        'now_time': agora.strftime('%H:%M'),
     }
     return render(request, "horarios.html", context)
 
 @login_required
 def reservar_laboratorio(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    # Impedir reservas para disponibilidades que já iniciaram
+    if disponibilidade.is_passada():
+        messages.error(request, "Não é possível reservar: este horário já passou.")
+        return redirect('horarios')
     # Verificar se o usuário já tem uma reserva para essa disponibilidade
     reserva_existente = Reserva.objects.filter(
         usuario=request.user, 
@@ -619,6 +633,8 @@ def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio', 'disponibilidade__monitor'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    from django.utils import timezone
+    agora = timezone.localtime(timezone.now())
     # Filtros
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
@@ -640,14 +656,30 @@ def minhas_reservas(request):
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     if status and status != 'todos':
-        today = date.today()
+        # Filtrar por status considerando a hora de término da disponibilidade
+        from django.utils import timezone
+        agora = timezone.localtime(timezone.now())
+        reservas_list = list(reservas)
         if status == 'futuras':
-            reservas = reservas.filter(disponibilidade__data__gt=today)
+            reservas = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
         elif status == 'hoje':
-            reservas = reservas.filter(disponibilidade__data=today)
+            reservas = [r for r in reservas_list if r.disponibilidade.data == agora.date()]
         elif status == 'passadas':
-            reservas = reservas.filter(disponibilidade__data__lt=today)
+            reservas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
+    # Para templates, marcar se cada reserva já expirou (considerando end_datetime)
+    try:
+        # reservas pode ser QuerySet or list; normalizamos para lista para iterar
+        reservas_iter = list(reservas)
+    except Exception:
+        reservas_iter = reservas
+    for r in reservas_iter:
+        try:
+            r.expirada = (r.disponibilidade.end_datetime() <= agora)
+        except Exception:
+            r.expirada = False
+    reservas = reservas_iter
     # Paginação
+    # Paginador aceita QuerySet ou lista
     paginator = Paginator(reservas, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -812,6 +844,10 @@ def remover_fila(request, fila_id):
 @login_required
 def entrar_fila_espera(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
+    # Impedir entrar na fila para disponibilidades que já iniciaram
+    if disponibilidade.is_passada():
+        messages.error(request, "Não é possível entrar na fila: este horário já passou.")
+        return redirect('horarios')
     # Verificar se já tem uma reserva ativa (pendente ou aprovada) para essa disponibilidade
     reserva_ativa = Reserva.objects.filter(
         usuario=request.user, 
@@ -1090,17 +1126,26 @@ def historico_reservas(request):
         reservas = reservas.filter(status_frequencia=status_frequencia)
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    # Separar reservas por categoria
-    hoje = date.today()
-    reservas_futuras = reservas.filter(disponibilidade__data__gt=hoje)
-    reservas_passadas = reservas.filter(disponibilidade__data__lt=hoje)
-    reservas_hoje = reservas.filter(disponibilidade__data=hoje)
-    # Paginação
-    paginator = Paginator(reservas, 10)
+    # Separar reservas por categoria considerando horário de término (tempo local)
+    from django.utils import timezone
+    agora = timezone.localtime(timezone.now())
+    reservas_list = list(reservas)
+    # marcar atributo expirada para uso nos templates
+    for r in reservas_list:
+        try:
+            r.expirada = (r.disponibilidade.end_datetime() <= agora)
+        except Exception:
+            r.expirada = False
+    reservas_futuras = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
+    reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
+    reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
+    # Paginação (usamos a lista completa ordenada originalmente)
+    paginator = Paginator(reservas_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Laboratórios para o filtro
     laboratorios = Laboratorio.objects.all()
+    hoje = agora.date()
     
     context = {
         'page_obj': page_obj,

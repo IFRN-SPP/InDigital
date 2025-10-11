@@ -448,7 +448,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if reserva.disponibilidade.data >= today and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
                                                     data-reserva-id="{{ reserva.id }}"
@@ -611,7 +611,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if reserva.disponibilidade.data >= today and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
                                                     data-reserva-id="{{ reserva.id }}"
@@ -715,7 +715,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if reserva.disponibilidade.data >= today and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
                                                     data-reserva-id="{{ reserva.id }}"

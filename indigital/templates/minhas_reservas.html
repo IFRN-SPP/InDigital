@@ -437,7 +437,7 @@
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.disponibilidade.data >= today and reserva.status_aprovacao != 'R' %}
+                                        {% if not reserva.expirada and reserva.status_aprovacao != 'R' %}
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-cancelar-modal"
                                                     data-reserva-id="{{ reserva.id }}"

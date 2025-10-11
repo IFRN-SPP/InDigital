@@ -1,6 +1,8 @@
 from django.db import models
 from usuarios.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import datetime
 
 class Laboratorio(models.Model):
     num_laboratorio = models.CharField(max_length=10, unique=True)
@@ -19,6 +21,32 @@ class Disponibilidade(models.Model):
 
     class Meta:
         unique_together = ('laboratorio', 'data', 'horario_inicio', 'horario_fim')
+
+    def start_datetime(self):
+        """Retorna o datetime (aware) do início da disponibilidade usando o timezone atual."""
+        dt = datetime.combine(self.data, self.horario_inicio)
+        if timezone.is_naive(dt):
+            tz = timezone.get_current_timezone()
+            dt = timezone.make_aware(dt, tz)
+        return timezone.localtime(dt)
+
+    def end_datetime(self):
+        """Retorna o datetime (aware) do fim da disponibilidade usando o timezone atual."""
+        dt = datetime.combine(self.data, self.horario_fim)
+        if timezone.is_naive(dt):
+            tz = timezone.get_current_timezone()
+            dt = timezone.make_aware(dt, tz)
+        return timezone.localtime(dt)
+
+    def is_passada(self):
+        """Retorna True se a disponibilidade já começou (horário de início menor que agora).
+
+        Observação: consideramos que, se o horário de início for anterior ao tempo atual, a
+        disponibilidade já passou e não deve mais aceitar reservas.
+        """
+        agora = timezone.localtime(timezone.now())
+        inicio = self.start_datetime()
+        return agora > inicio
 
     def clean(self):
         super().clean()
