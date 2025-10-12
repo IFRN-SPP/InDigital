@@ -16,6 +16,8 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
+BUILD_ENV = os.getenv("BUILD_ENV", default="local")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -114,6 +116,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if BUILD_ENV == "production":
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.getenv("EMAIL_HOST")
+    EMAIL_PORT = os.getenv("EMAIL_PORT")
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
@@ -196,5 +208,3 @@ AUTH_USER_MODEL = "usuarios.User"
 
 LOGOUT_REDIRECT_URL = "index"
 LOGIN_REDIRECT_URL = "dashboard_redirect"
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
