@@ -11,8 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-import traceback
 from django.http import HttpResponse
+from django.utils import timezone
 
 @login_required
 def dashboard_redirect(request):
@@ -812,6 +812,12 @@ def fila_espera(request):
 def promover_fila(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id)
     disponibilidade = fila.disponibilidade
+    agora = timezone.localtime(timezone.now())
+    # Não permitir promover reservas cujo horário já passou (início já ocorreu ou término já passou)
+    if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+        messages.error(request, "Não é possível promover esta reserva: o horário já passou.")
+        return redirect('fila_espera')
+
     if disponibilidade.vagas > 0:
         try:
             reserva = Reserva(usuario=fila.usuario, disponibilidade=disponibilidade)
@@ -868,6 +874,17 @@ def entrar_fila_espera(request, disponibilidade_id):
 @login_required
 def sair_fila_espera(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id, usuario=request.user)
+    # Não permitir sair da fila se o horário já passou
+    agora = timezone.localtime(timezone.now())
+    try:
+        if fila.disponibilidade.end_datetime() <= agora:
+            messages.error(request, "Não é possível sair da fila: o horário já passou.")
+            return redirect('minha_fila_espera')
+    except Exception:
+        # Se houver qualquer problema ao calcular end_datetime, prevenir a ação por segurança
+        messages.error(request, "Não é possível sair da fila neste momento.")
+        return redirect('minha_fila_espera')
+
     fila.delete()
     messages.success(request, "Você saiu da fila de espera.")
     return redirect('minha_fila_espera')
@@ -897,6 +914,7 @@ def minha_fila_espera(request):
             messages.error(request, "Data de fim inválida.")
     dados_filas = []
     today = date.today()
+    agora = timezone.localtime(timezone.now())
     for fila in minhas_filas:
         fila_geral = FilaEspera.objects.filter(disponibilidade=fila.disponibilidade).order_by('data_solicitacao')
         usuarios_em_ordem = list(fila_geral.values_list('usuario_id', flat=True))
@@ -906,12 +924,19 @@ def minha_fila_espera(request):
             status_fila = 'processado'
         else:
             status_fila = 'ativo'
+        # Determinar se o usuário ainda pode sair da fila (horário não passou e status ativo)
+        try:
+            can_sair = (fila.disponibilidade.end_datetime() > agora) and (status_fila == 'ativo')
+        except Exception:
+            can_sair = False
+
         item = {
             'id': fila.id,
             'disponibilidade': fila.disponibilidade,
             'data_solicitacao': fila.data_solicitacao,
             'posicao': posicao,
             'status': status_fila,
+            'can_sair': can_sair,
         }
         # Aplicar filtro de status se especificado
         if not status or status == 'todos' or status == status_fila:
@@ -1266,21 +1291,16 @@ def reservas_pendentes(request):
 def aprovar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
     disponibilidade = reserva.disponibilidade
-    from django.utils import timezone
     agora = timezone.localtime(timezone.now())
-
     # Não permitir aprovar reservas cujo horário já passou (início já ocorreu ou término já passou)
     if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
         messages.error(request, "Não é possível aprovar esta reserva: o horário já passou.")
         return redirect('reservas_pendentes')
-
     if disponibilidade.vagas > 0:
         reserva.status_aprovacao = 'A'
         reserva.save()
-        
         disponibilidade.vagas -= 1
         disponibilidade.save()
-    
         messages.success(request, f"Reserva de {reserva.usuario.username} foi aprovada com sucesso!")
     else:
         messages.error(request, "Não há mais vagas disponíveis para este horário.")
@@ -1310,21 +1330,16 @@ def aprovar_multiplas_reservas(request):
             try:
                 reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
                 disponibilidade = reserva.disponibilidade
-                from django.utils import timezone
                 agora = timezone.localtime(timezone.now())
-
                 # pular reservas cujo horário já passou
                 if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
                     expiradas += 1
                     continue
-
                 if disponibilidade.vagas > 0:
                     reserva.status_aprovacao = 'A'
                     reserva.save()
-                    
                     disponibilidade.vagas -= 1
                     disponibilidade.save()
-                    
                     aprovadas += 1
                 else:
                     sem_vagas += 1
@@ -1337,4 +1352,3 @@ def aprovar_multiplas_reservas(request):
         if expiradas > 0:
             messages.warning(request, f"{expiradas} reserva(s) não puderam ser aprovadas porque o horário já passou.")
     return redirect('reservas_pendentes')
-

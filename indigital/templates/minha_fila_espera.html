@@ -361,7 +361,7 @@
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if fila.disponibilidade.data >= today and fila.status == 'ativo' %}
+                                        {% if fila.can_sair %}
                                             <form method="post" action="{% url 'sair_fila_espera' fila.id %}" class="d-inline">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" 
@@ -381,11 +381,6 @@
                     
                     {% if page_obj.has_other_pages %}
                     <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                        <div class="float-left">
-                            <span class="text-muted">
-                                Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
-                            </span>
-                        </div>
                         <ul class="pagination pagination-sm m-0 float-right">
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
