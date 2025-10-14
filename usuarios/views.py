@@ -8,6 +8,9 @@ from functools import wraps
 from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import PasswordChangeView as AuthPasswordChangeView
+from django.urls import reverse_lazy
 
 @login_required
 def dashboard_redirect(request):
@@ -170,3 +173,7 @@ def listar_monitores(request):
         'email': email,
     }
     return render(request, "listar_monitores.html", context)
+
+class CustomPasswordChangeView(SuccessMessageMixin, AuthPasswordChangeView):
+    success_url = reverse_lazy('password_change')
+    success_message = "Senha alterada com sucesso!"

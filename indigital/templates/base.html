@@ -238,7 +238,12 @@
                                 <p>Perfil</p>
                             </a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <a href="{% url 'password_change' %}" class="nav-link">
+                                <i class="nav-icon fas fa-key"></i>
+                                <p>Alterar Senha</p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <form method="post" action="{% url 'account_logout' %}" style="display: inline;">
                                 {% csrf_token %}

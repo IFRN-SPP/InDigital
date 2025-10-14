@@ -230,7 +230,7 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <div class="card-title">Editar Informações Pessoais e Senha</div>
+                        <div class="card-title">Editar Informações Pessoais</div>
                     </div>
                     
                     <form method="post" enctype="multipart/form-data" id="profileForm">
@@ -349,48 +349,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="form-section">
-                                <h5 class="form-section-title">
-                                    <i class="fas fa-key me-2"></i>Alterar Senha
-                                </h5>
-                                
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    Preencha os campos abaixo apenas se desejar alterar sua senha. Caso contrário, deixe em branco.
-                                </div>
-
-                                <div class="row">
-    <div class="col-md-6">
-        <div class="mb-3 password-field">
-            <label for="new_password1" class="form-label">
-                <i class="fas fa-key me-1"></i>Nova Senha
-            </label>
-            <input type="password" class="form-control" id="new_password1"
-                   name="new_password1" placeholder="Digite a nova senha">
-            <span class="password-toggle" onclick="togglePassword('new_password1')">
-                <i class="fas fa-eye"></i>
-            </span>
-            <div class="password-strength" id="passwordStrength"></div>
-            <small class="form-text text-muted" id="passwordFeedback"></small>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="mb-3 password-field">
-            <label for="new_password2" class="form-label">
-                <i class="fas fa-key me-1"></i>Confirmar Nova Senha
-            </label>
-            <input type="password" class="form-control" id="new_password2"
-                   name="new_password2" placeholder="Digite a nova senha novamente">
-            <span class="password-toggle" onclick="togglePassword('new_password2')">
-                <i class="fas fa-eye"></i>
-            </span>
-            <div class="mt-2" id="passwordMatch"></div>
-        </div>
-    </div>
-</div>
-
                         <div class="card-footer">
                             <div class="action-buttons">
                                 <a href="{% url 'perfil' %}" class="btn btn-outline-secondary">

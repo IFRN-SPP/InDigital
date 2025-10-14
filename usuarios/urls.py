@@ -3,6 +3,8 @@ from django.conf.urls.static import static
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
+from .views import CustomPasswordChangeView
 
 urlpatterns = [
     path('cadastro/', views.cadastro, name='cadastro'),
@@ -19,8 +21,6 @@ urlpatterns = [
     path('password-reset/', 
          auth_views.PasswordResetView.as_view(
              template_name='account/password_reset.html',
-             email_template_name='account/password_reset_email.html',
-             subject_template_name='account/password_reset_subject.txt'
          ), 
          name='password_reset'),
     
@@ -44,7 +44,7 @@ urlpatterns = [
     
     # URLs para alteração de senha (usuário logado)
     path('password-change/', 
-         auth_views.PasswordChangeView.as_view(
+         CustomPasswordChangeView.as_view(
              template_name='account/password_change_form.html'
          ), 
          name='password_change'),
