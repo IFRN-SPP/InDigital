@@ -22,7 +22,7 @@ def admin_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('account_login')
         if request.user.is_superuser or request.user.perfil == 'administrador':
             return view_func(request, *args, **kwargs)
         else:
@@ -38,31 +38,12 @@ def cadastro(request):
             usuario.perfil = 'aluno'
             usuario.save()
             messages.success(request, 'Usuário cadastrado com sucesso! Faça login para acessar o sistema.')
-            return redirect('login')
+            return redirect('account_login')
         else:
             messages.error(request, 'Erro ao cadastrar usuário. Por favor, corrija os erros!')
     else:
         form = CadastroForm()
     return render(request, 'cadastro.html', {'form': form})
-
-
-def custom_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'Bem-vindo(a) de volta, {user.first_name}!')
-                return redirect('index')
-        else:
-            messages.error(request, 'Usuário ou senha inválidos.')
-    else:
-        form = AuthenticationForm()
-    
-    return render(request, 'account/login.html', {'form': form})
 
 @login_required
 def perfil(request):
