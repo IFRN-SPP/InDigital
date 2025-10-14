@@ -14,8 +14,8 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Usuário"
         verbose_name_plural = "Usuários"
-    
-    perfil = models.CharField(max_length=20, choices=[('aluno', 'Aluno'), ('administrador', 'Administrador'), ('monitor', 'Monitor')], default='aluno')
+
+    perfil = models.CharField(max_length=20, choices=[('aluno', 'Aluno'), ('administrador', 'Administrador'), ('monitor', 'Monitor'), ('outro', 'Outro')], default='aluno')
     foto_perfil = models.ImageField(upload_to='perfil_fotos/', blank=True, null=True)
     
     # Campos para dados do SUAP
@@ -30,6 +30,8 @@ class User(AbstractUser):
             return "Administrador"
         elif self.perfil == 'monitor':
             return "Monitor"
+        elif self.perfil == 'outro':
+            return "Outro"
         return "Aluno"
     
     def save(self, *args, **kwargs):

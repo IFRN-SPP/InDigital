@@ -26,15 +26,34 @@ def dashboard_redirect(request):
         return redirect('monitor_dashboard')
     else:
         return redirect('index')
-
-def monitor_required(view_func):
+    
+def aluno_required(view_func):
     """
-    Decorator para verificar se o usuário é um monitor.
+    Decorator para verificar se o usuário é aluno.
     """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('account_login')
+        if request.user.perfil == 'aluno':
+            return view_func(request, *args, **kwargs)
+        else:
+            messages.error(request, "Acesso negado. Apenas alunos podem acessar esta página.")
+            return render(request, '403.html', status=403)
+    return _wrapped_view
+
+def monitor_required(view_func):
+    """
+    Decorator para verificar se o usuário é um monitor.
+    Usuários com perfil 'outro' não têm permissão para acessar páginas de monitor.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('account_login')
+        if request.user.perfil == 'outro':
+            messages.error(request, "Acesso restrito a usuários autenticados via SUAP.")
+            return render(request, '403.html', status=403)
         # Verificar se o usuário é monitor ou administrador/superuser
         if request.user.perfil == 'monitor' or request.user.is_superuser or request.user.perfil == 'administrador':
             return view_func(request, *args, **kwargs)
@@ -51,7 +70,10 @@ def admin_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('account_login')
+        if request.user.perfil == 'outro':
+            messages.error(request, "Acesso restrito a usuários autenticados via SUAP.")
+            return render(request, '403.html', status=403)
         # Verificar se o usuário é administrador/superuser
         if request.user.is_superuser or request.user.perfil == 'administrador':
             return view_func(request, *args, **kwargs)
@@ -487,6 +509,7 @@ def excluir_laboratorio(request, laboratorio_id):
     
 # horarios e reservas
 @login_required
+@aluno_required
 def horarios(request):
     disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('data', 'horario_inicio')
     # Filtros
@@ -629,6 +652,7 @@ def cancelar_reserva(request, reserva_id):
     return redirect("minhas_reservas")
 
 @login_required
+@aluno_required
 def minhas_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio', 'disponibilidade__monitor'
@@ -890,6 +914,7 @@ def sair_fila_espera(request, fila_id):
     return redirect('minha_fila_espera')
 
 @login_required
+@aluno_required
 def minha_fila_espera(request):
     minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio', 'disponibilidade__monitor').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
     # Filtros
@@ -1124,6 +1149,7 @@ def reservas_por_usuario(request, usuario_id):
 
 # histórico de reservas
 @login_required
+@aluno_required
 def historico_reservas(request):
     # Buscar todas as reservas do usuário logado
     reservas = Reserva.objects.filter(usuario=request.user).select_related(

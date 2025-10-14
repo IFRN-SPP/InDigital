@@ -35,7 +35,7 @@ def cadastro(request):
         form = CadastroForm(request.POST, request.FILES)
         if form.is_valid():
             usuario = form.save(commit=False)
-            usuario.perfil = 'aluno'
+            usuario.perfil = 'outro'
             usuario.save()
             messages.success(request, 'Usuário cadastrado com sucesso! Faça login para acessar o sistema.')
             return redirect('account_login')
