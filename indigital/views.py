@@ -29,17 +29,20 @@ def dashboard_redirect(request):
     
 def aluno_required(view_func):
     """
-    Decorator para verificar se o usuário é aluno.
+    Decorator para verificar se o usuário é aluno, monitor ou administrador.
     """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('account_login')
-        if request.user.perfil == 'aluno':
-            return view_func(request, *args, **kwargs)
-        else:
-            messages.error(request, "Acesso negado. Apenas alunos podem acessar esta página.")
-            return render(request, '403.html', status=403)
+        if (
+            request.user.perfil in ['aluno', 'monitor', 'administrador']
+            or request.user.is_superuser
+        ):
+            return view_func(request, *args, **kwargs)    
+        messages.error(request, "Acesso negado. Apenas usuários autenticados com vínculo institucional podem acessar esta página.")
+        return render(request, '403.html', status=403)
+    
     return _wrapped_view
 
 def monitor_required(view_func):
