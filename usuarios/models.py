@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .managers import CustomUserManager
+import html
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -43,16 +44,12 @@ class User(AbstractUser):
         return self.first_name or self.email
     
     def get_foto_perfil_url(self):
+        """Retorna a URL da foto do perfil, priorizando o SUAP."""
         if self.foto_perfil:
             return self.foto_perfil.url
         elif self.suap_foto_url:
-            # Decodificar &amp; para & na URL do SUAP
-            import html
             return html.unescape(self.suap_foto_url)
-        # URL de um ícone padrão usando FontAwesome
         return "https://via.placeholder.com/120/6c757d/ffffff?text=👤"
     
     def get_nome_completo(self):
-        if self.suap_nome_completo:
-            return self.suap_nome_completo
-        return super().get_full_name()
+        return self.suap_nome_completo or super().get_full_name()
