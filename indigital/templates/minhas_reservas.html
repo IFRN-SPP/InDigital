@@ -343,17 +343,15 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-list mr-2"></i>Minhas Reservas
-                    </h3>
-                    <div class="card-tools">
-                        <span class="badge badge-primary" style="font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
-                        </span>
-                    </div>
-                </div>
+    <div class="card" style="border-color: #86B5E1;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-list mr-2"></i>Minhas Reservas
+            </h3>
+            <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+            </span>
+        </div>
                 <div class="card-body p-0">
                     {% if page_obj %}
                     <div class="table-responsive">
