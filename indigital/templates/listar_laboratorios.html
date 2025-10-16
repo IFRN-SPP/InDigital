@@ -561,12 +561,46 @@ $(document).ready(function() {
                     modal.find('.modal-body').html(response.form_html);
                 }
             },
+            // 🔧 CORREÇÃO AQUI: modal de erro estilizado
             error: function(xhr, status, error) {
                 console.log(' ERRO NA REQUISIÇÃO ');
                 console.log('Status:', status);
                 console.log('Error:', error);
                 console.log('Response Text:', xhr.responseText);
-                alert('Erro ao criar laboratório. Tente novamente.');
+
+                const modalErro = `
+                    <div class="modal fade" id="modalErroLaboratorio" tabindex="-1" aria-labelledby="modalErroLaboratorioLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-danger">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="modalErroLaboratorioLabel">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Erro ao Criar Laboratório
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+                                    <p id="mensagemErroLaboratorio" class="fw-semibold fs-5 text-danger">
+                                        Ocorreu um erro ao criar o laboratório.
+                                    </p>
+                                    <p class="text-muted small">
+                                        Verifique se o número do laboratório já existe e tente novamente.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-1"></i>Fechar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                $('#modalErroLaboratorio').remove();
+                $('body').append(modalErro);
+                const novoModal = new bootstrap.Modal(document.getElementById('modalErroLaboratorio'));
+                novoModal.show();
             }
         });
     });
@@ -808,4 +842,5 @@ $(document).ready(function() {
     console.log('Botões de exclusão encontrados:', $('.btn-excluir-laboratorio').length);
 });
 </script>
+
 {% endblock %}
