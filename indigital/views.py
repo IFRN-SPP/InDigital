@@ -268,8 +268,8 @@ def listar_disponibilidades(request):
 
 @login_required
 @admin_required
-def excluir_disponibilidade(request, reserva_id):
-    disponibilidade = get_object_or_404(Disponibilidade, id=reserva_id)
+def excluir_disponibilidade(request, disponibilidade_id):
+    disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     reservas_existentes = Reserva.objects.filter(disponibilidade=disponibilidade).exists()
 
     if reservas_existentes:
