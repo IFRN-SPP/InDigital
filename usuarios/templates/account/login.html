@@ -20,6 +20,34 @@
                 <h5>Acesso ao Sistema</h5>
                 <p>Utilize sua conta do SUAP ou credenciais locais</p>
             </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'login' in message.tags %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            showError('email', '{{ message }}');
+                        });
+                    </script>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {% if form.errors %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        {% if form.login.errors %}
+                            showError('email', '{{ form.login.errors.0 }}');
+                        {% endif %}
+                        {% if form.password.errors %}
+                            showError('password', '{{ form.password.errors.0 }}');
+                        {% endif %}
+                        {% if form.non_field_errors %}
+                            showError('password', '{{ form.non_field_errors.0 }}');
+                        {% endif %}
+                    });
+                </script>
+            {% endif %}
             
             <form method="POST" class="signin-form">
                 {% csrf_token %}
@@ -31,7 +59,9 @@
                            id="email" 
                            name="login" 
                            placeholder="Digite seu e-mail" 
+                           value="{{ form.login.value|default:'' }}"
                            required>
+                    <div id="emailError" class="error-message" style="display: none;"></div>
                 </div>
                 
                 <div class="form-group mb-3">
@@ -42,6 +72,7 @@
                            name="password" 
                            placeholder="Digite sua senha" 
                            required>
+                    <div id="passwordError" class="error-message" style="display: none;"></div>
                 </div>
 
                 <div class="text-end mb-4">
@@ -92,7 +123,6 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-
         document.body.classList.add('login-page');
         document.body.classList.remove('sidebar-open');
         document.body.classList.remove('sidebar-collapse');
@@ -110,7 +140,79 @@
         if (wrapper) {
             wrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: 100vh !important;';
         }
+
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorType = urlParams.get('error');
+        
+        if (errorType === 'email') {
+            showError('email', 'E-mail incorreto. Verifique o e-mail digitado.');
+        } else if (errorType === 'password') {
+            showError('password', 'Senha incorreta. Verifique a senha digitada.');
+        } else if (errorType === 'invalid') {
+            showError('password', 'E-mail ou senha incorretos.');
+        }
+
+        
+        document.getElementById('email').addEventListener('input', function() {
+            clearError('email');
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            clearError('password');
+        });
+
+        
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let hasError = false;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            
+            clearError('email');
+            clearError('password');
+
+            
+            if (email && (!email.includes('@') || !email.includes('.'))) {
+                showError('email', 'Por favor, digite um e-mail válido.');
+                hasError = true;
+            }
+
+            
+            if (!password) {
+                showError('password', 'Por favor, digite sua senha.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
     });
+
+   
+    function showError(field, message) {
+        const errorElement = document.getElementById(field + 'Error');
+        const inputElement = document.getElementById(field);
+        
+        if (errorElement && inputElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            inputElement.style.borderColor = '#dc3545';
+            inputElement.focus();
+        }
+    }
+
+    
+    function clearError(field) {
+        const errorElement = document.getElementById(field + 'Error');
+        const inputElement = document.getElementById(field);
+        
+        if (errorElement && inputElement) {
+            errorElement.style.display = 'none';
+            inputElement.style.borderColor = '#ced4da';
+        }
+    }
 </script>
 
 <style>
@@ -172,6 +274,17 @@
     .form-control:focus {
         border-color: var(--cor-intermediaria2) !important;
         box-shadow: 0 0 0 0.25rem rgba(134, 181, 225, 0.25) !important;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .form-control.error {
+        border-color: #dc3545 !important;
     }
 </style>
 {% endblock %}
