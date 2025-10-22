@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block title %}InDigital | Início{% endblock %}
+
 {% block content %}
 
 {% if not request.user.is_authenticated or request.user.perfil == 'outro' %}
