@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from indigital.models import Reserva
-from .forms import CadastroForm, EditarPerfilForm
+from .forms import CadastroForm, EditarPerfilForm, EditarUsuarioForm
 from django.contrib import messages
 from .models import User
 from functools import wraps
@@ -113,12 +113,12 @@ def listar_usuarios(request):
 @admin_required
 def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
-    form = EditarPerfilForm(request.POST or None, instance=usuario)
+    form = EditarUsuarioForm(request.POST or None, request.FILES or None, instance=usuario)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Usuário atualizado com sucesso!')
         return redirect('listar_usuarios')
-    return render(request, 'editar_usuario.html', {'form': form})
+    return render(request, 'editar_usuario.html', {'form': form, 'usuario': usuario})
 
 @login_required
 @admin_required

@@ -75,4 +75,18 @@ class EditarPerfilForm(forms.ModelForm):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['foto_perfil'].required = False           
+        self.fields['foto_perfil'].required = False          
+
+
+class EditarUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['foto_perfil', 'first_name', 'last_name', 'email', 'perfil']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['foto_perfil'].required = False
+        self.fields['first_name'].label = 'Primeiro Nome'
+        self.fields['last_name'].label = 'Sobrenome'
+        self.fields['email'].label = 'Email'
+        self.fields['perfil'].label = 'Perfil'

@@ -234,6 +234,16 @@
         color: #20597F;
     }
 
+    .btn-edit {
+        background-color: #20597F;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #75a5d1;
+        color: white;
+    }
+
     .confirmation-modal .modal-header {
         background-color: var(--cor-primaria);
         color: white;
@@ -412,6 +422,14 @@
                                     </td>
                                     <td class="text-center" style="border-color: #86B5E1;">
                                         <div class="action-buttons">
+                                            <!-- Botão Editar -->
+                                            <a href="{% url 'editar_usuario' usuario.id %}" 
+                                               class="action-btn btn-edit" 
+                                               title="Editar usuário"
+                                               data-toggle="tooltip">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
                                             <!-- Botão Deletar -->
                                             <button type="button" 
                                                     class="action-btn btn-delete btn-modal-excluir"

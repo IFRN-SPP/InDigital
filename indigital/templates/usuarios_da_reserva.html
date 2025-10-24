@@ -385,11 +385,6 @@
                 
                 {% if fila_page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    <div class="float-left">
-                        <span class="text-muted">
-                            Mostrando {{ fila_page_obj.start_index }} a {{ fila_page_obj.end_index }} de {{ fila_page_obj.paginator.count }} registros
-                        </span>
-                    </div>
                     {% if fila_page_obj.has_other_pages %}
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if fila_page_obj.has_previous %}

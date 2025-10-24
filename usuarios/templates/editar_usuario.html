@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}InDigital | Editar Usuário{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background-color: #20597F; color: white;">
+                    <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Editar Usuário</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-3 d-flex gap-2">
+                            <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+                                <i class="fas fa-times mr-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn" style="background-color: #20597F; color: white; border: none;">
+                                <i class="fas fa-save mr-1"></i>Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
