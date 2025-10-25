@@ -98,7 +98,7 @@
             <div class="text-center mt-4">
                 <p class="mb-2">
                     Já tem uma conta? 
-                    <a href="{% url 'account_login' %}" class="text-decoration-none">
+                    <a href="{% url 'account_login' %}" class="text-decoration-none" style="color: #20597F;">
                         <strong>Faça login aqui</strong>
                     </a>
                 </p>
@@ -212,6 +212,15 @@
     
     .input-group .form-control:focus {
         border-right: 1px solid var(--cor-intermediaria2);
+    }
+
+    a[href*="account_login"] {
+        color: #20597F !important;
+    }
+
+    a[href*="account_login"]:hover {
+        color: #1a4a6b !important;
+        text-decoration: underline;
     }
 </style>
 {% endblock %}

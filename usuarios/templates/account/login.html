@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="text-end mb-4">
-                    <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                    <a href="{% url 'password_reset' %}" class="text-decoration-none" style="color: #20597F;">
                         <small>Esqueceu sua senha?</small>
                     </a>
                 </div>
@@ -107,7 +107,7 @@
             <div class="text-center mt-4">
                 <p class="mb-2">
                     Não tem uma conta? 
-                    <a href="{% url 'cadastro' %}" class="text-decoration-none">
+                    <a href="{% url 'cadastro' %}" class="text-decoration-none" style="color: #20597F;">
                         <strong>Cadastre-se aqui</strong>
                     </a>
                 </p>
@@ -285,6 +285,17 @@
 
     .form-control.error {
         border-color: #dc3545 !important;
+    }
+
+    a[href*="password_reset"],
+    a[href*="cadastro"] {
+        color: #20597F !important;
+    }
+
+    a[href*="password_reset"]:hover,
+    a[href*="cadastro"]:hover {
+        color: #1a4a6b !important;
+        text-decoration: underline;
     }
 </style>
 {% endblock %}
