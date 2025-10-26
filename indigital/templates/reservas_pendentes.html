@@ -446,36 +446,41 @@
             </tr>
         </thead>
         <tbody>
-            {% for reserva in page_obj %}
-            <tr id="reserva-{{ reserva.id }}">
-                <td style="vertical-align: middle;">
-                    <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
-                </td>
-                <td style="vertical-align: middle;">
-                    <strong>{{ reserva.usuario.suap_id }}</strong>
-                    <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                    {{ reserva.disponibilidade.data|date:"d/m/Y" }}
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                    {{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}
-                </td>
-                <td style="vertical-align: middle;">
-                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                    {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
-                </td>
-                <td style="vertical-align: middle;">
-                    {% if reserva.disponibilidade.monitor %}
-                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                        {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
-                    {% else %}
-                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                        Não definido
-                    {% endif %}
-                </td>
+    {% for reserva in page_obj %}
+    <tr id="reserva-{{ reserva.id }}">
+        <td style="vertical-align: middle;">
+            <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
+        </td>
+        <td style="vertical-align: middle;">
+            <strong>
+                {% if reserva.usuario.get_full_name and reserva.usuario.get_full_name != "None None" %}
+                    {{ reserva.usuario.get_full_name }}
+                {% else %}
+                    {{ reserva.usuario.username }}
+                {% endif %}
+            </strong>
+        </td>
+        <td style="vertical-align: middle;">
+            <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+            {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+        </td>
+        <td style="vertical-align: middle;">
+            <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+            {{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}
+        </td>
+        <td style="vertical-align: middle;">
+            <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+            {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+        </td>
+        <td style="vertical-align: middle;">
+            {% if reserva.disponibilidade.monitor %}
+                <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                {{ reserva.disponibilidade.monitor.suap_nome_completo }}
+            {% else %}
+                <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                Não definido
+            {% endif %}
+        </td>
                 <td class="text-center" style="vertical-align: middle;">
                     <div class="action-buttons">
                         <button type="button" 
@@ -598,7 +603,6 @@
                 <h4 class="mb-3" style="color: #20597F;">Confirmar Aprovação</h4>
                 <p>Você está prestes a aprovar <span class="selected-count" id="countSelecionadas">0</span> reserva(s):</p>
                 <div class="reserva-list" id="listaReservasSelecionadas">
-                    <!-- Lista de reservas será preenchida via JavaScript -->
                 </div>
                 <p class="text-muted">Esta ação aprovará todas as reservas selecionadas simultaneamente.</p>
             </div>

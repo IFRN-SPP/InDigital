@@ -160,11 +160,6 @@
         color: white;
     }
     
-    .table thead {
-        background-color: var(--cor-intermediaria2);
-        color: var(--cor-primaria);
-    }
-    
     .badge-primary {
         background-color: var(--cor-primaria);
     }
@@ -203,6 +198,43 @@
         padding: 0.5rem 1rem;
         font-weight: bold;
     }
+
+    /* Estilo para botões de ação */
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-rejeitar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-rejeitar:hover {
+        background-color: #c82333;
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -221,7 +253,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
@@ -291,84 +323,90 @@
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-list mr-2"></i>Minhas Solicitações na Fila
                     </h3>
                     <div class="card-tools">
-                        <span class="badge badge-warning" style="font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} solicitaç{{ page_obj.paginator.count|pluralize:"ões" }}
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} solicitação{{ page_obj.paginator.count|pluralize:"ões" }}
                         </span>
                     </div>
                 </div>
+                
+                {% if page_obj %}
                 <div class="card-body p-0">
-                    {% if page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead style="background-color: #86B5E1; color: #20597F !important;">
                                 <tr>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 15%; border-color: #20597F;">Posição</th>
-                                    <th style="width: 15%; border-color: #20597F;">Solicitado em</th>
-                                    <th style="width: 15%; border-color: #20597F;">Status</th>
-                                    <th style="width: 10%; border-color: #20597F;">Ações</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">ID</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Data</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Horário</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Laboratório</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">Posição</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Solicitado em</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">Status</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for fila in page_obj %}
                                 <tr class="{% if fila.disponibilidade.data < today %}table-light{% elif fila.disponibilidade.data == today %}table-info{% endif %}">
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.data|date:"d/m/Y" }}
+                                        <span class="text-muted">{{ fila.id }}</span>
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.data|date:"d/m/Y" }}</strong>
                                         {% if fila.disponibilidade.data == today %}
-                                            <span class="badge badge-info">Hoje</span>
+                                            <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
                                         {% elif fila.disponibilidade.data > today %}
-                                            <span class="badge badge-success">Futuro</span>
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
                                         {% else %}
-                                            <span class="badge badge-secondary">Passado</span>
+                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}
+                                        <i class="fas fa-clock mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.laboratorio.num_laboratorio }}
+                                        <i class="fas fa-flask mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.laboratorio.num_laboratorio }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="badge badge-primary position-badge">
+                                        <span class="badge" style="background-color: #20597F; color: white;">
                                             {{ fila.posicao }}º
                                         </span>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-plus mr-1" style="color: #20597F;"></i>
-                                        {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
+                                        <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.data_solicitacao|date:"d/m/Y H:i" }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         {% if fila.status == 'ativo' %}
-                                            <span class="badge badge-warning">
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
                                                 <i class="fas fa-hourglass-half mr-1"></i> Aguardando
                                             </span>
                                         {% elif fila.status == 'processado' %}
-                                            <span class="badge badge-success">
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
                                                 <i class="fas fa-check mr-1"></i> Processado
                                             </span>
                                         {% else %}
-                                            <span class="badge badge-secondary">
+                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
                                                 <i class="fas fa-question mr-1"></i> {{ fila.status|capfirst }}
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
                                         {% if fila.can_sair %}
                                             <form method="post" action="{% url 'sair_fila_espera' fila.id %}" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                        onclick="return confirm('Tem certeza que deseja sair da fila de espera?')">
-                                                    <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                                                <button type="submit" class="action-btn btn-rejeitar"
+                                                        onclick="return confirm('Tem certeza que deseja sair da fila de espera?')"
+                                                        title="Sair da fila">
+                                                    <i class="fas fa-sign-out-alt"></i>
                                                 </button>
                                             </form>
                                         {% else %}
@@ -383,6 +421,11 @@
                     
                     {% if page_obj.has_other_pages %}
                     <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                        <div class="float-left">
+                            <span class="text-muted">
+                                Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+                            </span>
+                        </div>
                         <ul class="pagination pagination-sm m-0 float-right">
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
@@ -431,15 +474,17 @@
                     {% endif %}
                     
                     {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhuma solicitação na fila</h4>
-                        <p class="text-muted">
-                            Você não está em nenhuma fila de espera no momento ou não há registros que correspondem aos filtros aplicados.
-                        </p>
-                        <a href="{% url 'horarios' %}" class="btn btn-primary">
-                            <i class="fas fa-plus mr-1"></i> Fazer Nova Reserva
-                        </a>
+                    <div class="card-body">
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                            <h4 style="color: #20597F;">Nenhuma solicitação na fila</h4>
+                            <p class="text-muted">
+                                Você não está em nenhuma fila de espera no momento ou não há registros que correspondem aos filtros aplicados.
+                            </p>
+                            <a href="{% url 'horarios' %}" class="btn btn-primary">
+                                <i class="fas fa-plus mr-1"></i> Fazer Nova Reserva
+                            </a>
+                        </div>
                     </div>
                     {% endif %}
                 </div>
