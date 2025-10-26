@@ -312,80 +312,149 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
-    <div class="card" style="border-color: #86B5E1;">
-        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
-            <h3 class="card-title mb-0">
-                <i class="fas fa-list mr-2"></i>Horários Disponíveis
-            </h3>
-            <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                {{ page_obj.paginator.count }} horário{{ page_obj.paginator.count|pluralize:"s" }}
-            </span>
-        </div>
-                <div class="card-body p-0">
-                    {% if page_obj %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 15%; border-color: #20597F;">Vagas</th>
-                                    <th style="width: 15%; border-color: #20597F;">Monitor</th>
-                                    <th style="width: 25%; border-color: #20597F;">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for disponibilidade in page_obj %}
-                                <tr class="{% if disponibilidade.data < today %}table-light{% elif disponibilidade.data == today %}table-info{% endif %}">
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ disponibilidade.data|date:"d/m/Y" }}
-                                        {% if disponibilidade.expirada %}
-                                            <span class="badge badge-secondary">Expirado</span>
+    <div class="col-12">
+        <div class="card" style="border-color: #86B5E1;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-list mr-2"></i>Horários Disponíveis
+                </h3>
+                <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                    {{ page_obj.paginator.count }} horário{{ page_obj.paginator.count|pluralize:"s" }}
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background-color: white; color: #20597F !important; border-bottom: 2px solid #20597F;">
+    <tr>
+        <th style="width: 15%; color: #20597F !important;">Data</th>
+        <th style="width: 15%; color: #20597F !important;">Horário</th>
+        <th style="width: 15%; color: #20597F !important;">Laboratório</th>
+        <th style="width: 20%; color: #20597F !important;">Monitor</th>
+        <th style="width: 10%; color: #20597F !important;">Vagas</th>
+        <th style="width: 25%; color: #20597F !important;" class="text-center">Ação</th>
+    </tr>
+</thead>
+
+                        <tbody>
+                            {% for disponibilidade in page_obj %}
+                            <tr class="{% if disponibilidade.data < today %}table-light{% elif disponibilidade.data == today %}table-info{% endif %}">
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                    {{ disponibilidade.data|date:"d/m/Y" }}
+                                    {% if disponibilidade.expirada %}
+                                        <span class="badge badge-secondary">Expirado</span>
+                                    {% elif disponibilidade.data == today %}
+                                        <span class="badge badge-info">Hoje</span>
+                                    {% elif disponibilidade.data > today %}
+                                        <span class="badge badge-success">Futuro</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Passado</span>
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                                    {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                    {{ disponibilidade.laboratorio.num_laboratorio }}
+                                </td>
+                               <td style="vertical-align: middle;">
+    {% if disponibilidade.monitor %}
+        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+        {{ disponibilidade.monitor.get_nome_completo|default:"Não definido" }}
+    {% else %}
+        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+        Não definido
+    {% endif %}
+</td>
+                                <td style="vertical-align: middle;">
+                                    {% if disponibilidade.vagas > 0 %}
+                                        <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                            {{ disponibilidade.vagas }} vaga{{ disponibilidade.vagas|pluralize:"s" }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                            <i class="fas fa-times mr-1"></i> Esgotado
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;">
+                                    {% if not disponibilidade.expirada %}
+                                        {% if disponibilidade.data > today %}
+                                            {% if disponibilidade.id in minhas_reservas %}
+                                                {% if disponibilidade.id in reservas_pendentes %}
+                                                    <span class="btn btn-sm btn-warning disabled">
+                                                        <i class="fas fa-clock mr-1"></i> Aguardando Aprovação
+                                                    </span>
+                                                {% else %}
+                                                    <span class="btn btn-sm btn-info disabled">
+                                                        <i class="fas fa-check-circle mr-1"></i> Já Reservado
+                                                    </span>
+                                                {% endif %}
+                                            {% elif disponibilidade.id in reservas_rejeitadas %}
+                                                {% if disponibilidade.vagas > 0 %}
+                                                    <button type="button" class="btn btn-sm btn-success btn-reservar" 
+                                                            data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                            data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                            data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                            data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                        <span class="btn-text">
+                                                            <i class="fas fa-check mr-1"></i> Tentar Novamente
+                                                        </span>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                    </button>
+                                                {% else %}
+                                                    {% if disponibilidade.id not in reservas_em_fila %}
+                                                        <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
+                                                                data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                                data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                                data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                                data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                            <span class="btn-text">
+                                                                <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
+                                                            </span>
+                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                        </button>
+                                                    {% else %}
+                                                        <span class="btn btn-sm btn-secondary disabled">
+                                                            <i class="fas fa-check-circle mr-1"></i> Na Fila
+                                                        </span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% elif disponibilidade.vagas > 0 %}
+                                                <button type="button" class="btn btn-sm btn-success btn-reservar"
+                                                        data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                        data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                        data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                        data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                    <span class="btn-text">
+                                                        <i class="fas fa-check mr-1"></i> Reservar
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                </button>
+                                            {% else %}
+                                                {% if disponibilidade.id not in reservas_em_fila %}
+                                                    <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
+                                                            data-disponibilidade-id="{{ disponibilidade.id }}"
+                                                            data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
+                                                            data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
+                                                            data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
+                                                        <span class="btn-text">
+                                                            <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
+                                                        </span>
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                    </button>
+                                                {% else %}
+                                                    <span class="btn btn-sm btn-secondary disabled">
+                                                        <i class="fas fa-check-circle mr-1"></i> Na Fila
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
                                         {% elif disponibilidade.data == today %}
-                                            <span class="badge badge-info">Hoje</span>
-                                        {% elif disponibilidade.data > today %}
-                                            <span class="badge badge-success">Futuro</span>
-                                        {% else %}
-                                            <span class="badge badge-secondary">Passado</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ disponibilidade.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if disponibilidade.vagas > 0 %}
-                                            <span class="badge badge-success">
-                                                <i class="fas fa-users mr-1"></i> {{ disponibilidade.vagas }} vaga{{ disponibilidade.vagas|pluralize:"s" }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge badge-danger">
-                                                <i class="fas fa-times mr-1"></i> Esgotado
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if not disponibilidade.expirada %}
-                                            {% if disponibilidade.data > today %}
-                                                {% comment %}ação para data futura{% endcomment %}
+                                            {% if disponibilidade.horario_inicio|time:"H:i" >= now_time %}
                                                 {% if disponibilidade.id in minhas_reservas %}
                                                     {% if disponibilidade.id in reservas_pendentes %}
                                                         <span class="btn btn-sm btn-warning disabled">
@@ -455,83 +524,6 @@
                                                         </span>
                                                     {% endif %}
                                                 {% endif %}
-                                            {% elif disponibilidade.data == today %}
-                                                {% comment %}se for hoje, permitir somente se o horário de início for >= hora atual{% endcomment %}
-                                                {% if disponibilidade.horario_inicio|time:"H:i" >= now_time %}
-                                                    {% if disponibilidade.id in minhas_reservas %}
-                                                        {% if disponibilidade.id in reservas_pendentes %}
-                                                            <span class="btn btn-sm btn-warning disabled">
-                                                                <i class="fas fa-clock mr-1"></i> Aguardando Aprovação
-                                                            </span>
-                                                        {% else %}
-                                                            <span class="btn btn-sm btn-info disabled">
-                                                                <i class="fas fa-check-circle mr-1"></i> Já Reservado
-                                                            </span>
-                                                        {% endif %}
-                                                    {% elif disponibilidade.id in reservas_rejeitadas %}
-                                                        {% if disponibilidade.vagas > 0 %}
-                                                            <button type="button" class="btn btn-sm btn-success btn-reservar" 
-                                                                    data-disponibilidade-id="{{ disponibilidade.id }}"
-                                                                    data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
-                                                                    data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
-                                                                    data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
-                                                                <span class="btn-text">
-                                                                    <i class="fas fa-check mr-1"></i> Tentar Novamente
-                                                                </span>
-                                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                                            </button>
-                                                        {% else %}
-                                                            {% if disponibilidade.id not in reservas_em_fila %}
-                                                                <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
-                                                                        data-disponibilidade-id="{{ disponibilidade.id }}"
-                                                                        data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
-                                                                        data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
-                                                                        data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
-                                                                    <span class="btn-text">
-                                                                        <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
-                                                                    </span>
-                                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                                                </button>
-                                                            {% else %}
-                                                                <span class="btn btn-sm btn-secondary disabled">
-                                                                    <i class="fas fa-check-circle mr-1"></i> Na Fila
-                                                                </span>
-                                                            {% endif %}
-                                                        {% endif %}
-                                                    {% elif disponibilidade.vagas > 0 %}
-                                                        <button type="button" class="btn btn-sm btn-success btn-reservar"
-                                                                data-disponibilidade-id="{{ disponibilidade.id }}"
-                                                                data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
-                                                                data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
-                                                                data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
-                                                            <span class="btn-text">
-                                                                <i class="fas fa-check mr-1"></i> Reservar
-                                                            </span>
-                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                                        </button>
-                                                    {% else %}
-                                                        {% if disponibilidade.id not in reservas_em_fila %}
-                                                            <button type="button" class="btn btn-sm btn-warning btn-fila-espera"
-                                                                    data-disponibilidade-id="{{ disponibilidade.id }}"
-                                                                    data-disponibilidade-data="{{ disponibilidade.data|date:'d/m/Y' }}"
-                                                                    data-disponibilidade-horario="{{ disponibilidade.horario_inicio|time:'H:i' }} às {{ disponibilidade.horario_fim|time:'H:i' }}"
-                                                                    data-disponibilidade-laboratorio="{{ disponibilidade.laboratorio.num_laboratorio }}">
-                                                                <span class="btn-text">
-                                                                    <i class="fas fa-hourglass-half mr-1"></i> Fila de Espera
-                                                                </span>
-                                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                                            </button>
-                                                        {% else %}
-                                                            <span class="btn btn-sm btn-secondary disabled">
-                                                                <i class="fas fa-check-circle mr-1"></i> Na Fila
-                                                            </span>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="text-muted">
-                                                        <i class="fas fa-clock mr-1"></i> Expirado
-                                                    </span>
-                                                {% endif %}
                                             {% else %}
                                                 <span class="text-muted">
                                                     <i class="fas fa-clock mr-1"></i> Expirado
@@ -542,77 +534,31 @@
                                                 <i class="fas fa-clock mr-1"></i> Expirado
                                             </span>
                                         {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {% if page_obj.has_other_pages %}
-                    <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
-                                    </li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}" 
-                                           style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
-                                    </li>
-                                {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">
+                                            <i class="fas fa-clock mr-1"></i> Expirado
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhum horário disponível</h4>
-                        <p class="text-muted">
-                            Não há horários disponíveis que correspondem aos filtros aplicados ou ainda não foram criados horários.
-                        </p>
-                        {% if user.perfil == 'administrador' or user.is_superuser %}
-                            <a href="{% url 'listar_disponibilidades' %}" class="btn btn-primary">
-                                <i class="fas fa-plus mr-1"></i> Criar Disponibilidade
-                            </a>
-                        {% endif %}
-                    </div>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                    <h4 style="color: #20597F;">Nenhum horário disponível</h4>
+                    <p class="text-muted">
+                        Não há horários disponíveis que correspondem aos filtros aplicados ou ainda não foram criados horários.
+                    </p>
+                    {% if user.perfil == 'administrador' or user.is_superuser %}
+                        <a href="{% url 'listar_disponibilidades' %}" class="btn btn-primary">
+                            <i class="fas fa-plus mr-1"></i> Criar Disponibilidade
+                        </a>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

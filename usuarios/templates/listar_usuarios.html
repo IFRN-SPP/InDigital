@@ -285,6 +285,40 @@
         margin: 1rem 0;
         border-left: 4px solid #dc3545;
     }
+
+    /* Estilo das tabelas */
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .table thead {
+        background-color: white;
+        color: #20597F;
+        border-bottom: 2px solid #20597F;
+    }
+    
+    .table thead th {
+        background-color: white;
+        color: #20597F;
+        border-color: #dee2e6;
+        padding: 12px 8px;
+        font-weight: 600;
+        text-align: left;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        padding: 12px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+    }
 </style>
 {% endblock %}
 
@@ -307,18 +341,13 @@
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form method="get" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome:</label>
+                                    <label for="nome" class="form-label">Nome:</label>
                                     <input type="text" id="nome" name="nome" class="form-control form-control-sm" 
                                            value="{{ nome|default:'' }}" placeholder="Buscar por nome"
                                            style="border-color: #86B5E1;">
@@ -326,7 +355,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="matricula" class="form-label" style="color: #20597F; font-weight: 600;">Matrícula:</label>
+                                    <label for="matricula" class="form-label">Matrícula:</label>
                                     <input type="text" id="matricula" name="matricula" class="form-control form-control-sm" 
                                            value="{{ matricula|default:'' }}" placeholder="Buscar por matrícula"
                                            style="border-color: #86B5E1;">
@@ -334,7 +363,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="email" class="form-label" style="color: #20597F; font-weight: 600;">Email:</label>
+                                    <label for="email" class="form-label">Email:</label>
                                     <input type="email" id="email" name="email" class="form-control form-control-sm" 
                                            value="{{ email|default:'' }}" placeholder="Buscar por email"
                                            style="border-color: #86B5E1;">
@@ -342,7 +371,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="perfil" class="form-label" style="color: #20597F; font-weight: 600;">Perfil:</label>
+                                    <label for="perfil" class="form-label">Perfil:</label>
                                     <select name="perfil" id="perfil" class="form-control form-control-sm" style="border-color: #86B5E1;">
                                         <option value="todos" {% if not perfil or perfil == 'todos' %}selected{% endif %}>Todos os perfis</option>
                                         <option value="aluno" {% if perfil == 'aluno' %}selected{% endif %}>Aluno</option>
@@ -372,8 +401,8 @@
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                    <h3 class="card-title mb-0">
                         <i class="fas fa-list mr-2"></i>Lista de Usuários
                     </h3>
                     <div class="card-tools">
@@ -386,32 +415,34 @@
                     {% if page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
-                                    <th style="width: 5%; border-color: #20597F;">#</th>
-                                    <th style="width: 15%; border-color: #20597F;">Matrícula</th>
-                                    <th style="width: 25%; border-color: #20597F;">Nome</th>
-                                    <th style="width: 20%; border-color: #20597F;">Email</th>
-                                    <th style="width: 15%; border-color: #20597F;">Perfil</th>
-                                    <th style="width: 20%; border-color: #20597F;" class="text-center">Ações</th>
+                                    <th style="width: 5%;">ID</th>
+                                    <th style="width: 15%;">Matrícula</th>
+                                    <th style="width: 25%;">Nome</th>
+                                    <th style="width: 20%;">Email</th>
+                                    <th style="width: 15%;">Perfil</th>
+                                    <th style="width: 20%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for usuario in page_obj %}
                                 <tr id="usuario-{{ usuario.id }}">
-                                    <td style="border-color: #86B5E1;"><span class="text-muted">{{ usuario.id }}</span></td>
-                                    <td style="border-color: #86B5E1;">
+                                    <td style="vertical-align: middle;">
+                                        <span class="text-muted">{{ usuario.id }}</span>
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         <strong>{{ usuario.suap_id|default:"<span class='text-muted'>Não informado</span>" }}</strong>
                                     </td>
-                                    <td style="border-color: #86B5E1;">
+                                    <td style="vertical-align: middle;">
                                         {% if usuario.first_name or usuario.last_name %}
                                             <strong style="color: #20597F;">{{ usuario.first_name }} {{ usuario.last_name }}</strong>
                                         {% else %}
                                             <span class="text-muted"><i>Nome não informado</i></span>
                                         {% endif %}
                                     </td>
-                                    <td style="border-color: #86B5E1;">{{ usuario.email }}</td>
-                                    <td style="border-color: #86B5E1;">
+                                    <td style="vertical-align: middle;">{{ usuario.email }}</td>
+                                    <td style="vertical-align: middle;">
                                         <span class="badge badge-pill" 
                                             style="{% if usuario.perfil == 'administrador' or usuario.is_superuser %}background-color: #dc3545;
                                             {% elif usuario.perfil == 'monitor' %}background-color: #ffc107; color: #000;
@@ -420,7 +451,7 @@
                                             {% else %}{{ usuario.get_perfil_display }}{% endif %}
                                         </span>
                                     </td>
-                                    <td class="text-center" style="border-color: #86B5E1;">
+                                    <td class="text-center" style="vertical-align: middle;">
                                         <div class="action-buttons">
                                             <!-- Botão Editar -->
                                             <a href="{% url 'editar_usuario' usuario.id %}" 

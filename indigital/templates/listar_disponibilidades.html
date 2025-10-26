@@ -304,102 +304,97 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
-            <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-list mr-2"></i>Lista de Disponibilidades
-                    </h3>
-                    <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                        {{ page_obj.paginator.count }} disponibilidade{{ page_obj.paginator.count|pluralize:"s" }}
-                    </span>
-                </div>
-                <div class="card-body p-0">
-                    {% if page_obj %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Horário</th>
-                                    <th>Laboratório</th>
-                                    <th>Monitor</th>
-                                    <th>Vagas</th>
-                                    <th>Data</th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reserva in page_obj %}
-                                <tr id="disponibilidade-{{ reserva.id }}">
-                                    <td>{{ reserva.id }}</td>
-                                    <td>
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.monitor.get_nome_completo|default:"Não definido" }}
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-pill" 
-                                            style="{% if reserva.vagas > 0 %}background-color: #28a745;{% else %}background-color: #dc3545;{% endif %} color: white;">
-                                            {{ reserva.vagas }} vaga{{ reserva.vagas|pluralize:"s" }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.data|date:"d/m/Y" }}
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="action-buttons">
-                                            
-                                            <button type="button" 
-                                               class="action-btn btn-edit btn-editar" 
-                                               title="Editar disponibilidade"
-                                               data-disponibilidade-id="{{ reserva.id }}"
-                                               data-disponibilidade-data="{{ reserva.data|date:'Y-m-d' }}"
-                                               data-disponibilidade-horario-inicio="{{ reserva.horario_inicio|time:'H:i' }}"
-                                               data-disponibilidade-horario-fim="{{ reserva.horario_fim|time:'H:i' }}"
-                                               data-disponibilidade-laboratorio="{{ reserva.laboratorio.id }}"
-                                               data-disponibilidade-monitor="{{ reserva.monitor.id|default:'' }}"
-                                               data-disponibilidade-vagas="{{ reserva.vagas }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+    <div class="col-12">
+        <div class="card" style="border-color: #86B5E1;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-list mr-2"></i>Lista de Disponibilidades
+                </h3>
+                <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                    {{ page_obj.paginator.count }} disponibilidade{{ page_obj.paginator.count|pluralize:"s" }}
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background-color: #86B5E1; color: #20597F !important;">
+    <tr>
+        <th style="width: 15%; color: #20597F !important;">Data</th>
+        <th style="width: 15%; color: #20597F !important;">Horário</th>
+        <th style="width: 15%; color: #20597F !important;">Laboratório</th>
+        <th style="width: 20%; color: #20597F !important;">Monitor</th>
+        <th style="width: 10%; color: #20597F !important;">Vagas</th>
+        <th style="width: 25%; color: #20597F !important;" class="text-center">Ações</th>
+    </tr>
+</thead>
 
-                                            
-                                            <button type="button" 
-                                               class="action-btn btn-delete btn-excluir" 
-                                               title="Excluir disponibilidade"
-                                               data-disponibilidade-id="{{ reserva.id }}"
-                                               data-disponibilidade-info="{{ reserva.laboratorio.num_laboratorio }} - {{ reserva.data|date:'d/m/Y' }} {{ reserva.horario_inicio|time:'H:i' }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                        <tbody>
+                            {% for reserva in page_obj %}
+                            <tr id="disponibilidade-{{ reserva.id }}">
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.data|date:"d/m/Y" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.horario_inicio|time:"H:i" }} às {{ reserva.horario_fim|time:"H:i" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.laboratorio.num_laboratorio }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.monitor.get_nome_completo|default:"Não definido" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span class="badge badge-pill" 
+                                        style="{% if reserva.vagas > 0 %}background-color: #28a745;{% else %}background-color: #dc3545;{% endif %} color: white;">
+                                        {{ reserva.vagas }} vaga{{ reserva.vagas|pluralize:"s" }}
+                                    </span>
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <div class="action-buttons">
+                                        <button type="button" 
+                                           class="action-btn btn-edit btn-editar" 
+                                           title="Editar disponibilidade"
+                                           data-disponibilidade-id="{{ reserva.id }}"
+                                           data-disponibilidade-data="{{ reserva.data|date:'Y-m-d' }}"
+                                           data-disponibilidade-horario-inicio="{{ reserva.horario_inicio|time:'H:i' }}"
+                                           data-disponibilidade-horario-fim="{{ reserva.horario_fim|time:'H:i' }}"
+                                           data-disponibilidade-laboratorio="{{ reserva.laboratorio.id }}"
+                                           data-disponibilidade-monitor="{{ reserva.monitor.id|default:'' }}"
+                                           data-disponibilidade-vagas="{{ reserva.vagas }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
 
-                                            
-                                            <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
-                                               class="action-btn btn-users" 
-                                               title="Ver usuários inscritos">
-                                                <i class="fas fa-users"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-calendar-alt fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhuma disponibilidade encontrada</h4>
-                    </div>
-                    {% endif %}
+                                        <button type="button" 
+                                           class="action-btn btn-delete btn-excluir" 
+                                           title="Excluir disponibilidade"
+                                           data-disponibilidade-id="{{ reserva.id }}"
+                                           data-disponibilidade-info="{{ reserva.laboratorio.num_laboratorio }} - {{ reserva.data|date:'d/m/Y' }} {{ reserva.horario_inicio|time:'H:i' }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                        <a href="{% url 'usuarios_da_reserva' reserva.id %}" 
+                                           class="action-btn btn-users" 
+                                           title="Ver usuários inscritos">
+                                            <i class="fas fa-users"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-alt fa-4x mb-3" style="color: #86B5E1;"></i>
+                    <h4 style="color: #20597F;">Nenhuma disponibilidade encontrada</h4>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
