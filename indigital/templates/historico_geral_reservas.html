@@ -90,6 +90,112 @@
         background-color: var(--cor-primaria);
         border-color: var(--cor-primaria);
     }
+
+    /* Estilo das tabelas */
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .table thead {
+        background-color: white;
+        color: #20597F;
+        border-bottom: 2px solid #20597F;
+    }
+    
+    .table thead th {
+        background-color: white;
+        color: #20597F;
+        border-color: #dee2e6;
+        padding: 12px 8px;
+        font-weight: 600;
+        text-align: left;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        padding: 12px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+    }
+    
+    .card {
+        border: 1px solid #86B5E1;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        background-color: #20597F !important;
+        color: white !important;
+        border-bottom: 1px solid #86B5E1;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #86B5E1;
+        padding: 15px 20px;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 8px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; 
+        height: 32px; 
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-view {
+        background-color: #86B5E1;
+        color: #20597F;
+    }
+
+    .btn-view:hover {
+        background-color: #75a5d1;
+        color: #20597F;
+    }
 </style>
 {% endblock %}
 
@@ -112,23 +218,18 @@
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form method="GET" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="usuario" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                    <label for="usuario" class="form-label">Usuário:</label>
                                     <select class="form-control form-control-sm" id="usuario" name="usuario" style="border-color: #86B5E1;">
                                         <option value="todos" {% if usuario_id == 'todos' or not usuario_id %}selected{% endif %}>Todos os usuários</option>
                                         {% for user in usuarios %}
                                             <option value="{{ user.id }}" {% if usuario_id == user.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ user.username }}
+                                                {{ user.get_full_name|default:user.first_name|default:user.username }}
                                             </option>
                                         {% endfor %}
                                     </select>
@@ -136,19 +237,19 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <label for="data_inicio" class="form-label">Data Início:</label>
                                     <input type="date" class="form-control form-control-sm" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <label for="data_fim" class="form-label">Data Fim:</label>
                                     <input type="date" class="form-control form-control-sm" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Status:</label>
+                                    <label for="status_frequencia" class="form-label">Status:</label>
                                     <select class="form-control form-control-sm" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
                                         <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todos os status</option>
                                         <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
@@ -160,7 +261,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <label for="laboratorio" class="form-label">Laboratório:</label>
                                     <select class="form-control form-control-sm" id="laboratorio" name="laboratorio" style="border-color: #86B5E1;">
                                         <option value="todos" {% if laboratorio_id == 'todos' or not laboratorio_id %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
@@ -206,57 +307,63 @@
                     {% if page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
-                                    <th style="width: 20%; border-color: #20597F;">Usuário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 20%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Status</th>
-                                    <th style="width: 15%; border-color: #20597F;" class="text-center">Ações</th>
+                                    <th style="width: 20%;">Usuário</th>
+                                    <th style="width: 15%;">Data</th>
+                                    <th style="width: 15%;">Horário</th>
+                                    <th style="width: 15%;">Laboratório</th>
+                                    <th style="width: 20%;">Frequência</th>
+                                    <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in page_obj %}
                                 <tr>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        <strong>{{ reserva.usuario.username }}</strong>
-                                        {% if reserva.usuario.first_name %}
-                                            <br><small class="text-muted">{{ reserva.usuario.first_name }} {{ reserva.usuario.last_name }}</small>
-                                        {% endif %}
+                                        <strong>{{ reserva.usuario.get_full_name|default:reserva.usuario.first_name|default:reserva.usuario.username }}</strong>
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                    <td style="vertical-align: middle;">
+                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                        {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
-                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">Presente</span>
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                                <i class="fas fa-check mr-1"></i> Presente
+                                            </span>
                                         {% elif reserva.status_frequencia == 'F' %}
-                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">Faltou</span>
+                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times mr-1"></i> Faltou
+                                            </span>
                                         {% elif reserva.status_frequencia == 'N' %}
-                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">Não Registrado</span>
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                                <i class="fas fa-question mr-1"></i> Não Registrado
+                                            </span>
                                         {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Pendente</span>
+                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
-                                        <a href="{% url 'reservas_por_usuario' reserva.usuario.id %}" 
-                                           class="btn btn-sm" 
-                                           title="Ver histórico do usuário"
-                                           data-toggle="tooltip"
-                                           style="background-color: #86B5E1; color: #20597F; border: none;">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <div class="action-buttons">
+                                            <a href="{% url 'reservas_por_usuario' reserva.usuario.id %}" 
+                                               class="action-btn btn-view" 
+                                               title="Ver histórico do usuário"
+                                               data-toggle="tooltip">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}

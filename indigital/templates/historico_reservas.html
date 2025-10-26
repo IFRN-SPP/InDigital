@@ -79,18 +79,19 @@
     }
     
     .table thead {
-        background-color: #20597F;
+        background-color: white;
+        color: #20597F;
+        border-bottom: 2px solid #20597F;
     }
     
     .table thead th {
-        background-color: #20597F;
-        color: white;
-        border-color: #20597F;
+        background-color: white;
+        color: #20597F;
+        border-color: #dee2e6;
         padding: 12px 8px;
         font-weight: 600;
         text-align: left;
         vertical-align: middle;
-        border-bottom: 2px solid #16466d;
     }
     
     .table tbody td {
@@ -251,16 +252,40 @@
         border-left: 4px solid #dc3545;
     }
 
-    .btn-cancelar-reserva {
-        padding: 4px 8px;
-        font-size: 0.75rem;
-        line-height: 1.2;
-        border-radius: 3px;
+    .action-buttons {
+        display: flex;
+        gap: 4px; 
+        justify-content: center;
+        align-items: center;
     }
 
-    .btn-cancelar-reserva .fas {
-        font-size: 0.7rem;
-        margin-right: 2px;
+    .action-btn {
+        padding: 4px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; 
+        height: 32px; 
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-cancel {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c82333;
+        color: white;
     }
 </style>
 {% endblock %}
@@ -280,34 +305,29 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form method="GET" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <label for="data_inicio" class="form-label">Data Início:</label>
                                     <input type="date" class="form-control form-control-sm" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <label for="data_fim" class="form-label">Data Fim:</label>
                                     <input type="date" class="form-control form-control-sm" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Status:</label>
+                                    <label for="status_frequencia" class="form-label">Status:</label>
                                     <select class="form-control form-control-sm" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
                                         <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todos os status</option>
                                         <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
@@ -319,7 +339,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <label for="laboratorio" class="form-label">Laboratório:</label>
                                     <select class="form-control form-control-sm" id="laboratorio" name="laboratorio" style="border-color: #86B5E1;">
                                         <option value="todos" {% if laboratorio_id == 'todos' or not laboratorio_id %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
@@ -373,7 +393,7 @@
     <div class="tab-content" id="reservasTabsContent">
         <div class="tab-pane fade show active" id="todas" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-list mr-2"></i>Todas as Minhas Reservas
                     </h3>
@@ -383,24 +403,24 @@
                         </span>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
                                     <th style="width: 15%;">Data</th>
-                                    <th style="width: 20%;">Horário</th>
+                                    <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
-                                    <th style="width: 20%;">Status</th>
                                     <th style="width: 20%;">Monitor</th>
-                                    <th style="width: 10%;">Ações</th>
+                                    <th style="width: 20%;">Frequência</th>
+                                    <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in page_obj %}
                                 <tr id="reserva-{{ reserva.id }}">
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
                                         {% if reserva.disponibilidade.data == today %}
@@ -411,15 +431,24 @@
                                             <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.disponibilidade.monitor %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                                        {% else %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
                                             <span class="badge badge-pill" style="background-color: #28a745; color: white;">
                                                 <i class="fas fa-check mr-1"></i> Presente
@@ -438,35 +467,26 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-status="{{ reserva.status_frequencia }}"
-                                                    title="Cancelar Reserva">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-times mr-1"></i> Cancelar
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <div class="action-buttons">
+                                            {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                                <button type="button" 
+                                                        class="action-btn btn-cancel btn-modal"
+                                                        data-reserva-id="{{ reserva.id }}"
+                                                        data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                                        data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
+                                                        data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                                        data-reserva-status="{{ reserva.status_frequencia }}"
+                                                        title="Cancelar Reserva">
+                                                    <span class="btn-text">
+                                                        <i class="fas fa-times"></i>
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -542,42 +562,51 @@
 
         <div class="tab-pane fade" id="futuras" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-plus mr-2"></i>Reservas Futuras
                     </h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if reservas_futuras %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
                                     <th style="width: 15%;">Data</th>
-                                    <th style="width: 20%;">Horário</th>
+                                    <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
-                                    <th style="width: 20%;">Status</th>
                                     <th style="width: 20%;">Monitor</th>
-                                    <th style="width: 10%;">Ações</th>
+                                    <th style="width: 20%;">Frequência</th>
+                                    <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in reservas_futuras %}
                                 <tr id="reserva-{{ reserva.id }}">
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
                                         <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.disponibilidade.monitor %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                                        {% else %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
                                             <span class="badge badge-pill" style="background-color: #28a745; color: white;">
                                                 <i class="fas fa-check mr-1"></i> Presente
@@ -596,35 +625,26 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-status="{{ reserva.status_frequencia }}"
-                                                    title="Cancelar Reserva">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-times mr-1"></i> Cancelar
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <div class="action-buttons">
+                                            {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                                <button type="button" 
+                                                        class="action-btn btn-cancel btn-modal"
+                                                        data-reserva-id="{{ reserva.id }}"
+                                                        data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                                        data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
+                                                        data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                                        data-reserva-status="{{ reserva.status_frequencia }}"
+                                                        title="Cancelar Reserva">
+                                                    <span class="btn-text">
+                                                        <i class="fas fa-times"></i>
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -646,42 +666,51 @@
 
         <div class="tab-pane fade" id="hoje" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-day mr-2"></i>Reservas de Hoje
                     </h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if reservas_hoje %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
                                     <th style="width: 15%;">Data</th>
-                                    <th style="width: 20%;">Horário</th>
+                                    <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
-                                    <th style="width: 20%;">Status</th>
                                     <th style="width: 20%;">Monitor</th>
-                                    <th style="width: 10%;">Ações</th>
+                                    <th style="width: 20%;">Frequência</th>
+                                    <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in reservas_hoje %}
                                 <tr id="reserva-{{ reserva.id }}">
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
                                         <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.disponibilidade.monitor %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                                        {% else %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
                                             <span class="badge badge-pill" style="background-color: #28a745; color: white;">
                                                 <i class="fas fa-check mr-1"></i> Presente
@@ -700,35 +729,26 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-modal"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-status="{{ reserva.status_frequencia }}"
-                                                    title="Cancelar Reserva">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-times mr-1"></i> Cancelar
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <div class="action-buttons">
+                                            {% if not reserva.expirada and reserva.status_frequencia != 'P' and reserva.status_frequencia != 'F' %}
+                                                <button type="button" 
+                                                        class="action-btn btn-cancel btn-modal"
+                                                        data-reserva-id="{{ reserva.id }}"
+                                                        data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                                        data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
+                                                        data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                                        data-reserva-status="{{ reserva.status_frequencia }}"
+                                                        title="Cancelar Reserva">
+                                                    <span class="btn-text">
+                                                        <i class="fas fa-times"></i>
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -750,42 +770,51 @@
 
         <div class="tab-pane fade" id="passadas" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-check mr-2"></i>Reservas Passadas
                     </h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if reservas_passadas %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
+                            <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
                                 <tr>
                                     <th style="width: 15%;">Data</th>
-                                    <th style="width: 20%;">Horário</th>
+                                    <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
-                                    <th style="width: 20%;">Status</th>
                                     <th style="width: 20%;">Monitor</th>
-                                    <th style="width: 10%;">Ações</th>
+                                    <th style="width: 20%;">Frequência</th>
+                                    <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in reservas_passadas %}
                                 <tr id="reserva-{{ reserva.id }}">
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.data|date:"d/m/Y" }}
                                         <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
                                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
                                         {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
                                     </td>
-                                    <td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.disponibilidade.monitor %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                                        {% else %}
+                                            <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                            Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
                                             <span class="badge badge-pill" style="background-color: #28a745; color: white;">
                                                 <i class="fas fa-check mr-1"></i> Presente
@@ -804,18 +833,7 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
+                                    <td class="text-center" style="vertical-align: middle;">
                                         <span class="text-muted">-</span>
                                     </td>
                                 </tr>
@@ -931,7 +949,7 @@ $(document).ready(function() {
         }
     );
 
-    $(document).on('click', '.btn-cancelar-reserva', function() {
+    $(document).on('click', '.btn-cancel', function() {
         reservaIdAtual = $(this).data('reserva-id');
         
         $('#modalCancelLaboratorio').text($(this).data('reserva-laboratorio'));

@@ -344,184 +344,132 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
-    <div class="card" style="border-color: #86B5E1;">
-        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
-            <h3 class="card-title mb-0">
-                <i class="fas fa-list mr-2"></i>Minhas Reservas
-            </h3>
-            <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
-            </span>
-        </div>
-                <div class="card-body p-0">
-                    {% if page_obj %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 15%; border-color: #20597F;">Status</th>
-                                    <th style="width: 15%; border-color: #20597F;">Frequência</th>
-                                    <th style="width: 15%; border-color: #20597F;">Monitor</th>
-                                    <th style="width: 10%; border-color: #20597F;">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reserva in page_obj %}
-                                <tr class="{% if reserva.disponibilidade.data < today %}table-light{% elif reserva.disponibilidade.data == today %}table-info{% endif %}" id="reserva-{{ reserva.id }}">
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.data|date:"d/m/Y" }}
-                                        {% if reserva.disponibilidade.data == today %}
-                                            <span class="badge badge-info">Hoje</span>
-                                        {% elif reserva.disponibilidade.data > today %}
-                                            <span class="badge badge-success">Futuro</span>
-                                        {% else %}
-                                            <span class="badge badge-secondary">Passado</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.status_aprovacao == 'A' %}
-                                            <span class="badge badge-success">
-                                                <i class="fas fa-check mr-1"></i> Aprovada
-                                            </span>
-                                        {% elif reserva.status_aprovacao == 'P' %}
-                                            <span class="badge badge-warning">
-                                                <i class="fas fa-clock mr-1"></i> Pendente
-                                            </span>
-                                        {% elif reserva.status_aprovacao == 'R' %}
-                                            <span class="badge badge-danger">
-                                                <i class="fas fa-times mr-1"></i> Rejeitada
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.status_frequencia == 'P' %}
-                                            <span class="badge badge-success">
-                                                <i class="fas fa-check mr-1"></i> Presente
-                                            </span>
-                                        {% elif reserva.status_frequencia == 'F' %}
-                                            <span class="badge badge-danger">
-                                                <i class="fas fa-times mr-1"></i> Faltou
-                                            </span>
-                                        {% elif reserva.status_frequencia == 'N' %}
-                                            <span class="badge badge-warning">
-                                                <i class="fas fa-question mr-1"></i> Não Registrado
-                                            </span>
-                                        {% else %}
-                                            <span class="badge badge-secondary">
-                                                <i class="fas fa-clock mr-1"></i> Aguardando
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                Sem monitor
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if not reserva.expirada and reserva.status_aprovacao != 'R' %}
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-cancelar-modal"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-status="{{ reserva.status_aprovacao }}">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-times mr-1"></i> Cancelar
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {% if page_obj.has_other_pages %}
-                    <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
+    <div class="col-12">
+        <div class="card" style="border-color: #86B5E1;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-list mr-2"></i>Minhas Reservas
+                </h3>
+                <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                    {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background-color: #86B5E1; color: #20597F !important;">
+    <tr>
+        <th style="width: 15%; color: #20597F !important;">Data</th>
+        <th style="width: 15%; color: #20597F !important;">Horário</th>
+        <th style="width: 15%; color: #20597F !important;">Laboratório</th>
+        <th style="width: 20%; color: #20597F !important;">Monitor</th>
+        <th style="width: 15%; color: #20597F !important;">Status</th>
+        <th style="width: 10%; color: #20597F !important;">Frequência</th>
+        <th style="width: 10%; color: #20597F !important;" class="text-center">Ações</th>
+    </tr>
+</thead>
 
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
-                                    </li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                           style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
-                                    </li>
-                                {% endif %}
+                        <tbody>
+                            {% for reserva in page_obj %}
+                            <tr class="{% if reserva.disponibilidade.data < today %}table-light{% elif reserva.disponibilidade.data == today %}table-info{% endif %}" id="reserva-{{ reserva.id }}">
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+                                    {% if reserva.disponibilidade.data == today %}
+                                        <span class="badge badge-info">Hoje</span>
+                                    {% elif reserva.disponibilidade.data > today %}
+                                        <span class="badge badge-success">Futuro</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Passado</span>
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    {% if reserva.disponibilidade.monitor %}
+                                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                        {{ reserva.disponibilidade.monitor.get_nome_completo|default:"Não definido" }}
+                                    {% else %}
+                                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                        Não definido
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    {% if reserva.status_aprovacao == 'A' %}
+                                        <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                            <i class="fas fa-check mr-1"></i> Aprovada
+                                        </span>
+                                    {% elif reserva.status_aprovacao == 'P' %}
+                                        <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                            <i class="fas fa-clock mr-1"></i> Pendente
+                                        </span>
+                                    {% elif reserva.status_aprovacao == 'R' %}
+                                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                            <i class="fas fa-times mr-1"></i> Rejeitada
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    {% if reserva.status_frequencia == 'P' %}
+                                        <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                            <i class="fas fa-check mr-1"></i> Presente
+                                        </span>
+                                    {% elif reserva.status_frequencia == 'F' %}
+                                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                            <i class="fas fa-times mr-1"></i> Faltou
+                                        </span>
+                                    {% elif reserva.status_frequencia == 'N' %}
+                                        <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                            <i class="fas fa-question mr-1"></i> Não Registrado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
+                                            <i class="fas fa-clock mr-1"></i> Aguardando
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;">
+                                    {% if not reserva.expirada and reserva.status_aprovacao != 'R' %}
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger btn-cancelar-reserva btn-cancelar-modal"
+                                                data-reserva-id="{{ reserva.id }}"
+                                                data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                                data-reserva-horario="{{ reserva.disponibilidade.horario_inicio|time:'H:i' }} às {{ reserva.disponibilidade.horario_fim|time:'H:i' }}"
+                                                data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                                data-reserva-status="{{ reserva.status_aprovacao }}">
+                                            <span class="btn-text">
+                                                <i class="fas fa-times mr-1"></i> Cancelar
+                                            </span>
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
-                        <p class="text-muted">
-                            Você ainda não possui reservas ou não há reservas que correspondem aos filtros aplicados.
-                        </p>
-                        <a href="{% url 'horarios' %}" class="btn btn-primary">
-                            <i class="fas fa-plus mr-1"></i> Fazer Nova Reserva
-                        </a>
-                    </div>
-                    {% endif %}
+                        </tbody>
+                    </table>
                 </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                    <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
+                    <p class="text-muted">
+                        Você ainda não possui reservas ou não há reservas que correspondem aos filtros aplicados.
+                    </p>
+                    <a href="{% url 'horarios' %}" class="btn btn-primary">
+                        <i class="fas fa-plus mr-1"></i> Fazer Nova Reserva
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

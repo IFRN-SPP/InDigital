@@ -114,7 +114,6 @@
     .btn-success {
         background-color: #28a745;
         border-color: #28a745;
-        margin-right: 5px;
     }
 
     .btn-success:hover {
@@ -125,7 +124,6 @@
     .btn-danger {
         background-color: #dc3545;
         border-color: #dc3545;
-        margin-left: 5px;
     }
 
     .btn-danger:hover {
@@ -133,14 +131,74 @@
         border-color: #bd2130;
     }
     
+    .card {
+        border: 1px solid #86B5E1;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
     .card-header {
-        background-color: var(--cor-primaria);
-        color: white;
+        background-color: #20597F !important;
+        color: white !important;
+        border-bottom: 1px solid #86B5E1;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #86B5E1;
+        padding: 15px 20px;
+    }
+
+    /* Estilo das tabelas */
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 0;
     }
     
     .table thead {
-        background-color: var(--cor-intermediaria2);
-        color: var(--cor-primaria);
+        background-color: white;
+        color: #20597F;
+        border-bottom: 2px solid #20597F;
+    }
+    
+    .table thead th {
+        background-color: white;
+        color: #20597F;
+        border-color: #dee2e6;
+        padding: 12px 8px;
+        font-weight: 600;
+        text-align: left;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        padding: 12px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 8px;
     }
     
     .badge-warning {
@@ -218,6 +276,52 @@
         font-weight: bold;
         color: var(--cor-primaria);
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; 
+        height: 32px; 
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-aprovar {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-aprovar:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    .btn-rejeitar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-rejeitar:hover {
+        background-color: #c82333;
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -238,34 +342,29 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #20597F; color: white;">
                     <h3 class="card-title">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form method="get" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data início:</label>
+                                    <label for="data_inicio" class="form-label">Data início:</label>
                                     <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data fim:</label>
+                                    <label for="data_fim" class="form-label">Data fim:</label>
                                     <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <label for="laboratorio_id" class="form-label">Laboratório:</label>
                                     <select class="form-select" id="laboratorio_id" name="laboratorio_id" style="border-color: #86B5E1;">
                                         <option value="">Todos</option>
                                         {% for lab in laboratorios %}
@@ -276,7 +375,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="usuario_id" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                    <label for="usuario_id" class="form-label">Usuário:</label>
                                     <select class="form-select" id="usuario_id" name="usuario_id" style="border-color: #86B5E1;">
                                         <option value="">Todos</option>
                                         {% for usuario in usuarios %}
@@ -286,10 +385,10 @@
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
                                     <i class="fas fa-search mr-1"></i> Filtrar
                                 </button>
-                                <a href="{% url 'reservas_pendentes' %}" class="btn" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                <a href="{% url 'reservas_pendentes' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
                             </div>
@@ -303,12 +402,12 @@
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-list mr-2"></i>Reservas Pendentes
                     </h3>
                     <div class="card-tools">
-                        <span class="badge badge-warning" style="font-size: 0.9rem;">
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
                             {{ page_obj.paginator.count }} pendente{{ page_obj.paginator.count|pluralize:"s" }}
                         </span>
                     </div>
@@ -317,109 +416,101 @@
                 {% if page_obj %}
                 <div class="card-body p-0">
                     <div class="p-3" style="background-color: rgba(134, 181, 225, 0.1); border-bottom: 1px solid #86B5E1;">
-                        <button type="button" class="btn btn-success btn-modal" id="btnAprovarSelecionadas">
+                        <button type="button" class="btn btn-sm btn-success btn-modal" id="btnAprovarSelecionadas">
                             <span class="btn-text">
                                 <i class="fas fa-check"></i> Aprovar Selecionadas
                             </span>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
                         </button>
-                        <button type="button" class="btn" id="select-all" style="background-color: #86B5E1; color: #20597F; border: none;">
+                        <button type="button" class="btn btn-sm" id="select-all" style="background-color: #86B5E1; color: #20597F; border: none;">
                             Selecionar Todas
                         </button>
-                        <button type="button" class="btn" id="unselect-all" style="background-color: #86B5E1; color: #20597F; border: none;">
+                        <button type="button" class="btn btn-sm" id="unselect-all" style="background-color: #86B5E1; color: #20597F; border: none;">
                             Desmarcar Todas
                         </button>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 5%; border-color: #20597F;">
-                                        <input type="checkbox" id="check-all">
-                                    </th>
-                                    <th style="width: 15%; border-color: #20597F;">Usuário</th>
-                                    <th style="width: 10%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 10%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Monitor</th>
-                                    <th style="width: 15%; border-color: #20597F;">Solicitada em</th>
-                                    <th style="width: 15%; border-color: #20597F;">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reserva in page_obj %}
-                                <tr id="reserva-{{ reserva.id }}">
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <strong>{{ reserva.usuario.suap_id }}</strong>
-                                        <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.data|date:"d/m/Y" }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if reserva.disponibilidade.monitor %}
-                                            <i class="fas fa-user-tie mr-1" style="color: #20597F;"></i>
-                                            {{ reserva.disponibilidade.monitor.suap_nome_completo }}
-                                        {% else %}
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-slash mr-1"></i>
-                                                N/A
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-check mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.data_solicitacao|date:"d/m/Y H:i" }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <div class="btn-group" role="group">
-                                            <button type="button" 
-                                                    class="btn btn-success btn-sm btn-modal btn-aprovar"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-usuario="{{ reserva.usuario.get_full_name }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}"
-                                                    title="Aprovar">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-check"></i>
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                            <button type="button" 
-                                                    class="btn btn-danger btn-sm btn-modal btn-rejeitar"
-                                                    data-reserva-id="{{ reserva.id }}"
-                                                    data-reserva-usuario="{{ reserva.usuario.get_full_name }}"
-                                                    data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
-                                                    data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
-                                                    data-reserva-horario="{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}"
-                                                    title="Rejeitar">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-times"></i>
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+    <table class="table table-hover">
+        <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
+            <tr>
+                <th style="width: 5%;">
+                    <input type="checkbox" id="check-all">
+                </th>
+                <th style="width: 20%;">Usuário</th>
+                <th style="width: 15%;">Data</th>
+                <th style="width: 15%;">Horário</th>
+                <th style="width: 15%;">Laboratório</th>
+                <th style="width: 15%;">Monitor</th>
+                <th style="width: 15%;" class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in page_obj %}
+            <tr id="reserva-{{ reserva.id }}">
+                <td style="vertical-align: middle;">
+                    <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
+                </td>
+                <td style="vertical-align: middle;">
+                    <strong>{{ reserva.usuario.suap_id }}</strong>
+                    <br><small class="text-muted">{{ reserva.usuario.get_full_name }}</small>
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                    {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                    {{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}
+                </td>
+                <td style="vertical-align: middle;">
+                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                    {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                </td>
+                <td style="vertical-align: middle;">
+                    {% if reserva.disponibilidade.monitor %}
+                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                        {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                    {% else %}
+                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                        Não definido
+                    {% endif %}
+                </td>
+                <td class="text-center" style="vertical-align: middle;">
+                    <div class="action-buttons">
+                        <button type="button" 
+                                class="action-btn btn-aprovar btn-modal"
+                                data-reserva-id="{{ reserva.id }}"
+                                data-reserva-usuario="{{ reserva.usuario.get_full_name }}"
+                                data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                data-reserva-horario="{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}"
+                                title="Aprovar">
+                            <span class="btn-text">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                        </button>
+                        <button type="button" 
+                                class="action-btn btn-rejeitar btn-modal"
+                                data-reserva-id="{{ reserva.id }}"
+                                data-reserva-usuario="{{ reserva.usuario.get_full_name }}"
+                                data-reserva-laboratorio="{{ reserva.disponibilidade.laboratorio.num_laboratorio }}"
+                                data-reserva-data="{{ reserva.disponibilidade.data|date:'d/m/Y' }}"
+                                data-reserva-horario="{{ reserva.disponibilidade.horario_inicio }} às {{ reserva.disponibilidade.horario_fim }}"
+                                title="Rejeitar">
+                            <span class="btn-text">
+                                <i class="fas fa-times"></i>
+                            </span>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                        </button>
                     </div>
-                </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
                 {% else %}
                 <div class="card-body">
                     <div class="text-center py-5">
