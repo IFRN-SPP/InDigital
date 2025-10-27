@@ -291,19 +291,12 @@
                                 <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                 {{ fila.disponibilidade.data|date:"d/m/Y" }}
                             </div>
-                            {% if fila.disponibilidade.data == today %}
-                                <span class="badge badge-pill mt-1" style="background-color: #17a2b8; color: white; font-size: 0.7rem;">Hoje</span>
-                            {% elif fila.disponibilidade.data > today %}
-                                <span class="badge badge-pill mt-1" style="background-color: #28a745; color: white; font-size: 0.7rem;">Futuro</span>
-                            {% else %}
-                                <span class="badge badge-pill mt-1" style="background-color: #6c757d; color: white; font-size: 0.7rem;">Passado</span>
-                            {% endif %}
                         </div>
                     </td>
                     <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
                         <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                        {{ fila.disponibilidade.horario_inicio|time:"H:i" }}<br>
-                        <small>às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</small>
+                        {{ fila.disponibilidade.horario_inicio|time:"H:i" }}
+                        às {{ fila.disponibilidade.horario_fim|time:"H:i" }}
                     </td>
                     <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
                         <i class="fas fa-flask mr-1" style="color: #20597F;"></i>

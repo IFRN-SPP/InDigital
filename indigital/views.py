@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils import timezone
+from django.db import transaction
 
 
 @login_required
@@ -925,38 +926,77 @@ def promover_fila(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id)
     disponibilidade = fila.disponibilidade
     agora = timezone.localtime(timezone.now())
-    # Não permitir promover reservas cujo horário já passou (início já ocorreu ou término já passou)
-    if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
-        messages.error(request, "Não é possível promover esta reserva: o horário já passou.")
+
+    # Rejeitar métodos diferentes de POST para segurança
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if request.method != 'POST':
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Método inválido.'}, status=405)
         return redirect('fila_espera')
 
-    if disponibilidade.vagas > 0:
-        try:
-            reserva = Reserva(usuario=fila.usuario, disponibilidade=disponibilidade)
+    # Não permitir promover reservas cujo horário já passou (início já ocorreu ou término já passou)
+    if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+        msg = "Não é possível promover esta reserva: o horário já passou."
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': msg}, status=400)
+        messages.error(request, msg)
+        return redirect('fila_espera')
+
+    if disponibilidade.vagas <= 0:
+        msg = "Não há vagas disponíveis para promover o usuário da fila de espera."
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': msg}, status=400)
+        messages.error(request, msg)
+        return redirect('fila_espera')
+
+    # Usar transação para evitar condições de corrida
+    try:
+        with transaction.atomic():
+            reserva = Reserva(usuario=fila.usuario, disponibilidade=disponibilidade, status_aprovacao='A')
             reserva.clean()
             reserva.save()
             disponibilidade.vagas -= 1
             disponibilidade.save()
             fila.delete()
-            messages.success(request, f"Usuário {fila.usuario.username} promovido da fila de espera para reserva.")
-        except ValidationError as e:
-            if hasattr(e, 'message'):
-                error_msg = e.message
-            elif hasattr(e, 'messages') and e.messages:
-                error_msg = e.messages[0]
-            else:
-                error_msg = str(e)
-            messages.error(request, f"Não foi possível promover {fila.usuario.username}: {error_msg}")
-    else:
-        messages.error(request, "Não há vagas disponíveis para promover o usuário da fila de espera.")
+    except ValidationError as e:
+        if hasattr(e, 'message'):
+            error_msg = e.message
+        elif hasattr(e, 'messages') and e.messages:
+            error_msg = e.messages[0]
+        else:
+            error_msg = str(e)
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': error_msg}, status=400)
+        messages.error(request, f"Não foi possível promover {fila.usuario.username}: {error_msg}")
+        return redirect('fila_espera')
+    except Exception as e:
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        messages.error(request, f"Erro ao promover usuário: {str(e)}")
+        return redirect('fila_espera')
+
+    success_msg = f"Usuário {fila.usuario.username} promovido da fila de espera para reserva."
+    if is_ajax:
+        return JsonResponse({'success': True, 'message': success_msg})
+    messages.success(request, success_msg)
     return redirect('fila_espera')
 
 @login_required
 @admin_required
 def remover_fila(request, fila_id):
     fila = get_object_or_404(FilaEspera, id=fila_id)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if request.method != 'POST':
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Método inválido.'}, status=405)
+        return redirect('fila_espera')
+
+    usuario_nome = fila.usuario.username
     fila.delete()
-    messages.success(request, f"Usuário {fila.usuario.username} removido da fila de espera.")
+    success_msg = f"Usuário {usuario_nome} removido da fila de espera."
+    if is_ajax:
+        return JsonResponse({'success': True, 'message': success_msg})
+    messages.success(request, success_msg)
     return redirect('fila_espera')
 
 @login_required

@@ -376,13 +376,6 @@
                                 <td style="vertical-align: middle;">
                                     <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
                                     {{ reserva.disponibilidade.data|date:"d/m/Y" }}
-                                    {% if reserva.disponibilidade.data == today %}
-                                        <span class="badge badge-info">Hoje</span>
-                                    {% elif reserva.disponibilidade.data > today %}
-                                        <span class="badge badge-success">Futuro</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">Passado</span>
-                                    {% endif %}
                                 </td>
                                 <td style="vertical-align: middle;">
                                     <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
