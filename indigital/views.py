@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils import timezone
 
+
 @login_required
 def dashboard_redirect(request):
     """
@@ -272,15 +273,37 @@ def excluir_disponibilidade(request, disponibilidade_id):
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
     reservas_existentes = Reserva.objects.filter(disponibilidade=disponibilidade).exists()
 
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if reservas_existentes:
+            return JsonResponse({
+                'success': False,
+                'message': 'Não é possível excluir esta disponibilidade porque existem reservas associadas.'
+            })
+
+        
+        if request.method == 'POST':
+            disponibilidade.delete()
+            return JsonResponse({
+                'success': True,
+                'message': 'Disponibilidade excluída com sucesso!'
+            })
+
+        
+        return JsonResponse({'success': False, 'message': 'Método inválido.'}, status=400)
+
+    
     if reservas_existentes:
         messages.error(request, "Não é possível excluir esta disponibilidade porque existem reservas associadas.")
         return redirect('listar_disponibilidades')
-    if request.method == "POST":
+
+    if request.method == 'POST':
         disponibilidade.delete()
         messages.success(request, "Disponibilidade excluída com sucesso!")
         return redirect('listar_disponibilidades')
-    else:
-        return render(request, "excluir_disponibilidade.html", {'reserva': disponibilidade})
+
+    
+    return render(request, "excluir_disponibilidade.html", {'reserva': disponibilidade})
 
 @login_required
 @admin_required
