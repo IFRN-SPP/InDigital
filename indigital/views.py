@@ -183,23 +183,58 @@ def index(request):
 @admin_required
 def editar_disponibilidade(request, reserva_id):
     reserva = get_object_or_404(Disponibilidade, id=reserva_id)
-
     context = {
-        "reserva" : reserva,
-        "form" : DisponibilidadeForm(instance=reserva),
+        "reserva": reserva,
+        "form": DisponibilidadeForm(instance=reserva),
         "laboratorios": Laboratorio.objects.all()
     }
 
     if request.method == 'POST':
         form = DisponibilidadeForm(request.POST, instance=reserva)
         if form.is_valid():
-            form.save()
+            disponibilidade = form.save(commit=False)
+
+            # Validação: horário de início deve ser menor que horário de fim
+            if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
+                form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
+                context["form"] = form
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+
+                messages.error(request, "O horário de início deve ser menor que o horário de fim.")
+                return render(request, "editar_disponibilidade.html", context)
+
+            # Verifica conflito de horários, excluindo a própria disponibilidade que está sendo editada
+            conflito = Disponibilidade.objects.filter(
+                laboratorio=disponibilidade.laboratorio,
+                data=disponibilidade.data,
+                horario_inicio__lt=disponibilidade.horario_fim,
+                horario_fim__gt=disponibilidade.horario_inicio
+            ).exclude(id=disponibilidade.id).exists()
+
+            if conflito:
+                # Adiciona erro ao formulário para feedback e mantém o formulário preenchido
+                form.add_error(None, "Já existe uma disponibilidade nesse horário para este laboratório.")
+                context["form"] = form
+
+                # Se for requisição AJAX, retorna o HTML do modal com erros
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+
+                messages.error(request, "Já existe uma disponibilidade nesse horário para este laboratório.")
+                return render(request, "editar_disponibilidade.html", context)
+
+            # Sem conflito: salva e retorna
+            disponibilidade.save()
             messages.success(request, "Disponibilidade editada com sucesso!")
             return redirect('listar_disponibilidades')
         else:
             context["form"] = form
             messages.error(request, "Erro ao editar disponibilidade!")
-    
+
     return render(request, "editar_disponibilidade.html", context)
 
 @login_required
@@ -311,7 +346,35 @@ def criar_disponibilidade(request):
     if request.method == 'POST':
         form = DisponibilidadeForm(request.POST)
         if form.is_valid():
-            disponibilidade = form.save()
+            disponibilidade = form.save(commit=False)
+
+            # Validação: horário de início deve ser menor que horário de fim
+            if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
+                form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+
+                messages.error(request, "O horário de início deve ser menor que o horário de fim.")
+                return redirect('listar_disponibilidades')
+
+            # Verifica se já existe uma disponibilidade conflitante
+            conflito = Disponibilidade.objects.filter(
+                laboratorio=disponibilidade.laboratorio,
+                data=disponibilidade.data,
+                horario_inicio__lt=disponibilidade.horario_fim,
+                horario_fim__gt=disponibilidade.horario_inicio
+            ).exists()
+
+            if conflito:
+                messages.error(request, "Já existe uma disponibilidade nesse horário para este laboratório.")
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+                return redirect('listar_disponibilidades')
+
+            disponibilidade.save()
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
@@ -319,7 +382,6 @@ def criar_disponibilidade(request):
             messages.success(request, "Disponibilidade criada com sucesso!")
             return redirect('listar_disponibilidades')
         else:
-
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 form_html = render_to_string('modal_form.html', {'form': form}, request=request)
                 return JsonResponse({'success': False, 'form_html': form_html})
