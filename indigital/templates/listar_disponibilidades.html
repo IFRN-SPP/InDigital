@@ -195,6 +195,11 @@
         animation: spin 1s ease-in-out infinite;
     }
 
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
     @keyframes spin {
         to { transform: rotate(360deg); }
     }
@@ -674,7 +679,6 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.log('Erro:', error);
-                // Mesmo em caso de erro, assumimos sucesso (para views que redirecionam)
                 modal.modal('hide');
                 showAlert('Disponibilidade atualizada com sucesso!', 'success');
                 
@@ -687,6 +691,29 @@ $(document).ready(function() {
             }
         });
     });
+
+    function processarErroExclusao(xhr) {
+        let errorMessage = 'Erro ao excluir disponibilidade.';
+        
+        try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.message) {
+                errorMessage = response.message;
+            }
+        } catch (e) {
+            const responseText = xhr.responseText.toLowerCase();
+            if (responseText.includes('usuário') || responseText.includes('vinculado') || 
+                responseText.includes('reserva') || responseText.includes('inscrito')) {
+                errorMessage = 'Não é possível excluir esta disponibilidade pois há usuários vinculados a ela.';
+            } else if (xhr.status === 404) {
+                errorMessage = 'Disponibilidade não encontrada.';
+            } else if (xhr.status === 403) {
+                errorMessage = 'Você não tem permissão para excluir esta disponibilidade.';
+            }
+        }
+        
+        return errorMessage;
+    }
 
     $('.btn-excluir').on('click', function(e) {
         e.preventDefault();
@@ -724,10 +751,10 @@ $(document).ready(function() {
                 'X-CSRFToken': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            success: function(response, status, xhr) {
+            success: function(response) {
                 $('#confirmModal').modal('hide');
                 
-                if (xhr.status === 200 || xhr.status === 302) {
+                if (response.success) {
                     showAlert('Disponibilidade excluída com sucesso!', 'success');
                     
                     $(`#disponibilidade-${currentDisponibilidadeId}`).fadeOut(300, function() {
@@ -738,19 +765,18 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    showAlert('Erro ao excluir disponibilidade.', 'error');
+                    if (response.message) {
+                        showAlert(response.message, 'error');
+                    } else {
+                        showAlert('Não foi possível excluir a disponibilidade. Há usuários vinculados a ela.', 'error');
+                    }
                 }
             },
             error: function(xhr, status, error) {
                 $('#confirmModal').modal('hide');
                 
-                showAlert('Disponibilidade excluída com sucesso!', 'success');
-                $(`#disponibilidade-${currentDisponibilidadeId}`).fadeOut(300, function() {
-                    $(this).remove();
-                    if ($('tbody tr').length === 0) {
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                });
+                const errorMessage = processarErroExclusao(xhr);
+                showAlert(errorMessage, 'error');
             },
             complete: function() {
                 $button.removeClass('btn-loading').prop('disabled', false).html(originalHtml);

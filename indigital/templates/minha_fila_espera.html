@@ -351,71 +351,71 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for fila in page_obj %}
-                                <tr class="{% if fila.disponibilidade.data < today %}table-light{% elif fila.disponibilidade.data == today %}table-info{% endif %}">
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="text-muted">{{ fila.id }}</span>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.data|date:"d/m/Y" }}</strong>
-                                        {% if fila.disponibilidade.data == today %}
-                                            <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
-                                        {% elif fila.disponibilidade.data > today %}
-                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
-                                        {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</strong>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.laboratorio.num_laboratorio }}</strong>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="badge" style="background-color: #20597F; color: white;">
-                                            {{ fila.posicao }}º
-                                        </span>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.data_solicitacao|date:"d/m/Y H:i" }}</strong>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if fila.status == 'ativo' %}
-                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
-                                                <i class="fas fa-hourglass-half mr-1"></i> Aguardando
-                                            </span>
-                                        {% elif fila.status == 'processado' %}
-                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
-                                                <i class="fas fa-check mr-1"></i> Processado
-                                            </span>
-                                        {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
-                                                <i class="fas fa-question mr-1"></i> {{ fila.status|capfirst }}
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
-                                        {% if fila.can_sair %}
-                                            <form method="post" action="{% url 'sair_fila_espera' fila.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="action-btn btn-rejeitar"
-                                                        onclick="return confirm('Tem certeza que deseja sair da fila de espera?')"
-                                                        title="Sair da fila">
-                                                    <i class="fas fa-sign-out-alt"></i>
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
+    {% for fila in page_obj %}
+    <tr class="{% if fila.disponibilidade.data < today %}table-light{% elif fila.disponibilidade.data == today %}table-info{% endif %}">
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <span class="text-muted">{{ fila.id }}</span>
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
+            {{ fila.disponibilidade.data|date:"d/m/Y" }}
+            {% if fila.disponibilidade.data == today %}
+                <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
+            {% elif fila.disponibilidade.data > today %}
+                <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
+            {% else %}
+                <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
+            {% endif %}
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <i class="fas fa-clock mr-2" style="color: #20597F;"></i>
+            {{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <i class="fas fa-flask mr-2" style="color: #20597F;"></i>
+            {{ fila.disponibilidade.laboratorio.num_laboratorio }}
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <span class="badge" style="background-color: #20597F; color: white;">
+                {{ fila.posicao }}º
+            </span>
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
+            {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
+        </td>
+        <td style="border-color: #86B5E1; vertical-align: middle;">
+            {% if fila.status == 'ativo' %}
+                <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                    <i class="fas fa-hourglass-half mr-1"></i> Aguardando
+                </span>
+            {% elif fila.status == 'processado' %}
+                <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                    <i class="fas fa-check mr-1"></i> Processado
+                </span>
+            {% else %}
+                <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
+                    <i class="fas fa-question mr-1"></i> {{ fila.status|capfirst }}
+                </span>
+            {% endif %}
+        </td>
+        <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
+            {% if fila.can_sair %}
+                <form method="post" action="{% url 'sair_fila_espera' fila.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn btn-rejeitar"
+                            onclick="return confirm('Tem certeza que deseja sair da fila de espera?')"
+                            title="Sair da fila">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
                         </table>
                     </div>
                     

@@ -12,7 +12,6 @@
         --cor-intermediaria3: #20597F;
       }
       
-      
       body {
         font-family: 'Source Sans 3', sans-serif;
         background-color: #f4f6f9;
@@ -41,9 +40,16 @@
         border: none;
       }
       .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eaecef;
+        background-color: var(--cor-primaria);
+        color: white;
+        border-bottom: 1px solid var(--cor-primaria);
         font-weight: 600;
+        padding: 15px 20px;
+      }
+      .card-header .card-title {
+        color: white;
+        margin: 0;
+        font-size: 1.2rem;
       }
       .app-sidebar {
         background: linear-gradient(180deg, var(--cor-primaria) 0%, var(--cor-primaria) 100%) !important;
@@ -61,7 +67,6 @@
         text-align: center;
       }
       
-      /* Correção para o layout do AdminLTE */
       .wrapper {
         display: flex;
         flex-direction: column;
@@ -88,7 +93,7 @@
         width: 78px;
       }
       
-      /* Estilo para o banner */
+      /* Estilo do banner */
       .welcome-banner {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -142,24 +147,23 @@
         z-index: 0;
       }
       
-      /* Cores padrão nos elementos */
       .bg-info {
-        background-color: #20597F !important; /* Azul escuro */
+        background-color: #20597F !important; 
         color: white !important;
       }
       
       .bg-success {
-        background-color: #86B5E1 !important; /* Azul claro */
+        background-color: #86B5E1 !important; 
         color: white !important;
       }
       
       .bg-warning {
-        background-color: #20597F !important; /* Azul escuro */
+        background-color: #20597F !important; 
         color: white !important;
       }
       
       .bg-danger {
-        background-color: #86B5E1 !important; /* Azul claro */
+        background-color: #86B5E1 !important; 
         color: white !important;
       }
       
@@ -183,6 +187,91 @@
       .pagination .page-link {
         color: var(--cor-primaria);
       }
+
+      /* ESTILOS DA TABELA */
+      .reservas-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 0;
+      }
+
+      .reservas-table thead th {
+          background-color: #f8f9fa;
+          color: var(--cor-primaria);
+          font-weight: 600;
+          padding: 15px 12px;
+          border-bottom: 2px solid var(--cor-intermediaria2);
+          text-align: left;
+          font-size: 0.9rem;
+      }
+
+      .reservas-table tbody tr {
+          transition: background-color 0.2s ease;
+          border-bottom: 1px solid #eaecef;
+      }
+
+      .reservas-table tbody tr:hover {
+          background-color: #f8f9fa;
+      }
+
+      .reservas-table tbody td {
+          padding: 14px 12px;
+          vertical-align: middle;
+      }
+
+      .status-badge {
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+      }
+
+      .status-presente {
+          background-color: var(--cor-intermediaria2);
+          color: white;
+      }
+
+      .status-falta {
+          background-color: #6c757d;
+          color: white;
+      }
+
+      .status-pendente {
+          background-color: var(--cor-primaria);
+          color: white;
+      }
+
+      .lab-info {
+          background-color: var(--cor-intermediaria2);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-weight: 600;
+          font-size: 0.8rem;
+      }
+
+      .time-slot {
+          font-weight: 600;
+          color: var(--cor-primaria);
+      }
+
+      .user-display {
+          font-weight: 500;
+          color: #495057;
+      }
+
+      .empty-reservas {
+          text-align: center;
+          padding: 40px 20px;
+          color: #6c757d;
+      }
+
+      .empty-reservas i {
+          font-size: 3rem;
+          margin-bottom: 15px;
+          color: #dee2e6;
+      }
       
       @media (max-width: 767.98px) {
         .content-wrapper {
@@ -204,6 +293,15 @@
         }
         .welcome-icon {
           display: none;
+        }
+        
+        .reservas-table {
+            font-size: 0.85rem;
+        }
+        
+        .reservas-table thead th,
+        .reservas-table tbody td {
+            padding: 10px 8px;
         }
       }
     </style>
@@ -270,38 +368,55 @@
                       Reservas do dia
                     </h3>
                   </div>
-                  <div class="card-body">
+                  <div class="card-body p-0">
                     <div class="tab-content p-0">
-                      <table class="table table-bordered">
+                      <table class="reservas-table">
                         <thead>
                           <tr>
-                            <th style="width: 10px">ID</th>
+                            <th>ID</th>
                             <th>Horário</th>
                             <th>Laboratório</th>
                             <th>Usuário</th>
-                            <th style="width: 40px">Status</th>
+                            <th>Frequência</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for reserva in reservas_hoje %}
                           <tr class="align-middle">
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}</td>
-                            <td>{{ reserva.disponibilidade.laboratorio.num_laboratorio }}</td>
-                            <td>{{ reserva.usuario.first_name|default:reserva.usuario.username }}</td>
+                            <td><strong>{{ forloop.counter }}</strong></td>
+                            <td>
+                                <span class="time-slot">
+                                    {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} - {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="lab-info">
+                                    Lab {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="user-display">
+                                    {{ reserva.usuario.first_name|default:reserva.usuario.username }}
+                                </span>
+                            </td>
                             <td>
                               {% if reserva.status_frequencia == 'P' %}
-                                  <span class="badge bg-success">Presente</span>
+                                  <span class="status-badge status-presente">Presente</span>
                               {% elif reserva.status_frequencia == 'F' %}
-                                  <span class="badge bg-danger">Falta</span>
+                                  <span class="status-badge status-falta">Faltou</span>
                               {% else %}
-                                  <span class="badge bg-warning">Pendente</span>
+                                  <span class="status-badge status-pendente">Pendente</span>
                               {% endif %}
                             </td>
                           </tr>
                           {% empty %}
                           <tr>
-                            <td colspan="5" class="text-center">Nenhuma reserva encontrada para hoje</td>
+                            <td colspan="5">
+                                <div class="empty-reservas">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <h4>Nenhuma reserva encontrada para hoje</h4>
+                                </div>
+                            </td>
                           </tr>
                           {% endfor %}
                         </tbody>
