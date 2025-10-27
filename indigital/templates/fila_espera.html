@@ -106,6 +106,53 @@
     .custom-modal .modal-footer {
         border-top: 1px solid #86B5E1;
     }
+
+    /* Estilo para botões de ação */
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-aprovar {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-aprovar:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    .btn-rejeitar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-rejeitar:hover {
+        background-color: #c82333;
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -202,40 +249,46 @@
                         </span>
                     </div>
                 </div>
+                
+                {% if page_obj %}
                 <div class="card-body p-0">
-                    {% if page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
+                            <thead style="background-color: #86B5E1; color: #20597F !important;">
                                 <tr>
-                                    <th style="width: 10%; border-color: #20597F;">Posição</th>
-                                    <th style="width: 15%; border-color: #20597F;">Usuário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Laboratório</th>
-                                    <th style="width: 15%; border-color: #20597F;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F;">Data da Solicitação</th>
-                                    <th style="width: 15%; border-color: #20597F;" class="text-center">Ações</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">ID</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">Posição</th>
+                                    <th style="width: 25%; border-color: #20597F; color: #20597F !important;">Usuário</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Data</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Horário</th>
+                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Laboratório</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for fila in page_obj %}
                                 <tr id="fila-{{ fila.id }}">
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        <span class="text-muted">{{ fila.id }}</span>
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <span class="badge" style="background-color: #20597F; color: white;">
                                             {{ page_obj.start_index|add:forloop.counter0 }}º
                                         </span>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ fila.usuario.suap_nome_completo }}
+                                        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
+                                        <strong>
+                                            {% if fila.usuario.get_full_name %}
+                                                {{ fila.usuario.get_full_name }}
+                                            {% else %}
+                                                {{ fila.usuario.first_name|default:fila.usuario.username }}
+                                            {% endif %}
+                                        </strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.laboratorio.num_laboratorio }}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.data|date:"d/m/Y" }}
+                                        <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.data|date:"d/m/Y" }}</strong>
                                         {% if fila.disponibilidade.data == today %}
                                             <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
                                         {% elif fila.disponibilidade.data > today %}
@@ -245,28 +298,30 @@
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
-                                        {{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}
+                                        <i class="fas fa-clock mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-plus mr-1" style="color: #20597F;"></i>
-                                        {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
+                                        <i class="fas fa-flask mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.disponibilidade.laboratorio.num_laboratorio }}</strong>
                                     </td>
                                     <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-promover" 
+                                        <div class="action-buttons">
+                                            <button type="button" class="action-btn btn-aprovar"
                                                     title="Promover para reserva"
-                                                    style="background-color: #28a745; color: white; border: none; margin-right: 4px;"
                                                     data-fila-id="{{ fila.id }}"
-                                                    data-usuario-nome="{{ fila.usuario.suap_nome_completo }}">
-                                                <i class="fas fa-arrow-up"></i>
+                                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
+                                                <span class="btn-text">
+                                                    <i class="fas fa-arrow-up"></i>
+                                                </span>
                                             </button>
-                                            <button type="button" class="btn btn-remover" 
+                                            <button type="button" class="action-btn btn-rejeitar"
                                                     title="Remover da fila"
-                                                    style="background-color: #dc3545; color: white; border: none;"
                                                     data-fila-id="{{ fila.id }}"
-                                                    data-usuario-nome="{{ fila.usuario.suap_nome_completo }}">
-                                                <i class="fas fa-trash"></i>
+                                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
+                                                <span class="btn-text">
+                                                    <i class="fas fa-trash"></i>
+                                                </span>
                                             </button>
                                         </div>
                                     </td>
@@ -275,7 +330,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {% else %}
+                </div>
+                {% else %}
+                <div class="card-body">
                     <div class="text-center py-5">
                         <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
                         <h4 style="color: #20597F;">Nenhum usuário na fila de espera</h4>
@@ -287,8 +344,8 @@
                             {% endif %}
                         </p>
                     </div>
-                    {% endif %}
                 </div>
+                {% endif %}
                 
                 {% if page_obj %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
@@ -389,14 +446,14 @@ $(document).ready(function() {
             } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
                 $(this).css('background-color', '#86B5E1');
             } else if ($(this).css('background-color') === 'rgb(200, 35, 51)') {
+                $(this).css('background-color', '#1ad458ff');
+            } else if ($(this).css('background-color') === 'rgba(33, 136, 56, 1)') {
                 $(this).css('background-color', '#dc3545');
-            } else if ($(this).css('background-color') === 'rgb(33, 136, 56)') {
-                $(this).css('background-color', '#28a745');
             }
         }
     );
 
-    $('.btn-promover').on('click', function() {
+    $('.btn-aprovar').on('click', function() {
         currentFilaId = $(this).data('fila-id');
         const usuarioNome = $(this).data('usuario-nome');
         currentAction = 'promover';
@@ -411,7 +468,7 @@ $(document).ready(function() {
         $('#confirmModal').modal('show');
     });
 
-    $('.btn-remover').on('click', function() {
+    $('.btn-rejeitar').on('click', function() {
         currentFilaId = $(this).data('fila-id');
         const usuarioNome = $(this).data('usuario-nome');
         currentAction = 'remover';

@@ -71,6 +71,26 @@
         z-index: 0;
     }
     
+    .info-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 4px solid var(--cor-primaria);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .info-item i {
+        color: var(--cor-primaria);
+        width: 25px;
+        margin-right: 10px;
+    }
+    
     .table-hover tbody tr:hover {
         background-color: rgba(134, 181, 225, 0.1);
     }
@@ -91,18 +111,37 @@
         border-color: var(--cor-primaria);
     }
     
-    .info-card {
-        border: 1px solid #86B5E1;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    .btn-primary {
+        background-color: var(--cor-primaria);
+        border-color: var(--cor-primaria);
     }
     
-    .info-card .card-header {
-        background-color: #20597F;
+    .btn-primary:hover {
+        background-color: #16466d;
+        border-color: #16466d;
+    }
+    
+    .btn-secondary {
+        background-color: #86B5E1;
+        color: #20597F;
+        border-color: #86B5E1;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #76a5d9;
+        border-color: #76a5d9;
+        color: #20597F;
+    }
+    
+    .card-header {
+        background-color: var(--cor-primaria);
         color: white;
-        border-bottom: 1px solid #86B5E1;
-        font-weight: 600;
-        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 8px;
     }
 </style>
 {% endblock %}
@@ -118,33 +157,50 @@
         </div>
     </div>
 
-    <div class="card info-card mb-4">
-        <div class="card-header">
-            <h3 class="mb-0">
-                <i class="fas fa-info-circle mr-2"></i> Informações da Disponibilidade
-            </h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <strong><i class="fas fa-flask mr-2" style="color: #20597F;"></i> Laboratório:</strong><br>
-                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.laboratorio.num_laboratorio }}</span>
-                </div>
-                <div class="col-md-3">
-                    <strong><i class="fas fa-calendar mr-2" style="color: #20597F;"></i> Data:</strong><br>
-                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.data|date:"d/m/Y" }}</span>
-                </div>
-                <div class="col-md-3">
-                    <strong><i class="fas fa-clock mr-2" style="color: #20597F;"></i> Horário:</strong><br>
-                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}</span>
-                </div>
-                <div class="col-md-3">
-                    <strong><i class="fas fa-user-tie mr-2" style="color: #20597F;"></i> Monitor:</strong><br>
-                    {% if disponibilidade.monitor %}
-                        <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.suap_nome_completo }}</span>
-                    {% else %}
-                        <span class="text-muted">Sem monitor</span>
-                    {% endif %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-item">
+                            <i class="fas fa-flask"></i>
+                            <div>
+                                <strong>Laboratório:</strong><br>
+                                <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.laboratorio.num_laboratorio }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <div>
+                                <strong>Data:</strong><br>
+                                <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.data|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>Horário:</strong><br>
+                                <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-item">
+                            <i class="fas fa-user-tie"></i>
+                            <div>
+                                <strong>Monitor:</strong><br>
+                                {% if disponibilidade.monitor %}
+                                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.suap_nome_completo }}</span>
+                                {% else %}
+                                    <span class="text-muted">Sem monitor</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,29 +270,32 @@
                     <h3 class="card-title mb-0">
                         <i class="fas fa-check-circle mr-2"></i> Reservas Confirmadas
                     </h3>
-                    <div class="card-tools">
-                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ reservas_count }} reserva{{ reservas_count|pluralize:"s" }}
-                        </span>
-                    </div>
+                    <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                        {{ reservas_count }} reserva{{ reservas_count|pluralize:"s" }}
+                    </span>
                 </div>
+                
+                {% if reservas_page_obj %}
                 <div class="card-body p-0">
-                    {% if reservas_page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
+                            <thead style="background-color: #86B5E1; color: #20597F !important;">
                                 <tr>
-                                    <th style="width: 40%; border-color: #20597F;">Usuário</th>
-                                    <th style="width: 30%; border-color: #20597F;">Status Frequência</th>
-                                    <th style="width: 30%; border-color: #20597F;">Data da Reserva</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">ID</th>
+                                    <th style="width: 40%; border-color: #20597F; color: #20597F !important;">Usuário</th>
+                                    <th style="width: 30%; border-color: #20597F; color: #20597F !important;">Frequência</th>
+                                    <th style="width: 20%; border-color: #20597F; color: #20597F !important;">Horário da Reserva</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reserva in reservas_page_obj %}
                                 <tr>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.usuario.suap_nome_completo }}
+                                        {{ reservas_page_obj.start_index|add:forloop.counter0 }}
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ reserva.usuario.suap_nome_completo }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
@@ -258,7 +317,7 @@
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-plus mr-1" style="color: #20597F;"></i>
+                                        <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
                                         {{ disponibilidade.horario_inicio|time:"H:i" }} às {{ disponibilidade.horario_fim|time:"H:i" }}
                                     </td>
                                 </tr>
@@ -266,18 +325,15 @@
                             </tbody>
                         </table>
                     </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
-                        <p class="text-muted">Não há reservas confirmadas para esta disponibilidade.</p>
-                    </div>
-                    {% endif %}
                 </div>
-                
-                {% if reservas_page_obj %}
+
+                {% if reservas_page_obj.has_other_pages %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    {% if reservas_page_obj.has_other_pages %}
+                    <div class="float-left">
+                        <span class="text-muted">
+                            Mostrando {{ reservas_page_obj.start_index }} a {{ reservas_page_obj.end_index }} de {{ reservas_page_obj.paginator.count }} registros
+                        </span>
+                    </div>
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if reservas_page_obj.has_previous %}
                             <li class="page-item">
@@ -322,7 +378,16 @@
                             </li>
                         {% endif %}
                     </ul>
-                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
+                        <p class="text-muted">Não há reservas confirmadas para esta disponibilidade.</p>
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -336,37 +401,40 @@
                     <h3 class="card-title mb-0">
                         <i class="fas fa-hourglass-half mr-2"></i> Fila de Espera
                     </h3>
-                    <div class="card-tools">
-                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ fila_count }} usuário{{ fila_count|pluralize:"s" }}
-                        </span>
-                    </div>
+                    <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                        {{ fila_count }} usuário{{ fila_count|pluralize:"s" }}
+                    </span>
                 </div>
+                
+                {% if fila_page_obj %}
                 <div class="card-body p-0">
-                    {% if fila_page_obj %}
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F;">
+                            <thead style="background-color: #86B5E1; color: #20597F !important;">
                                 <tr>
-                                    <th style="width: 20%; border-color: #20597F;">Posição</th>
-                                    <th style="width: 50%; border-color: #20597F;">Usuário</th>
-                                    <th style="width: 30%; border-color: #20597F;">Data de Entrada</th>
+                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">#</th>
+                                    <th style="width: 20%; border-color: #20597F; color: #20597F !important;">Posição</th>
+                                    <th style="width: 50%; border-color: #20597F; color: #20597F !important;">Usuário</th>
+                                    <th style="width: 20%; border-color: #20597F; color: #20597F !important;">Data de Entrada</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for fila in fila_page_obj %}
                                 <tr>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
+                                        {{ fila_page_obj.start_index|add:forloop.counter0 }}
+                                    </td>
+                                    <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <span class="badge" style="background-color: #20597F; color: white;">
                                             {{ forloop.counter0|add:fila_page_obj.start_index }}º
                                         </span>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ fila.usuario.username }}
+                                        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
+                                        <strong>{{ fila.usuario.username }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar-plus mr-1" style="color: #20597F;"></i>
+                                        <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
                                         {{ fila.data_solicitacao|date:"d/m/Y H:i" }}
                                     </td>
                                 </tr>
@@ -374,18 +442,15 @@
                             </tbody>
                         </table>
                     </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Fila de espera vazia</h4>
-                        <p class="text-muted">Não há usuários na fila de espera para esta disponibilidade.</p>
-                    </div>
-                    {% endif %}
                 </div>
-                
-                {% if fila_page_obj %}
+
+                {% if fila_page_obj.has_other_pages %}
                 <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    {% if fila_page_obj.has_other_pages %}
+                    <div class="float-left">
+                        <span class="text-muted">
+                            Mostrando {{ fila_page_obj.start_index }} a {{ fila_page_obj.end_index }} de {{ fila_page_obj.paginator.count }} registros
+                        </span>
+                    </div>
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if fila_page_obj.has_previous %}
                             <li class="page-item">
@@ -430,7 +495,16 @@
                             </li>
                         {% endif %}
                     </ul>
-                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                        <h4 style="color: #20597F;">Fila de espera vazia</h4>
+                        <p class="text-muted">Não há usuários na fila de espera para esta disponibilidade.</p>
+                    </div>
                 </div>
                 {% endif %}
             </div>
