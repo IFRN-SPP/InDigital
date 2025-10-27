@@ -252,85 +252,89 @@
                 
                 {% if page_obj %}
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead style="background-color: #86B5E1; color: #20597F !important;">
-                                <tr>
-                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">ID</th>
-                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">Posição</th>
-                                    <th style="width: 25%; border-color: #20597F; color: #20597F !important;">Usuário</th>
-                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Data</th>
-                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Horário</th>
-                                    <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Laboratório</th>
-                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;" class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for fila in page_obj %}
-                                <tr id="fila-{{ fila.id }}">
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="text-muted">{{ fila.id }}</span>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <span class="badge" style="background-color: #20597F; color: white;">
-                                            {{ page_obj.start_index|add:forloop.counter0 }}º
-                                        </span>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
-                                        <strong>
-                                            {% if fila.usuario.get_full_name %}
-                                                {{ fila.usuario.get_full_name }}
-                                            {% else %}
-                                                {{ fila.usuario.first_name|default:fila.usuario.username }}
-                                            {% endif %}
-                                        </strong>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.data|date:"d/m/Y" }}</strong>
-                                        {% if fila.disponibilidade.data == today %}
-                                            <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
-                                        {% elif fila.disponibilidade.data > today %}
-                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
-                                        {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-clock mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.horario_inicio|time:"H:i" }} às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</strong>
-                                    </td>
-                                    <td style="border-color: #86B5E1; vertical-align: middle;">
-                                        <i class="fas fa-flask mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.disponibilidade.laboratorio.num_laboratorio }}</strong>
-                                    </td>
-                                    <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
-                                        <div class="action-buttons">
-                                            <button type="button" class="action-btn btn-aprovar"
-                                                    title="Promover para reserva"
-                                                    data-fila-id="{{ fila.id }}"
-                                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                </span>
-                                            </button>
-                                            <button type="button" class="action-btn btn-rejeitar"
-                                                    title="Remover da fila"
-                                                    data-fila-id="{{ fila.id }}"
-                                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-trash"></i>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead style="background-color: #86B5E1; color: #20597F !important;">
+                <tr>
+                    <th style="width: 8%; border-color: #20597F; color: #20597F !important; text-align: center;">ID</th>
+                    <th style="width: 10%; border-color: #20597F; color: #20597F !important; text-align: center;">Posição</th><th style="width: 22%; border-color: #20597F; color: #20597F !important; text-align: center;">Usuário</th>
+                    <th style="width: 18%; border-color: #20597F; color: #20597F !important; text-align: center;">Data</th>
+                    <th style="width: 15%; border-color: #20597F; color: #20597F !important; text-align: center;">Horário</th>
+                    <th style="width: 15%; border-color: #20597F; color: #20597F !important; text-align: center;">Laboratório</th>
+                    <th style="width: 12%; border-color: #20597F; color: #20597F !important; text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in page_obj %}
+                <tr id="fila-{{ fila.id }}">
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <span class="text-muted">{{ fila.id }}</span>
+                    </td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <span class="badge" style="background-color: #20597F; color: white;">
+                            {{ page_obj.start_index|add:forloop.counter0 }}º
+                        </span>
+                    </td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+    <div class="d-flex align-items-center justify-content-center">
+        <i class="fas fa-user mr-2" style="color: #20597F;"></i>
+        {% if fila.usuario.get_full_name %}
+            {{ fila.usuario.get_full_name }}
+        {% else %}
+            {{ fila.usuario.first_name|default:fila.usuario.username }}
+        {% endif %}
+    </div>
+</td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <div class="d-flex flex-column align-items-center">
+                            <div>
+                                <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                {{ fila.disponibilidade.data|date:"d/m/Y" }}
+                            </div>
+                            {% if fila.disponibilidade.data == today %}
+                                <span class="badge badge-pill mt-1" style="background-color: #17a2b8; color: white; font-size: 0.7rem;">Hoje</span>
+                            {% elif fila.disponibilidade.data > today %}
+                                <span class="badge badge-pill mt-1" style="background-color: #28a745; color: white; font-size: 0.7rem;">Futuro</span>
+                            {% else %}
+                                <span class="badge badge-pill mt-1" style="background-color: #6c757d; color: white; font-size: 0.7rem;">Passado</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                        {{ fila.disponibilidade.horario_inicio|time:"H:i" }}<br>
+                        <small>às {{ fila.disponibilidade.horario_fim|time:"H:i" }}</small>
+                    </td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                        {{ fila.disponibilidade.laboratorio.num_laboratorio }}
+                    </td>
+                    <td style="border-color: #86B5E1; vertical-align: middle; text-align: center;">
+                        <div class="action-buttons">
+                            <button type="button" class="action-btn btn-aprovar"
+                                    title="Promover para reserva"
+                                    data-fila-id="{{ fila.id }}"
+                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
+                                <span class="btn-text">
+                                    <i class="fas fa-arrow-up"></i>
+                                </span>
+                            </button>
+                            <button type="button" class="action-btn btn-rejeitar"
+                                    title="Remover da fila"
+                                    data-fila-id="{{ fila.id }}"
+                                    data-usuario-nome="{% if fila.usuario.get_full_name %}{{ fila.usuario.get_full_name }}{% else %}{{ fila.usuario.first_name|default:fila.usuario.username }}{% endif %}">
+                                <span class="btn-text">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
                 {% else %}
                 <div class="card-body">
                     <div class="text-center py-5">
