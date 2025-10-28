@@ -21,10 +21,10 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC), com o 
 ![Django](https://img.shields.io/badge/-Django-0d1117?style=for-the-badge&logo=Django&logoColor=green)
 ![Python](https://img.shields.io/badge/-Python-0d1117?style=for-the-badge&logo=Python)
 ![HTML](https://img.shields.io/badge/-HTML5-0d1117?style=for-the-badge&logo=html5&logoColor)
-![CSS3](https://img.shields.io/badge/-CSS3-0d1117?style=for-the-badge&logo=css3&logoColor=blue)
 ![JavaScript](https://img.shields.io/badge/-JavaScript-0d1117?style=for-the-badge&logo=javascript&logoColor)
-![AJAX](https://img.shields.io/badge/-AJAX-0d1117?style=for-the-badge&logo=ajax&logoColor)
 ![Bootstrap](https://img.shields.io/badge/-Bootstrap-0d1117?style=for-the-badge&logo=bootstrap&logoColor)
+![CSS3](https://img.shields.io/badge/-CSS3-0d1117?style=for-the-badge&logo=css3&logoColor=blue)
+![AJAX](https://img.shields.io/badge/-AJAX-0d1117?style=for-the-badge&logo=ajax&logoColor)
 
 ## INSTALAÇÃO
 
@@ -62,19 +62,19 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+- Faça as migrações necessárias
+
+```bash
+python manage.py migrate
+```
+
 - Crie as variáveis de ambiente
 
 ```bash
 .env 
 ```
 
-> Crie um arquivo `.env` na raiz do projeto, baseado no exemplo `.env exemplo`:
-
-- Faça as migrações necessárias
-
-```bash
-python manage.py migrate
-```
+> Crie um arquivo `.env` na raiz do projeto, baseado no exemplo `.env exemplo`.
 
 ### Autenticação com SUAP
 
@@ -87,6 +87,7 @@ Isso permite que os usuários acessem o sistema com suas credenciais institucion
 
 ```bash
 Acesse o painel de administração do SUAP:
+
 https://suap.ifrn.edu.br/admin/api/aplicacaooauth2/
 ```
 
@@ -105,7 +106,7 @@ Copie o Client ID e o Client Secret gerados.
 ```
 
 ```bash
-Clque em salvar.
+Clique em salvar.
 ```
 
 ```bash
@@ -125,4 +126,6 @@ python manage.py runserver
 
 - Acesse a aplicação localmente
 
-(http://127.0.0.1:8000)
+```bash
+http://127.0.0.1:8000
+```
