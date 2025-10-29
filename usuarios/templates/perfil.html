@@ -46,9 +46,18 @@
     }
     
     .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eaecef;
+        background-color: #20597F !important;
+        border-bottom: 1px solid #20597F;
         font-weight: 600;
+        color: white !important;
+    }
+    
+    .card-header .card-title {
+        color: white !important;
+    }
+    
+    .card-header .card-title i {
+        color: white !important;
     }
     
     .app-sidebar {
@@ -158,7 +167,6 @@
         z-index: 0;
     }
 
-    /* Cores padrão dos elementos */
     .bg-info {
         background-color: #20597F !important;
         color: white !important;
@@ -200,7 +208,6 @@
         color: var(--cor-primaria);
     }
     
-    /* Estilos da página de perfil */
     .profile-header {
         display: flex;
         align-items: center;
@@ -269,13 +276,12 @@
         gap: 10px;
         margin-top: 30px;
         margin-bottom: 20px;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid var(--cor-primaria);
+        padding: 0;
+        background-color: transparent;
+        border-radius: 0;
+        border-left: none;
     }
 
-    /* Botão primário */
     .btn-primary {
         background-color: var(--cor-primaria) !important;
         border-color: var(--cor-primaria) !important;
@@ -291,6 +297,10 @@
     
     .profile-content {
         margin-bottom: 40px;
+    }
+
+    .full-width {
+        width: 100%;
     }
     
     @media (max-width: 767.98px) {
@@ -344,98 +354,99 @@
 {% endblock %}
 
 {% block content %}
-
-        <section class="content">
-            <div class="container-fluid">
-                <div class="welcome-banner">
-                    <h1>Meu Perfil</h1>
-                    <p>Visualize e gerencie suas informações pessoais</p>
-                    <div class="welcome-icon">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="welcome-banner">
+            <h1>Meu Perfil</h1>
+            <p>Visualize e gerencie suas informações pessoais</p>
+            <div class="welcome-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-header">
+                <img src="{{ usuario.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar"
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ usuario.get_nome_completo|urlencode }}&size=120&background=6c757d&color=ffffff';"
+                     loading="lazy">
+                <div class="profile-info">
+                    <h3>{{ usuario.get_nome_completo }}</h3>
+                    <p>Email: {{ usuario.email }}</p>
+                    <p>Vínculo: {{ usuario.vinculo }}</p>
+                    {% if usuario.suap_id %}
+                    <p>Matrícula: {{ usuario.suap_id }}</p> 
+                    {% endif %}
+                    {% if usuario.suap_foto_url and not usuario.foto_perfil %}
+                    <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
+                    {% endif %}                         
                 </div>
-                
-                <div class="profile-content">
-                    <div class="profile-header">
-                        <img src="{{ usuario.get_foto_perfil_url }}" alt="Avatar do usuário" class="profile-avatar"
-                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ usuario.get_nome_completo|urlencode }}&size=120&background=6c757d&color=ffffff';"
-                             loading="lazy">
-                        <div class="profile-info">
-                            <h3>{{ usuario.get_nome_completo }}</h3>
-                            <p>Email: {{ usuario.email }}</p>
-                            <p>Vínculo: {{ usuario.vinculo }}</p>
-                            <p>Matrícula: {{ usuario.suap_id }}</p> 
-                            {% if usuario.suap_foto_url and not usuario.foto_perfil %}
-                            <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
-                            {% endif %}                         
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card info-card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-id-card me-2"></i>Informações Pessoais
-                                    </div>
-                                </div>
-                                
-                                <div class="card-body">
-                                    <div class="info-item">
-                                        <span class="info-label">Nome Completo</span>
-                                        <span class="info-value">{{ usuario.get_nome_completo }}</span>
-                                    </div>
-                                    
-                                    <div class="info-item">
-                                        <span class="info-label">E-mail</span>
-                                        <span class="info-value">{{ usuario.email }}</span>
-                                    </div>
-                                    
-                                    <div class="info-item">
-                                        <span class="info-label">Vínculo</span>
-                                        <span class="info-value">{{ usuario.vinculo }}</span>
-                                    </div>
-                                </div>
+            </div>
+            
+            <div class="row">
+                <div class="{% if usuario.suap_id or usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or user.is_superuser %}col-md-6{% else %}col-12 full-width{% endif %}">
+                    <div class="card info-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-id-card me-2"></i>Informações Pessoais
                             </div>
                         </div>
                         
-                        <div class="col-md-6">
-                            <div class="card info-card">
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <i class="fas fa-chart-bar me-2"></i>Estatísticas
-                                    </div>
-                                </div>
-                                
-                                <div class="card-body">
-                                    <div class="info-item">
-                                        <span class="info-label">Total de Reservas</span>
-                                        <span class="info-value">{{ total_reservas|default:"0" }}</span>
-                                    </div>
-                                    
-                                    <div class="info-item">
-                                        <span class="info-label">Reservas Aprovadas</span>
-                                        <span class="info-value">{{ reservas_aprovadas|default:"0" }}</span>
-                                    </div>
-                                    
-                                    <div class="info-item">
-                                        <span class="info-label">Solicitações Pendentes</span>
-                                        <span class="info-value">{{ solicitacao_pendente|default:"0" }}</span>
-                                    </div>
-                                </div>
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Nome Completo</span>
+                                <span class="info-value">{{ usuario.get_nome_completo }}</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">E-mail</span>
+                                <span class="info-value">{{ usuario.email }}</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Vínculo</span>
+                                <span class="info-value">{{ usuario.vinculo }}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="action-buttons">
-                        <a href="{% url 'editar_perfil' %}" class="btn btn-primary">
-                            <i class="fas fa-edit me-2"></i>Editar Perfil
-                        </a>
-                    </div>
-                    
                 </div>
+                
+                <!-- Estatísticas apenas para usuários do SUAP, monitores, e superusuários -->
+                {% if usuario.suap_id or usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or user.is_superuser %}
+                <div class="col-md-6">
+                    <div class="card info-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-chart-bar me-2"></i>Estatísticas
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="info-item">
+                                <span class="info-label">Total de Reservas</span>
+                                <span class="info-value">{{ total_reservas|default:"0" }}</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Reservas Aprovadas</span>
+                                <span class="info-value">{{ reservas_aprovadas|default:"0" }}</span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Solicitações Pendentes</span>
+                                <span class="info-value">{{ solicitacao_pendente|default:"0" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
-        </section>
+            
+            <div class="action-buttons">
+                <a href="{% url 'editar_perfil' %}" class="btn btn-primary">
+                    <i class="fas fa-edit me-2"></i>Editar Perfil
+                </a>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 {% endblock content %}

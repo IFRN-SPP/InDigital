@@ -452,13 +452,11 @@
             <input type="checkbox" name="reservas_selecionadas" value="{{ reserva.id }}" class="reserva-checkbox">
         </td>
         <td style="vertical-align: middle;">
-            <strong>
                 {% if reserva.usuario.get_full_name and reserva.usuario.get_full_name != "None None" %}
                     {{ reserva.usuario.get_full_name }}
                 {% else %}
                     {{ reserva.usuario.username }}
                 {% endif %}
-            </strong>
         </td>
         <td style="vertical-align: middle;">
             <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
