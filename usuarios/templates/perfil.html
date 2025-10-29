@@ -298,6 +298,10 @@
     .profile-content {
         margin-bottom: 40px;
     }
+
+    .full-width {
+        width: 100%;
+    }
     
     @media (max-width: 767.98px) {
         .content-wrapper {
@@ -369,7 +373,9 @@
                     <h3>{{ usuario.get_nome_completo }}</h3>
                     <p>Email: {{ usuario.email }}</p>
                     <p>Vínculo: {{ usuario.vinculo }}</p>
+                    {% if usuario.suap_id %}
                     <p>Matrícula: {{ usuario.suap_id }}</p> 
+                    {% endif %}
                     {% if usuario.suap_foto_url and not usuario.foto_perfil %}
                     <small class="text-muted"><i class="fas fa-sync-alt"></i> Foto sincronizada do SUAP</small>
                     {% endif %}                         
@@ -377,7 +383,7 @@
             </div>
             
             <div class="row">
-                <div class="col-md-6">
+                <div class="{% if usuario.suap_id or usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or user.is_superuser %}col-md-6{% else %}col-12 full-width{% endif %}">
                     <div class="card info-card">
                         <div class="card-header">
                             <div class="card-title">
@@ -404,6 +410,8 @@
                     </div>
                 </div>
                 
+                <!-- Estatísticas apenas para usuários do SUAP, monitores, e superusuários -->
+                {% if usuario.suap_id or usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or user.is_superuser %}
                 <div class="col-md-6">
                     <div class="card info-card">
                         <div class="card-header">
@@ -430,6 +438,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
             
             <div class="action-buttons">
