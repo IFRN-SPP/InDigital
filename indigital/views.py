@@ -140,17 +140,23 @@ def monitor_dashboard(request):
         disponibilidade__monitor=request.user,
         status_aprovacao='A'
     )
+    user = request.user
     # Estatísticas
-    total_reservas = reservas_monitor.count()
-    presentes = reservas_monitor.filter(status_frequencia='P').count()
-    faltas = reservas_monitor.filter(status_frequencia='F').count()
-    pendentes = reservas_monitor.filter(disponibilidade__data__gte=date.today()).count()
+    minhas_reservas = Reserva.objects.filter(usuario=user)
+
+    total_reservas = minhas_reservas.count()
+    reservas_presentes = minhas_reservas.filter(status_frequencia='P').count()
+    reservas_faltas = minhas_reservas.filter(status_frequencia='F').count()
+    reservas_pendentes = minhas_reservas.filter(
+        disponibilidade__data__gte=date.today(),
+        status_frequencia = ''
+    ).count()
     
     context = {
         'total_reservas': total_reservas,
-        'presentes': presentes,
-        'faltas': faltas,
-        'pendentes': pendentes,
+        'reservas_presentes': reservas_presentes,
+        'reservas_faltas': reservas_faltas,
+        'reservas_pendentes': reservas_pendentes,
         'reservas_hoje': page_obj,
         'page_obj': page_obj,
         'today': date.today(),
@@ -166,16 +172,21 @@ def index(request):
     elif user.perfil == 'monitor':
         return redirect('monitor_dashboard')
 
-    total_reservas = Reserva.objects.count()
-    presentes = Reserva.objects.filter(status_frequencia='P').count()
-    faltas = Reserva.objects.filter(status_frequencia='F').count()
-    pendentes = Reserva.objects.filter(disponibilidade__data__gte=date.today()).count()
-    
+    minhas_reservas = Reserva.objects.filter(usuario=user)
+
+    total_reservas = minhas_reservas.count()
+    reservas_presentes = minhas_reservas.filter(status_frequencia='P').count()
+    reservas_faltas = minhas_reservas.filter(status_frequencia='F').count()
+    reservas_pendentes = minhas_reservas.filter(
+        disponibilidade__data__gte=date.today(),
+        status_frequencia = ''
+    ).count()
+
     context = {
         'total_reservas': total_reservas,
-        'presentes': presentes,
-        'faltas': faltas,
-        'pendentes': pendentes,
+        'reservas_presentes': reservas_presentes,
+        'reservas_faltas': reservas_faltas,
+        'reservas_pendentes': reservas_pendentes,
     }
     return render(request, "index.html", context)
 
@@ -280,7 +291,7 @@ def listar_disponibilidades(request):
             messages.error(request, "Número mínimo de vagas deve ser um número.")
     
     # Paginação
-    paginator = Paginator(disponibilidades, 10)
+    paginator = Paginator(disponibilidades, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -641,7 +652,7 @@ def horarios(request):
     for d in disponibilidades:
         d.expirada = d.is_passada()
     # Paginação 
-    paginator = Paginator(disponibilidades, 10) 
+    paginator = Paginator(disponibilidades, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Buscar reservas e filas do usuário para verificar status
@@ -793,7 +804,7 @@ def minhas_reservas(request):
     reservas = reservas_iter
     # Paginação
     # Paginador aceita QuerySet ou lista
-    paginator = Paginator(reservas, 10)
+    paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Buscar laboratórios para o filtro
@@ -845,7 +856,7 @@ def reservas_do_dia(request):
     if status_frequencia and status_frequencia != 'todos':
         reservas = reservas.filter(status_frequencia=status_frequencia)
     # Paginação
-    paginator = Paginator(reservas, 10)
+    paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros
@@ -901,7 +912,7 @@ def fila_espera(request):
     if monitor_id and monitor_id != 'todos':
         filas = filas.filter(disponibilidade__monitor_id=monitor_id)
     # Paginação
-    paginator = Paginator(filas, 10)
+    paginator = Paginator(filas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros
@@ -1095,7 +1106,7 @@ def minha_fila_espera(request):
         if not status or status == 'todos' or status == status_fila:
             dados_filas.append(item)
     # Paginação
-    paginator = Paginator(dados_filas, 10)
+    paginator = Paginator(dados_filas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros
@@ -1138,10 +1149,10 @@ def usuarios_da_reserva(request, disponibilidade_id):
     if usuario_nome:
         fila_espera = fila_espera.filter(usuario__suap_nome_completo__icontains=usuario_nome)
     # Paginação para reservas e fila de espera
-    reservas_paginator = Paginator(reservas, 10)
+    reservas_paginator = Paginator(reservas, 5)
     reservas_page_number = request.GET.get('reservas_page')
     reservas_page_obj = reservas_paginator.get_page(reservas_page_number)
-    fila_paginator = Paginator(fila_espera, 10)
+    fila_paginator = Paginator(fila_espera, 5)
     fila_page_number = request.GET.get('fila_page')
     fila_page_obj = fila_paginator.get_page(fila_page_number)
 
@@ -1186,7 +1197,7 @@ def listar_disponibilidades_monitor(request):
         except ValueError:
             messages.error(request, "Número mínimo de vagas deve ser um número.")
     # Paginação
-    paginator = Paginator(disponibilidades, 10)
+    paginator = Paginator(disponibilidades, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros (apenas laboratórios que o monitor tem disponibilidades)
@@ -1257,7 +1268,7 @@ def reservas_por_usuario(request, usuario_id):
     if status_frequencia and status_frequencia != 'todos':
         reservas = reservas.filter(status_frequencia=status_frequencia)
     # Paginação
-    paginator = Paginator(reservas, 10)
+    paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros
@@ -1319,7 +1330,7 @@ def historico_reservas(request):
     reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
     reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
     # Paginação (usamos a lista completa ordenada originalmente)
-    paginator = Paginator(reservas_list, 10)
+    paginator = Paginator(reservas_list, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Laboratórios para o filtro
@@ -1373,7 +1384,7 @@ def historico_geral_reservas(request):
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     # Paginação
-    paginator = Paginator(reservas, 10)
+    paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Dados para os filtros
@@ -1422,7 +1433,7 @@ def reservas_pendentes(request):
     if usuario_id:
         reservas = reservas.filter(usuario__id=usuario_id)
     # Paginação
-    paginator = Paginator(reservas, 10)
+    paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     # Filtros
