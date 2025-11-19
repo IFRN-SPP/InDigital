@@ -122,97 +122,60 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.body.classList.add('login-page');
-        document.body.classList.remove('sidebar-open');
-        document.body.classList.remove('sidebar-collapse');
-        document.body.classList.remove('sidebar-collapsed');
-        document.body.classList.remove('hold-transition');
-        document.body.classList.remove('sidebar-mini');
-        document.body.classList.remove('layout-fixed');
-        
-        const contentWrapper = document.querySelector('.content-wrapper');
-        if (contentWrapper) {
-            contentWrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important;';
-        }
-        
-        const wrapper = document.querySelector('.wrapper');
-        if (wrapper) {
-            wrapper.style.cssText = 'margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: 100vh !important;';
-        }
+document.addEventListener('DOMContentLoaded', function() {
 
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const errorType = urlParams.get('error');
-        
-        if (errorType === 'email') {
-            showError('email', 'E-mail incorreto. Verifique o e-mail digitado.');
-        } else if (errorType === 'password') {
-            showError('password', 'Senha incorreta. Verifique a senha digitada.');
-        } else if (errorType === 'invalid') {
-            showError('password', 'E-mail ou senha incorretos.');
-        }
+    // Remove classes do layout que interferem no login
+    document.body.classList.remove(
+        'sidebar-open',
+        'sidebar-collapse',
+        'sidebar-mini',
+        'layout-fixed',
+        'hold-transition'
+    );
 
-        
-        document.getElementById('email').addEventListener('input', function() {
-            clearError('email');
-        });
+    // Adiciona classe que pode ser estilizada no CSS
+    document.body.classList.add('login-page');
 
-        document.getElementById('password').addEventListener('input', function() {
-            clearError('password');
-        });
+    // Remove efeitos do wrapper mas sem quebrar o layout
+    const wrapper = document.querySelector('.wrapper');
+    if (wrapper) wrapper.style.minHeight = "100vh";
 
-        
-        document.querySelector('form').addEventListener('submit', function(e) {
-            let hasError = false;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            
-            clearError('email');
-            clearError('password');
-
-            
-            if (email && (!email.includes('@') || !email.includes('.'))) {
-                showError('email', 'Por favor, digite um e-mail válido.');
-                hasError = true;
-            }
-
-            
-            if (!password) {
-                showError('password', 'Por favor, digite sua senha.');
-                hasError = true;
-            }
-
-            if (hasError) {
-                e.preventDefault();
-            }
-        });
-    });
-
-   
-    function showError(field, message) {
-        const errorElement = document.getElementById(field + 'Error');
-        const inputElement = document.getElementById(field);
-        
-        if (errorElement && inputElement) {
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            inputElement.style.borderColor = '#dc3545';
-            inputElement.focus();
-        }
+    // Remove o content-wrapper das páginas internas
+    const contentWrapper = document.querySelector('.content-wrapper');
+    if (contentWrapper) {
+        contentWrapper.style.margin = "0";
+        contentWrapper.style.padding = "0";
+        contentWrapper.style.width = "100%";
     }
 
-    
-    function clearError(field) {
-        const errorElement = document.getElementById(field + 'Error');
-        const inputElement = document.getElementById(field);
-        
-        if (errorElement && inputElement) {
-            errorElement.style.display = 'none';
-            inputElement.style.borderColor = '#ced4da';
-        }
+    // Limpar erros ao digitar
+    document.getElementById('email').addEventListener('input', () => clearError('email'));
+    document.getElementById('password').addEventListener('input', () => clearError('password'));
+
+});
+
+// Funções de erro
+function showError(field, message) {
+    const err = document.getElementById(field + 'Error');
+    const inp = document.getElementById(field);
+
+    if (err && inp) {
+        err.textContent = message;
+        err.style.display = 'block';
+        inp.style.borderColor = '#dc3545';
+        inp.focus();
     }
+}
+
+function clearError(field) {
+    const err = document.getElementById(field + 'Error');
+    const inp = document.getElementById(field);
+
+    if (err && inp) {
+        err.style.display = 'none';
+        inp.style.borderColor = '#ced4da';
+    }
+}
 </script>
 
 <style>

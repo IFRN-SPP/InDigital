@@ -319,7 +319,7 @@
                                         </div>
                                         <div class="card-footer bg-transparent">
                                             <div class="btn-group w-100" role="group">
-                                                {% if perms.indigital.editar_laboratorio %}
+                                                {% if user.perfil == "administrador" or user.is_superuser %}
                                                     <button type="button" 
                                                             class="btn btn-sm btn-editar-laboratorio" 
                                                             style="background-color: #20597F; color: white; border: none;"
@@ -328,7 +328,7 @@
                                                         <i class="fas fa-edit"></i> Editar
                                                     </button>
                                                 {% endif %}
-                                                {% if perms.indigital.excluir_laboratorio %}
+                                                {% if user.perfil == "administrador" or user.is_superuser %}
                                                     <button type="button" 
                                                             class="btn btn-sm btn-excluir-laboratorio" 
                                                             style="background-color: #dc3545; color: white; border: none;"
