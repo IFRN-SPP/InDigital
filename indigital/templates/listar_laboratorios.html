@@ -526,322 +526,229 @@
 
 {% block extra_js %}
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('=== SISTEMA DE LABORATÓRIOS INICIADO ===');
+
     let currentLaboratorioId = null;
-    const csrfToken = '{{ csrf_token }}';
 
-    console.log('Document ready - Laboratórios JavaScript carregado');
-    
-    $(document).on('submit', '#formCriarLaboratorio', function(e) {
-        e.preventDefault(); 
-        console.log('Formulário de criação submetido');
-        
-        var form = $(this);
-        var modal = $('#modalCriarLaboratorio');
-        var formData = form.serialize();
-        
-        console.log('Enviando dados para:', form.attr('action'));
-        console.log('Dados:', formData);
-        
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Resposta recebida:', response);
-                
-                if (response.success) {
-                    console.log(' Sucesso - fechando modal e recarregando');
-                    modal.modal('hide');
-                    location.reload();
-                } else {
-                    console.log(' Erros de validação');
-                    modal.find('.modal-body').html(response.form_html);
-                }
-            },
-            // 🔧 CORREÇÃO AQUI: modal de erro estilizado
-            error: function(xhr, status, error) {
-                console.log(' ERRO NA REQUISIÇÃO ');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                console.log('Response Text:', xhr.responseText);
+    // ===============================
+    // 1. BOTÃO EDITAR LABORATÓRIO
+    // ===============================
+    document.addEventListener('click', function (e) {
+        const button = e.target.closest('.btn-editar-laboratorio');
+        if (!button) return;
 
-                const modalErro = `
-                    <div class="modal fade" id="modalErroLaboratorio" tabindex="-1" aria-labelledby="modalErroLaboratorioLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-danger">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="modalErroLaboratorioLabel">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>Erro ao Criar Laboratório
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
-                                    <p id="mensagemErroLaboratorio" class="fw-semibold fs-5 text-danger">
-                                        Ocorreu um erro ao criar o laboratório.
-                                    </p>
-                                    <p class="text-muted small">
-                                        Verifique se o número do laboratório já existe e tente novamente.
-                                    </p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Fechar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                $('#modalErroLaboratorio').remove();
-                $('body').append(modalErro);
-                const novoModal = new bootstrap.Modal(document.getElementById('modalErroLaboratorio'));
-                novoModal.show();
-            }
-        });
-    });
-
-    $(document).on('click', '.btn-editar-laboratorio', function(e) {
         e.preventDefault();
-        var laboratorioId = $(this).data('laboratorio-id');
-        console.log('Abrindo modal de edição para laboratório ID:', laboratorioId);
-        
-        var modal = $('#modalEditarLaboratorio');
-        var modalBody = $('#modalEditarLaboratorioBody');
-        
-        modalBody.html(`
+
+        currentLaboratorioId = button.dataset.laboratorioId;
+
+        console.log("Editar - ID:", currentLaboratorioId);
+
+        if (!currentLaboratorioId) {
+            console.error("ID do laboratório não encontrado");
+            return;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("modalEditarLaboratorio"));
+        const modalBody = document.getElementById("modalEditarLaboratorioBody");
+
+        modalBody.innerHTML = `
             <div class="text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Carregando...</span>
-                </div>
+                <div class="spinner-border text-primary"></div>
                 <p class="mt-2">Carregando formulário...</p>
             </div>
-        `);
-        
-        modal.modal('show');
-        
-        var url = '{% url "editar_laboratorio" 0 %}'.replace('0', laboratorioId);
-        console.log('URL da requisição:', url);
-        
-        $.ajax({
-            url: url,
-            type: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Formulário de edição carregado com sucesso');
-                modalBody.html(response);
-            },
-            error: function(xhr, status, error) {
-                console.log('=== ERRO AO CARREGAR FORMULÁRIO ===');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                
-                modalBody.html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Erro ${xhr.status}:</strong> Não foi possível carregar o formulário.
-                        <div class="mt-3">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                Fechar
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{% url "editar_laboratorio" 0 %}'.replace('0', '${laboratorioId}')">
-                                Abrir página normal
-                            </button>
-                        </div>
-                    </div>
-                `);
-            }
+        `;
+
+        modal.show();
+
+        // URL correta
+        fetch(`/laboratorio/${currentLaboratorioId}/editar/`, {
+            method: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+        .then(html => {
+            modalBody.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Erro ao carregar formulário:", error);
+            modalBody.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Erro:</strong> Não foi possível carregar o formulário.
+                </div>
+            `;
         });
     });
 
-    $(document).on('submit', '#formEditarLaboratorio', function(e) {
-        e.preventDefault();
-        console.log('Formulário de edição submetido');
-        
-        var form = $(this);
-        var modal = $('#modalEditarLaboratorio');
-        var formData = form.serialize();
-        
-        console.log('Enviando dados para:', form.attr('action'));
-        console.log('Dados:', formData);
-        
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Resposta recebida:', response);
-                
-                if (response.success) {
-                    console.log(' Edição bem-sucedida - fechando modal e recarregando');
-                    modal.modal('hide');
-                    location.reload();
-                } else {
-                    console.log(' Erros de validação na edição');
-                    $('#modalEditarLaboratorioBody').html(response.form_html);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log('ERRO AO SALVAR EDIÇÃO');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                alert('Erro ao editar laboratório. Tente novamente.');
-            }
-        });
-    });
 
-    // Exclusão de laboratório
-    $(document).on('click', '.btn-excluir-laboratorio', function(e) {
+    // ===============================
+    // 2. BOTÃO EXCLUIR LABORATÓRIO
+    // ===============================
+    document.addEventListener('click', function (e) {
+        const button = e.target.closest('.btn-excluir-laboratorio');
+        if (!button) return;
+
         e.preventDefault();
-        currentLaboratorioId = $(this).data('laboratorio-id');
-        const laboratorioNumero = $(this).data('laboratorio-numero');
-        const laboratorioCapacidade = $(this).data('laboratorio-capacidade');
-        
-        console.log('Abrindo modal de exclusão para laboratório ID:', currentLaboratorioId);
-        
-        $('#modalExcluirLaboratorioBody').html(`
+
+        currentLaboratorioId = button.dataset.laboratorioId;
+
+        console.log("Excluir clicado - ID:", currentLaboratorioId);
+
+        const numero = button.dataset.laboratorioNumero;
+        const capacidade = button.dataset.laboratorioCapacidade;
+
+        const modalBody = document.getElementById('modalExcluirLaboratorioBody');
+        modalBody.innerHTML = `
             <div class="text-center">
                 <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                 <h5 class="text-danger mb-3">Confirmar Exclusão</h5>
-                <p>Tem certeza que deseja excluir o laboratório?</p>
+                <p>Deseja realmente excluir o laboratório <strong>${numero}</strong>?</p>
                 <div class="alert alert-warning">
-                    <strong>Laboratório {{ laboratorio.num_laboratorio }}</strong><br>
-                    <i class="fas fa-flask mr-1"></i> Número: <strong>${laboratorioNumero}</strong><br>
-                    <i class="fas fa-users mr-1"></i> Capacidade: <strong>${laboratorioCapacidade} pessoas</strong>
+                    <strong>Número:</strong> ${numero}<br>
+                    <strong>Capacidade:</strong> ${capacidade} pessoas
                 </div>
-                <p class="text-muted small">
-                    <i class="fas fa-exclamation-circle mr-1"></i>
-                    Esta ação não pode ser desfeita. Todas as disponibilidades associadas a este laboratório também serão removidas.
-                </p>
+                <p class="small text-muted">Esta ação não pode ser desfeita.</p>
             </div>
-        `);
-        
-        $('#modalExcluirLaboratorio').modal('show');
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById("modalExcluirLaboratorio"));
+        modal.show();
     });
 
-    // Confirmar exclusão via AJAX
-    $('#confirmarExclusaoLaboratorio').on('click', function() {
-        if (!currentLaboratorioId) return;
 
-        const $button = $(this);
-        const originalHtml = $button.html();
-        
-        $button.addClass('btn-loading').prop('disabled', true);
+    // ===============================
+    // 3. SUBMIT DO FORMULÁRIO DE EDIÇÃO
+    // ===============================
+    document.addEventListener('submit', function (e) {
+        if (e.target.id !== "formEditarLaboratorio") return;
 
-        const url = '{% url "excluir_laboratorio" 0 %}'.replace('0', currentLaboratorioId);
-        console.log('Excluindo laboratório via URL:', url);
+        e.preventDefault();
+        console.log("Enviando formulário de edição...");
 
-        // Fazer requisição AJAX
-        $.ajax({
-            url: url,
-            type: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response, status, xhr) {
-                $('#modalExcluirLaboratorio').modal('hide');
-                
-                if (xhr.status === 200 || xhr.status === 302) {
-                    showAlert('Laboratório excluído com sucesso!', 'success');
-                    
-                    $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
-                        $(this).remove();
-                        
-                        if ($('.laboratory-card').length === 0) {
-                            setTimeout(() => location.reload(), 1000);
-                        }
-                    });
-                } else {
-                    showAlert('Erro ao excluir laboratório.', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#modalExcluirLaboratorio').modal('hide');
-                
-                showAlert('Laboratório excluído com sucesso!', 'success');
-                $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
-                    $(this).remove();
-                    if ($('.laboratory-card').length === 0) {
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                });
-            },
-            complete: function() {
-                $button.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(resp => resp.ok ? resp.json() : Promise.reject(resp.status))
+        .then(data => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarLaboratorio'));
+                modal.hide();
+
+                showAlert(data.message || "Laboratório atualizado!", "success");
+
+                setTimeout(() => window.location.reload(), 800);
+                return;
             }
+
+            if (data.errors) {
+                let errorsHtml = '<div class="alert alert-danger">';
+                Object.entries(data.errors).forEach(([campo, msgs]) => {
+                    errorsHtml += `<div><strong>${campo}:</strong> ${msgs.join(', ')}</div>`;
+                });
+                errorsHtml += '</div>';
+
+                form.insertAdjacentHTML("afterbegin", errorsHtml);
+            }
+        })
+        .catch(error => {
+            console.error("Erro na edição:", error);
+            showAlert("Erro ao editar. Tente novamente.", "error");
         });
     });
 
+
+    // ===============================
+    // 4. CONFIRMAR EXCLUSÃO
+    // ===============================
+    document.getElementById("confirmarExclusaoLaboratorio").addEventListener("click", function () {
+        if (!currentLaboratorioId) return;
+
+        const button = this;
+        button.disabled = true;
+        const original = button.innerHTML;
+
+        button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Excluindo...`;
+
+        fetch(`/laboratorio/${currentLaboratorioId}/excluir/`, {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        })
+        .then(resp => resp.ok ? resp.json() : Promise.reject(resp.status))
+        .then(data => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalExcluirLaboratorio"));
+            modal.hide();
+
+            if (data.success) {
+                showAlert(data.message, "success");
+
+                const card = document.getElementById(`laboratorio-${currentLaboratorioId}`);
+                if (card) {
+                    card.style.opacity = "0";
+                    setTimeout(() => card.remove(), 300);
+                }
+
+                return;
+            }
+
+            showAlert(data.error || "Erro ao excluir.", "error");
+        })
+        .catch(err => {
+            console.error(err);
+            showAlert("Erro na exclusão.", "error");
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = original;
+            currentLaboratorioId = null;
+        });
+    });
+
+
+    // ===============================
+    // FUNÇÃO GLOBAL DE ALERTA
+    // ===============================
     function showAlert(message, type) {
-        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-        
-        const alertHtml = `
-            <div class="alert ${alertClass} alert-dismissible fade show alert-fixed" role="alert">
-                <i class="fas ${icon} mr-2"></i>
+        const css = type === "success" ? "alert-success" : "alert-danger";
+
+        document.querySelectorAll('.alert-fixed').forEach(a => a.remove());
+
+        const html = `
+            <div class="alert ${css} alert-dismissible fade show alert-fixed" role="alert">
                 ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         `;
-        
-        $('.alert-fixed').remove();
-        $('body').append(alertHtml);
-        
+        document.body.insertAdjacentHTML("beforeend", html);
+
         setTimeout(() => {
-            $('.alert-fixed').alert('close');
-        }, 5000);
+            const alert = document.querySelector('.alert-fixed');
+            if (alert) bootstrap.Alert.getOrCreateInstance(alert).close();
+        }, 4000);
     }
 
-    $(document).on('change', '#id_capacidade, #modalEditarLaboratorio #id_capacidade', function() {
-        var capacidade = $(this).val();
-        
-        if (capacidade && (capacidade < 1 || capacidade > 1000)) {
-            $(this).addClass('is-invalid');
-            if (!$(this).next('.alert-capacidade').length) {
-                $(this).after('<div class="alert alert-danger alert-capacidade mt-2">A capacidade deve ser um número entre 1 e 1000.</div>');
-            }
-        } else {
-            $(this).removeClass('is-invalid');
-            $(this).next('.alert-capacidade').remove();
-        }
-    });
 
-    $('#modalExcluirLaboratorio').on('hidden.bs.modal', function() {
+    // ===============================
+    // LIMPAR MODAIS AO FECHAR
+    // ===============================
+    document.getElementById('modalEditarLaboratorio').addEventListener('hidden.bs.modal', () => {
+        document.getElementById('modalEditarLaboratorioBody').innerHTML = "";
         currentLaboratorioId = null;
-        $('#confirmarExclusaoLaboratorio').removeClass('btn-loading').prop('disabled', false);
     });
 
-    $('#modalCriarLaboratorio').on('hidden.bs.modal', function () {
-        $(this).find('form')[0].reset();
-        $(this).find('.form-control').removeClass('is-invalid is-valid');
-        $(this).find('.error-message').empty();
-        $(this).find('.alert').remove();
+    document.getElementById('modalExcluirLaboratorio').addEventListener('hidden.bs.modal', () => {
+        currentLaboratorioId = null;
+        const button = document.getElementById('confirmarExclusaoLaboratorio');
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-trash"></i> Excluir';
     });
-
-    $('#modalEditarLaboratorio').on('hidden.bs.modal', function () {
-        $(this).find('.modal-body').html('');
-    });
-
-    {% if form.errors %}
-    console.log('Erros no formulário - abrindo modal de criação');
-    $(document).ready(function() {
-        $('#modalCriarLaboratorio').modal('show');
-    });
-    {% endif %}
-
-    console.log('Botões de exclusão encontrados:', $('.btn-excluir-laboratorio').length);
 });
 </script>
-
 {% endblock %}
