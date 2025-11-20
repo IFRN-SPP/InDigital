@@ -754,10 +754,10 @@ document.addEventListener('DOMContentLoaded', function() {
         reservasSelecionadas.forEach(reservaId => {
             const reservaRow = document.querySelector(`#reserva-${reservaId}`);
             if (reservaRow) {
-                const usuario = reservaRow.cells[1].querySelector('strong').textContent;
-                const laboratorio = reservaRow.cells[2].textContent.trim();
-                const data = reservaRow.cells[3].textContent.trim();
-                const horario = reservaRow.cells[4].textContent.trim();
+                const usuario = reservaRow.cells[1].textContent.trim();
+                const laboratorio = reservaRow.cells[4].textContent.trim();
+                const data = reservaRow.cells[2].textContent.trim();
+                const horario = reservaRow.cells[3].textContent.trim();
                 
                 const item = document.createElement('div');
                 item.className = 'reserva-item';
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('btnAprovarSelecionadas').addEventListener('click', function() {
         if (reservasSelecionadas.length === 0) {
-            mostrarResultado('warning', 'Nenhuma Reserva Selecionada', 'Por favor, selecione pelo menos uma reserva para aprovar.', false);
+            alert('Por favor, selecione pelo menos uma reserva para aprovar.');
             return;
         }
         $('#modalAprovarSelecionadas').modal('show');
@@ -805,40 +805,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        $.ajax({
-            url: '{% url "aprovar_multiplas_reservas" %}',
-            type: 'POST',
-            data: {
-                'reservas_selecionadas': reservasSelecionadas,
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                $('#modalAprovarSelecionadas').modal('hide');
-                reservasSelecionadas.forEach(reservaId => {
-                    $(`#reserva-${reservaId}`).fadeOut(300, function() {
-                        $(this).remove();
-                    });
-                });
-                
-                const reservasRestantes = $('tbody tr').length;
-                if (reservasRestantes === 0) {
-                    location.reload();
-                } else {
-                    mostrarResultado('success', 'Reservas Aprovadas!', `${reservasSelecionadas.length} reserva(s) foram aprovadas com sucesso.`, false);
-                }
-            },
-            error: function(xhr) {
-                $('#modalAprovarSelecionadas').modal('hide');
-                let mensagem = 'Erro ao aprovar reservas. Tente novamente.';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    mensagem = xhr.responseJSON.error;
-                }
-                mostrarResultado('error', 'Erro na Aprovação', mensagem, true);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).removeClass('loading');
-            }
+        // SOLUÇÃO MAIS SIMPLES: Enviar o form tradicional
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "aprovar_multiplas_reservas" %}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        reservasSelecionadas.forEach(reservaId => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'reservas_selecionadas';
+            input.value = reservaId;
+            form.appendChild(input);
         });
+        
+        document.body.appendChild(form);
+        form.submit();
     });
 
     document.querySelectorAll('.btn-aprovar').forEach(btn => {
@@ -858,37 +845,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        $.ajax({
-            url: '{% url "aprovar_reserva" 0 %}'.replace('0', reservaIdAtual),
-            type: 'POST',
-            data: {
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                $('#modalAprovarIndividual').modal('hide');
-                $(`#reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                    $(this).remove();
-                    
-                    const reservasRestantes = $('tbody tr').length;
-                    if (reservasRestantes === 0) {
-                        location.reload();
-                    } else {
-                        mostrarResultado('success', 'Reserva Aprovada!', 'A reserva foi aprovada com sucesso.', false);
-                    }
-                });
-            },
-            error: function(xhr) {
-                $('#modalAprovarIndividual').modal('hide');
-                let mensagem = 'Erro ao aprovar reserva. Tente novamente.';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    mensagem = xhr.responseJSON.error;
-                }
-                mostrarResultado('error', 'Erro na Aprovação', mensagem, true);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).removeClass('loading');
-            }
-        });
+        // SOLUÇÃO SIMPLES: Redirecionar para a URL de aprovação
+        window.location.href = '{% url "aprovar_reserva" 0 %}'.replace('0', reservaIdAtual);
     });
 
     document.querySelectorAll('.btn-rejeitar').forEach(btn => {
@@ -908,81 +866,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        
-        $.ajax({
-            url: '{% url "rejeitar_reserva" 0 %}'.replace('0', reservaIdAtual),
-            type: 'POST',
-            data: {
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                $('#modalRejeitar').modal('hide');
-                $(`#reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                    $(this).remove();
-                    
-                    const reservasRestantes = $('tbody tr').length;
-                    if (reservasRestantes === 0) {
-                        location.reload();
-                    } else {
-                        mostrarResultado('success', 'Reserva Rejeitada!', 'A reserva foi rejeitada com sucesso.', false);
-                    }
-                });
-            },
-            error: function(xhr) {
-                $('#modalRejeitar').modal('hide');
-                let mensagem = 'Erro ao rejeitar reserva. Tente novamente.';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    mensagem = xhr.responseJSON.error;
-                }
-                mostrarResultado('error', 'Erro na Rejeição', mensagem, true);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).removeClass('loading');
-                document.getElementById('motivoRejeicao').value = '';
-            }
-        });
+        // SOLUÇÃO SIMPLES: Redirecionar para a URL de rejeição
+        window.location.href = '{% url "rejeitar_reserva" 0 %}'.replace('0', reservaIdAtual);
     });
-
-    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
-        const $modal = $('#modalResultado');
-        const $icon = $('#resultadoIcon');
-        const $titulo = $('#resultadoTitulo');
-        const $mensagem = $('#resultadoMensagem');
-        const $header = $('#modalResultadoLabel');
-        const $btn = $modal.find('.btn-primary');
-
-        switch(tipo) {
-            case 'success':
-                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
-                $header.text('Sucesso');
-                break;
-            case 'error':
-                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
-                $header.text('Erro');
-                break;
-            case 'warning':
-                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
-                $header.text('Atenção');
-                break;
-        }
-
-        $titulo.text(titulo);
-        $mensagem.text(mensagem);
-
-        if (recarregar) {
-            $btn.html('<i class="fas fa-sync-alt mr-1"></i> Atualizar Página');
-            $btn.off('click').on('click', function() {
-                location.reload();
-            });
-        } else {
-            $btn.html('<i class="fas fa-check mr-1"></i> Entendido');
-            $btn.off('click').on('click', function() {
-                $modal.modal('hide');
-            });
-        }
-        
-        $modal.modal('show');
-    }
 
     $('#modalAprovarIndividual, #modalRejeitar').on('hidden.bs.modal', function() {
         reservaIdAtual = null;
@@ -993,22 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#btnConfirmarAprovarSelecionadas').prop('disabled', false).removeClass('loading');
     });
 
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            }
-        }
-    );
+    // Inicializar contador
     atualizarContadorSelecionadas();
 });
 </script>

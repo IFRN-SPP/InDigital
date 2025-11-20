@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db import transaction
+from django.views.decorators.http import require_POST
 
 
 @login_required
@@ -1457,19 +1458,75 @@ def aprovar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
     disponibilidade = reserva.disponibilidade
     agora = timezone.localtime(timezone.now())
-    # Não permitir aprovar reservas cujo horário já passou (início já ocorreu ou término já passou)
+    
+    # Não permitir aprovar reservas cujo horário já passou
     if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': "Não é possível aprovar esta reserva: o horário já passou."})
         messages.error(request, "Não é possível aprovar esta reserva: o horário já passou.")
         return redirect('reservas_pendentes')
+    
     if disponibilidade.vagas > 0:
         reserva.status_aprovacao = 'A'
         reserva.save()
         disponibilidade.vagas -= 1
         disponibilidade.save()
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': f"Reserva aprovada com sucesso!"})
         messages.success(request, f"Reserva de {reserva.usuario.username} foi aprovada com sucesso!")
     else:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': "Não há mais vagas disponíveis para este horário."})
         messages.error(request, "Não há mais vagas disponíveis para este horário.")
+    
+    # Se for AJAX, retorna JSON. Se não, faz redirect normal
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
     return redirect('reservas_pendentes')
+
+@login_required
+@admin_required
+@require_POST
+def aprovar_multiplas_reservas(request):
+    try:
+        reservas_ids = request.POST.getlist('reservas_selecionadas[]')
+        reservas_aprovadas = 0
+        errors = []
+        
+        for reserva_id in reservas_ids:
+            try:
+                reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
+                disponibilidade = reserva.disponibilidade
+                agora = timezone.localtime(timezone.now())
+                
+                # Verificar se pode aprovar
+                if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+                    errors.append(f"Reserva {reserva_id}: horário já passou")
+                    continue
+                
+                if disponibilidade.vagas > 0:
+                    reserva.status_aprovacao = 'A'
+                    reserva.save()
+                    disponibilidade.vagas -= 1
+                    disponibilidade.save()
+                    reservas_aprovadas += 1
+                else:
+                    errors.append(f"Reserva {reserva_id}: não há vagas disponíveis")
+                    
+            except Reserva.DoesNotExist:
+                errors.append(f"Reserva {reserva_id}: não encontrada ou já aprovada")
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'{reservas_aprovadas} reserva(s) aprovada(s) com sucesso!',
+            'aprovadas': reservas_aprovadas,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 
 @login_required
 @admin_required
@@ -1485,35 +1542,29 @@ def rejeitar_reserva(request, reserva_id):
 def aprovar_multiplas_reservas(request):
     if request.method == 'POST':
         reservas_ids = request.POST.getlist('reservas_selecionadas')
-        if not reservas_ids:
-            messages.error(request, "Nenhuma reserva foi selecionada.")
-            return redirect('reservas_pendentes')
-        aprovadas = 0
-        sem_vagas = 0
-        expiradas = 0
+        reservas_aprovadas = 0
+        
         for reserva_id in reservas_ids:
             try:
                 reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
                 disponibilidade = reserva.disponibilidade
                 agora = timezone.localtime(timezone.now())
-                # pular reservas cujo horário já passou
-                if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
-                    expiradas += 1
-                    continue
-                if disponibilidade.vagas > 0:
-                    reserva.status_aprovacao = 'A'
-                    reserva.save()
-                    disponibilidade.vagas -= 1
-                    disponibilidade.save()
-                    aprovadas += 1
-                else:
-                    sem_vagas += 1
+                
+                # Verificar se pode aprovar
+                if not (disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora):
+                    if disponibilidade.vagas > 0:
+                        reserva.status_aprovacao = 'A'
+                        reserva.save()
+                        disponibilidade.vagas -= 1
+                        disponibilidade.save()
+                        reservas_aprovadas += 1
+                        
             except Reserva.DoesNotExist:
                 continue
-        if aprovadas > 0:
-            messages.success(request, f"{aprovadas} reserva(s) aprovada(s) com sucesso!")
-        if sem_vagas > 0:
-            messages.warning(request, f"{sem_vagas} reserva(s) não puderam ser aprovadas por falta de vagas.")
-        if expiradas > 0:
-            messages.warning(request, f"{expiradas} reserva(s) não puderam ser aprovadas porque o horário já passou.")
+        
+        if reservas_aprovadas > 0:
+            messages.success(request, f'{reservas_aprovadas} reserva(s) aprovada(s) com sucesso!')
+        else:
+            messages.error(request, 'Nenhuma reserva pôde ser aprovada.')
+    
     return redirect('reservas_pendentes')
