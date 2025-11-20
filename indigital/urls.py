@@ -35,6 +35,5 @@ urlpatterns = [
     path('aprovar/multiplas/reservas/', views.aprovar_multiplas_reservas, name='aprovar_multiplas_reservas'),
     path('criar-disponibilidade/', views.criar_disponibilidade, name='criar_disponibilidade'),
     path('criar-laboratorio/', views.criar_laboratorio, name='criar_laboratorio'),
-    path('laboratorio/<int:laboratorio_id>/editar/', views.editar_laboratorio, name='editar_laboratorio'),
-    path('laboratorio/<int:laboratorio_id>/excluir/', views.excluir_laboratorio, name='excluir_laboratorio'),
+    path('editar-laboratorio/<int:laboratorio_id>/', views.editar_laboratorio, name='editar_laboratorio'),
 ]
