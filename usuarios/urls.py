@@ -5,6 +5,8 @@ from . import views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from .views import CustomPasswordChangeView
+from .views import CustomPasswordChangeView, ajustar_perfil
+
 
 urlpatterns = [
     path('cadastro/', views.cadastro, name='cadastro'),
@@ -16,6 +18,7 @@ urlpatterns = [
     path('usuarios/<int:usuario_id>/tornar_monitor/', views.tornar_monitor, name='tornar_monitor'),
     path('usuarios/<int:usuario_id>/remover_monitor/', views.remover_monitor, name='remover_monitor'),
     path('listar/monitores/', views.listar_monitores, name='listar_monitores'),
+    path('ajustar-perfil/<int:user_id>/', ajustar_perfil, name='ajustar_perfil'),
     
     # URLs para recuperação de senha (esqueci a senha)
     path('password-reset/', 

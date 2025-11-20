@@ -177,3 +177,20 @@ def listar_monitores(request):
 class CustomPasswordChangeView(SuccessMessageMixin, AuthPasswordChangeView):
     success_url = reverse_lazy('password_change')
     success_message = "Senha alterada com sucesso!"
+
+@login_required
+@admin_required
+def ajustar_perfil(request, user_id):
+    usuario = get_object_or_404(User, id=user_id)
+    novo_perfil = request.GET.get("perfil")
+
+    if novo_perfil not in ["outro", "aluno", "monitor", "administrador"]:
+        messages.error(request, "Perfil inválido.")
+        return redirect('listar_usuarios')
+
+    usuario.perfil = novo_perfil
+    usuario.save()
+
+    messages.success(request, f"Perfil alterado para {novo_perfil}!")
+    return redirect('listar_usuarios')
+
