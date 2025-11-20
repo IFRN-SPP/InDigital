@@ -795,7 +795,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('btnAprovarSelecionadas').addEventListener('click', function() {
         if (reservasSelecionadas.length === 0) {
-            alert('Por favor, selecione pelo menos uma reserva para aprovar.');
+            document.getElementById('resultadoIcon').innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>';
+            document.getElementById('resultadoTitulo').textContent = 'Atenção';
+            document.getElementById('resultadoMensagem').textContent = 'Por favor, selecione pelo menos uma reserva para aprovar.';
+            document.querySelector('#modalResultado .modal-footer').style.display = 'none';
+            $('#modalResultado').modal('show');
             return;
         }
         $('#modalAprovarSelecionadas').modal('show');
@@ -879,6 +883,10 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#btnConfirmarAprovarSelecionadas').prop('disabled', false).removeClass('loading');
     });
 
+    
+    $('#modalResultado').on('hidden.bs.modal', function() {
+        document.querySelector('#modalResultado .modal-footer').style.display = 'flex';
+    });
     
     atualizarContadorSelecionadas();
 });
