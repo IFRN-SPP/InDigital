@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db import transaction
+from django.views.decorators.http import require_POST
 
 
 @login_required
@@ -360,7 +361,16 @@ def criar_disponibilidade(request):
         if form.is_valid():
             disponibilidade = form.save(commit=False)
 
-            # Validação: horário de início deve ser menor que horário de fim
+            if disponibilidade.vagas <= 0:
+                form.add_error('vagas', "O número de vagas deve ser maior que zero.")
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+
+                messages.error(request, "O número de vagas deve ser maior que zero.")
+                return redirect('listar_disponibilidades')
+
             if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
                 form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
 
@@ -371,7 +381,6 @@ def criar_disponibilidade(request):
                 messages.error(request, "O horário de início deve ser menor que o horário de fim.")
                 return redirect('listar_disponibilidades')
 
-            # Verifica se já existe uma disponibilidade conflitante
             conflito = Disponibilidade.objects.filter(
                 laboratorio=disponibilidade.laboratorio,
                 data=disponibilidade.data,
@@ -414,64 +423,52 @@ def criar_disponibilidade(request):
 @admin_required
 def editar_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
-
-    action_url = f"/laboratorio/{laboratorio.id}/editar"
-
+    
     if request.method == 'POST':
         try:
             print("=== DEBUG POST ===")
             print(f"Dados POST: {dict(request.POST)}")
-
+            
             form = LaboratorioForm(request.POST, instance=laboratorio)
             print(f"Formulário válido: {form.is_valid()}")
-
+            
             if form.is_valid():
                 print("Salvando laboratório...")
                 laboratorio = form.save()
                 print("Laboratório salvo!")
-
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
-
                 
                 messages.success(request, f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!')
                 return redirect('listar_laboratorios')
-
             else:
                 print(f"Erros do formulário: {form.errors}")
-
+                
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     num_lab_errors = form.errors.get('num_laboratorio', [])
                     capacidade_errors = form.errors.get('capacidade', [])
-
+                    
                     form_html = f"""
-                    <form id="formEditarLaboratorio" method="POST" action="{action_url}">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="{request.COOKIES.get('csrftoken', '')}">
-                        
+                     <form id="formEditarLaboratorio" method="POST" action="/editar-laboratorio/{laboratorio.id}/">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{request.META.get('CSRF_COOKIE', '')}">
                         <div class="form-field">
                             <label for="id_num_laboratorio" class="form-label">
                                 <i class="fas fa-hashtag mr-1"></i>Número do Laboratório *
                             </label>
-                            <input type="text" name="num_laboratorio" id="id_num_laboratorio"
-                                   class="form-control {'is-invalid' if num_lab_errors else ''}" 
-                                   value="{request.POST.get('num_laboratorio', laboratorio.num_laboratorio)}"
-                                   placeholder="Ex: L001, LAB-01" required maxlength="10">
-                            {"".join(f'<div class="error-message">{e}</div>' for e in num_lab_errors)}
+                            <input type="text" name="num_laboratorio" id="id_num_laboratorio" class="form-control {'is-invalid' if num_lab_errors else ''}" 
+                                   value="{request.POST.get('num_laboratorio', laboratorio.num_laboratorio)}" placeholder="Ex: L001, LAB-01" required maxlength="10">
+                            {"".join(f'<div class="error-message">{error}</div>' for error in num_lab_errors)}
                         </div>
-
                         <div class="form-field">
                             <label for="id_capacidade" class="form-label">
                                 <i class="fas fa-users mr-1"></i>Capacidade *
                             </label>
-                            <input type="number" name="capacidade" id="id_capacidade" 
-                                   class="form-control {'is-invalid' if capacidade_errors else ''}" 
-                                   value="{request.POST.get('capacidade', laboratorio.capacidade)}"
-                                   min="1" max="1000" required>
-                            {"".join(f'<div class="error-message">{e}</div>' for e in capacidade_errors)}
+                            <input type="number" name="capacidade" id="id_capacidade" class="form-control {'is-invalid' if capacidade_errors else ''}" 
+                                   value="{request.POST.get('capacidade', laboratorio.capacidade)}" min="1" max="1000" required>
+                            {"".join(f'<div class="error-message">{error}</div>' for error in capacidade_errors)}
                             <small class="text-muted">Número máximo de pessoas que o laboratório suporta</small>
                         </div>
-
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times mr-2"></i>Cancelar
@@ -482,53 +479,41 @@ def editar_laboratorio(request, laboratorio_id):
                         </div>
                     </form>
                     """
-
                     return JsonResponse({'success': False, 'form_html': form_html})
-
+                
                 messages.error(request, 'Erro ao editar laboratório!')
-
+        
         except Exception as e:
             print(f" ERRO NO POST: {str(e)}")
             import traceback
             print(traceback.format_exc())
-
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
             
             messages.error(request, f'Erro: {str(e)}')
             return redirect('listar_laboratorios')
-
     
-    else:
+    else: 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-
             form_html = f"""
-            <form id="formEditarLaboratorio" method="POST" action="{action_url}">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{request.COOKIES.get('csrftoken', '')}">
-
+            <form id="formEditarLaboratorio" method="POST" action="/editar-laboratorio/{laboratorio.id}/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{request.META.get('CSRF_COOKIE', '')}">
                 <div class="form-field">
                     <label for="id_num_laboratorio" class="form-label">
                         <i class="fas fa-hashtag mr-1"></i>Número do Laboratório *
                     </label>
-                    <input type="text" name="num_laboratorio" id="id_num_laboratorio"
-                           class="form-control"
-                           value="{laboratorio.num_laboratorio}"
-                           required maxlength="10">
+                    <input type="text" name="num_laboratorio" id="id_num_laboratorio" class="form-control" 
+                           value="{laboratorio.num_laboratorio}" placeholder="Ex: L001, LAB-01" required maxlength="10">
                 </div>
-
                 <div class="form-field">
                     <label for="id_capacidade" class="form-label">
                         <i class="fas fa-users mr-1"></i>Capacidade *
                     </label>
-                    <input type="number" name="capacidade" id="id_capacidade" 
-                           class="form-control"
-                           value="{laboratorio.capacidade}"
-                           min="1" max="1000" required>
+                    <input type="number" name="capacidade" id="id_capacidade" class="form-control" 
+                           value="{laboratorio.capacidade}" min="1" max="1000" required>
                     <small class="text-muted">Número máximo de pessoas que o laboratório suporta</small>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times mr-2"></i>Cancelar
@@ -539,13 +524,14 @@ def editar_laboratorio(request, laboratorio_id):
                 </div>
             </form>
             """
-
             return HttpResponse(form_html)
-
         
         form = LaboratorioForm(instance=laboratorio)
-        return render(request, 'listar_laboratorios.html', {'form': form, 'laboratorio': laboratorio})
-
+        context = {
+            'form': form,
+            'laboratorio': laboratorio
+        }
+        return render(request, 'listar_laboratorios.html', context)
 
 @login_required
 @admin_required
@@ -623,25 +609,12 @@ def criar_laboratorio(request):
 @admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
-
     if request.method == "POST":
-
         laboratorio.delete()
-
-        
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": True,
-                "message": "Laboratório excluído com sucesso!"
-            })
-
-        
         messages.success(request, "Laboratório excluído com sucesso!")
-        return redirect("listar_laboratorios")
-
-    
-    return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
-
+        return redirect('listar_laboratorios')
+    else:
+        return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
     
 # horarios e reservas
 @login_required
@@ -1493,19 +1466,75 @@ def aprovar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, status_aprovacao='P')
     disponibilidade = reserva.disponibilidade
     agora = timezone.localtime(timezone.now())
-    # Não permitir aprovar reservas cujo horário já passou (início já ocorreu ou término já passou)
+    
+    # Não permitir aprovar reservas cujo horário já passou
     if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': "Não é possível aprovar esta reserva: o horário já passou."})
         messages.error(request, "Não é possível aprovar esta reserva: o horário já passou.")
         return redirect('reservas_pendentes')
+    
     if disponibilidade.vagas > 0:
         reserva.status_aprovacao = 'A'
         reserva.save()
         disponibilidade.vagas -= 1
         disponibilidade.save()
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': f"Reserva aprovada com sucesso!"})
         messages.success(request, f"Reserva de {reserva.usuario.username} foi aprovada com sucesso!")
     else:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': "Não há mais vagas disponíveis para este horário."})
         messages.error(request, "Não há mais vagas disponíveis para este horário.")
+    
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True})
     return redirect('reservas_pendentes')
+
+@login_required
+@admin_required
+@require_POST
+def aprovar_multiplas_reservas(request):
+    try:
+        reservas_ids = request.POST.getlist('reservas_selecionadas[]')
+        reservas_aprovadas = 0
+        errors = []
+        
+        for reserva_id in reservas_ids:
+            try:
+                reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
+                disponibilidade = reserva.disponibilidade
+                agora = timezone.localtime(timezone.now())
+                
+                # Verificar se pode aprovar
+                if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
+                    errors.append(f"Reserva {reserva_id}: horário já passou")
+                    continue
+                
+                if disponibilidade.vagas > 0:
+                    reserva.status_aprovacao = 'A'
+                    reserva.save()
+                    disponibilidade.vagas -= 1
+                    disponibilidade.save()
+                    reservas_aprovadas += 1
+                else:
+                    errors.append(f"Reserva {reserva_id}: não há vagas disponíveis")
+                    
+            except Reserva.DoesNotExist:
+                errors.append(f"Reserva {reserva_id}: não encontrada ou já aprovada")
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'{reservas_aprovadas} reserva(s) aprovada(s) com sucesso!',
+            'aprovadas': reservas_aprovadas,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 
 @login_required
 @admin_required
@@ -1521,35 +1550,29 @@ def rejeitar_reserva(request, reserva_id):
 def aprovar_multiplas_reservas(request):
     if request.method == 'POST':
         reservas_ids = request.POST.getlist('reservas_selecionadas')
-        if not reservas_ids:
-            messages.error(request, "Nenhuma reserva foi selecionada.")
-            return redirect('reservas_pendentes')
-        aprovadas = 0
-        sem_vagas = 0
-        expiradas = 0
+        reservas_aprovadas = 0
+        
         for reserva_id in reservas_ids:
             try:
                 reserva = Reserva.objects.get(id=reserva_id, status_aprovacao='P')
                 disponibilidade = reserva.disponibilidade
                 agora = timezone.localtime(timezone.now())
-                # pular reservas cujo horário já passou
-                if disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora:
-                    expiradas += 1
-                    continue
-                if disponibilidade.vagas > 0:
-                    reserva.status_aprovacao = 'A'
-                    reserva.save()
-                    disponibilidade.vagas -= 1
-                    disponibilidade.save()
-                    aprovadas += 1
-                else:
-                    sem_vagas += 1
+                
+                # Verificar se pode aprovar
+                if not (disponibilidade.is_passada() or disponibilidade.end_datetime() <= agora):
+                    if disponibilidade.vagas > 0:
+                        reserva.status_aprovacao = 'A'
+                        reserva.save()
+                        disponibilidade.vagas -= 1
+                        disponibilidade.save()
+                        reservas_aprovadas += 1
+                        
             except Reserva.DoesNotExist:
                 continue
-        if aprovadas > 0:
-            messages.success(request, f"{aprovadas} reserva(s) aprovada(s) com sucesso!")
-        if sem_vagas > 0:
-            messages.warning(request, f"{sem_vagas} reserva(s) não puderam ser aprovadas por falta de vagas.")
-        if expiradas > 0:
-            messages.warning(request, f"{expiradas} reserva(s) não puderam ser aprovadas porque o horário já passou.")
+        
+        if reservas_aprovadas > 0:
+            messages.success(request, f'{reservas_aprovadas} reserva(s) aprovada(s) com sucesso!')
+        else:
+            messages.error(request, 'Nenhuma reserva pôde ser aprovada.')
+    
     return redirect('reservas_pendentes')
