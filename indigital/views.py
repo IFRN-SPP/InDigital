@@ -361,7 +361,16 @@ def criar_disponibilidade(request):
         if form.is_valid():
             disponibilidade = form.save(commit=False)
 
-            # Validação: horário de início deve ser menor que horário de fim
+            if disponibilidade.vagas <= 0:
+                form.add_error('vagas', "O número de vagas deve ser maior que zero.")
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    form_html = render_to_string('modal_form.html', {'form': form}, request=request)
+                    return JsonResponse({'success': False, 'form_html': form_html})
+
+                messages.error(request, "O número de vagas deve ser maior que zero.")
+                return redirect('listar_disponibilidades')
+
             if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
                 form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
 
@@ -372,7 +381,6 @@ def criar_disponibilidade(request):
                 messages.error(request, "O horário de início deve ser menor que o horário de fim.")
                 return redirect('listar_disponibilidades')
 
-            # Verifica se já existe uma disponibilidade conflitante
             conflito = Disponibilidade.objects.filter(
                 laboratorio=disponibilidade.laboratorio,
                 data=disponibilidade.data,
@@ -1480,7 +1488,7 @@ def aprovar_reserva(request, reserva_id):
             return JsonResponse({'success': False, 'error': "Não há mais vagas disponíveis para este horário."})
         messages.error(request, "Não há mais vagas disponíveis para este horário.")
     
-    # Se for AJAX, retorna JSON. Se não, faz redirect normal
+    
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'success': True})
     return redirect('reservas_pendentes')

@@ -805,7 +805,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        // SOLUÇÃO MAIS SIMPLES: Enviar o form tradicional
+        
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{% url "aprovar_multiplas_reservas" %}';
@@ -845,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        // SOLUÇÃO SIMPLES: Redirecionar para a URL de aprovação
+        
         window.location.href = '{% url "aprovar_reserva" 0 %}'.replace('0', reservaIdAtual);
     });
 
@@ -866,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const $btn = $(this);
         $btn.prop('disabled', true).addClass('loading');
         
-        // SOLUÇÃO SIMPLES: Redirecionar para a URL de rejeição
+        
         window.location.href = '{% url "rejeitar_reserva" 0 %}'.replace('0', reservaIdAtual);
     });
 
@@ -879,7 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#btnConfirmarAprovarSelecionadas').prop('disabled', false).removeClass('loading');
     });
 
-    // Inicializar contador
+    
     atualizarContadorSelecionadas();
 });
 </script>

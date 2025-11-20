@@ -560,6 +560,24 @@ $(document).ready(function() {
     let currentDisponibilidadeId = null;
     const csrfToken = '{{ csrf_token }}';
 
+    function validarFormularioDisponibilidade(form) {
+        const inicio = form.find('[name="horario_inicio"]').val();
+        const fim = form.find('[name="horario_fim"]').val();
+        const vagas = parseInt(form.find('[name="vagas"]').val());
+        
+        if (vagas <= 0 || isNaN(vagas)) {
+            showAlert('O número de vagas deve ser maior que zero.', 'error');
+            return false;
+        }
+        
+        if (inicio && fim && inicio >= fim) {
+            showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+
     $(document).on('submit', '#formCriarDisponibilidade', function(e) {
         e.preventDefault(); 
         
@@ -569,11 +587,8 @@ $(document).ready(function() {
         var submitButton = form.find('button[type="submit"]');
         var originalHtml = submitButton.html();
         
-        const inicio = form.find('[name="horario_inicio"]').val();
-        const fim = form.find('[name="horario_fim"]').val();
-        
-        if (!validarHorarios(inicio, fim)) {
-            return;
+        if (!validarFormularioDisponibilidade(form)) {
+            return; 
         }
         
         submitButton.addClass('btn-loading').prop('disabled', true);
@@ -605,13 +620,14 @@ $(document).ready(function() {
         });
     });
 
-    function validarHorarios(inicio, fim) {
-        if (inicio && fim && inicio >= fim) {
-            showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
-            return false;
+    $(document).on('change', '#formCriarDisponibilidade [name="vagas"]', function() {
+        const vagas = parseInt($(this).val());
+        if (vagas <= 0 || isNaN(vagas)) {
+            showAlert('O número de vagas deve ser maior que zero.', 'error');
+            $(this).focus();
+            $(this).select();
         }
-        return true;
-    }
+    });
 
     $('.btn-editar').on('click', function(e) {
         e.preventDefault();
@@ -696,7 +712,7 @@ $(document).ready(function() {
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="vagas" class="form-label">Número de Vagas:</label>
-                                <input type="number" class="form-control" id="vagas" name="vagas" value="${disponibilidadeData.vagas}" min="0" required>
+                                <input type="number" class="form-control" id="vagas" name="vagas" value="${disponibilidadeData.vagas}" min="1" required>
                             </div>
                         </div>
                     </div>
@@ -726,8 +742,19 @@ $(document).ready(function() {
             const inicio = $('#horario_inicio').val();
             const fim = $('#horario_fim').val();
             
-            if (!validarHorarios(inicio, fim)) {
+            if (inicio && fim && inicio >= fim) {
+                showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
                 $('#horario_fim').val('');
+            }
+        });
+
+        
+        $(document).on('change', '#vagas', function() {
+            const vagas = parseInt($(this).val());
+            if (vagas <= 0 || isNaN(vagas)) {
+                showAlert('O número de vagas deve ser maior que zero.', 'error');
+                $(this).focus();
+                $(this).select();
             }
         });
     }
@@ -745,9 +772,17 @@ $(document).ready(function() {
         
         const inicio = $('#horario_inicio').val();
         const fim = $('#horario_fim').val();
+        const vagas = parseInt($('#vagas').val());
         
-        if (!validarHorarios(inicio, fim)) {
-            return;
+        
+        if (vagas <= 0 || isNaN(vagas)) {
+            showAlert('O número de vagas deve ser maior que zero.', 'error');
+            return; 
+        }
+        
+        if (inicio && fim && inicio >= fim) {
+            showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
+            return; 
         }
         
         submitButton.addClass('btn-loading').prop('disabled', true);
@@ -776,11 +811,7 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
                 console.log('Erro:', error);
                 modal.modal('hide');
-                showAlert('Disponibilidade atualizada com sucesso!', 'success');
-                
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                showAlert('Erro ao atualizar disponibilidade. Verifique os dados.', 'error');
             },
             complete: function() {
                 submitButton.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
@@ -828,7 +859,7 @@ $(document).ready(function() {
         $('#confirmModal').modal('show');
     });
 
-    // Confirmar exclusão via AJAX
+    
     $('#confirmDelete').on('click', function() {
         if (!currentDisponibilidadeId) return;
 
@@ -839,7 +870,7 @@ $(document).ready(function() {
 
         const url = '{% url "excluir_disponibilidade" 0 %}'.replace('0', currentDisponibilidadeId);
 
-        // Fazer requisição AJAX
+        
         $.ajax({
             url: url,
             type: 'POST',
