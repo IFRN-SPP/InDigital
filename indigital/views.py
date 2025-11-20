@@ -1307,7 +1307,7 @@ def historico_reservas(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
-    laboratorio_id = request.GET.get('laboratorio')
+    laboratorio_id = request.GET.get('laboratorio_id')
     # Aplicar filtros
     if data_inicio:
         try:
@@ -1322,7 +1322,10 @@ def historico_reservas(request):
         except ValueError:
             messages.error(request, "Data de fim inválida.")
     if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
+        if status_frequencia == 'N':  
+            reservas = reservas.filter(status_frequencia='')
+        else:
+            reservas = reservas.filter(status_frequencia=status_frequencia)
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     # Separar reservas por categoria considerando horário de término (tempo local)
@@ -1338,7 +1341,7 @@ def historico_reservas(request):
     reservas_futuras = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
     reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
     reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
-    # Paginação (usamos a lista completa ordenada originalmente)
+    # Paginação
     paginator = Paginator(reservas_list, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

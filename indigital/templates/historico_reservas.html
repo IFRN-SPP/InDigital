@@ -304,43 +304,49 @@
     <div class="row mb-4">
     <div class="col-12">
         <div class="card" style="border-color: #86B5E1;">
-            <div class="card-header" style="background-color: #20597F; color: white;">
-                <h3 class="card-title">
-                    <i class="fas fa-filter mr-2"></i>Filtros de Busca
-                </h3>
-            </div>
+            <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
                     <form method="GET" class="form-horizontal">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_inicio" class="form-label">Data Início:</label>
-                                    <input type="date" class="form-control form-control-sm" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <input type="date" name="data_inicio" id="data_inicio" 
+                                           class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="data_fim" class="form-label">Data Fim:</label>
-                                    <input type="date" class="form-control form-control-sm" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
+                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <input type="date" name="data_fim" id="data_fim" 
+                                           class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="status_frequencia" class="form-label">Status:</label>
-                                    <select class="form-control form-control-sm" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todos os status</option>
+                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Frequência:</label>
+                                    <select class="form-select" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todas as frequências</option>
                                         <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
                                         <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
                                         <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
-                                        <option value="" {% if status_frequencia == '' %}selected{% endif %}>Pendente</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio" class="form-label">Laboratório:</label>
-                                    <select class="form-control form-control-sm" id="laboratorio" name="laboratorio" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if laboratorio_id == 'todos' or not laboratorio_id %}selected{% endif %}>Todos os laboratórios</option>
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
                                             <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
                                                 {{ lab.num_laboratorio }}
@@ -352,10 +358,10 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search mr-1"></i> Filtrar
                                 </button>
-                                <a href="{% url 'historico_reservas' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                <a href="{% url 'historico_reservas' %}" class="btn btn-secondary">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
                             </div>
@@ -412,6 +418,7 @@
                                     <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
                                     <th style="width: 20%;">Monitor</th>
+                                    <th style="width: 15%;">Status</th>
                                     <th style="width: 20%;">Frequência</th>
                                     <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
@@ -445,6 +452,21 @@
                                         {% else %}
                                             <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
                                             Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.status_aprovacao == 'A' %}
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                                <i class="fas fa-check mr-1"></i> Aprovada
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'P' %}
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'R' %}
+                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times mr-1"></i> Rejeitada
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td style="vertical-align: middle;">
@@ -560,10 +582,15 @@
 
         <div class="tab-pane fade" id="futuras" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-plus mr-2"></i>Reservas Futuras
                     </h3>
+                    <div class="card-tools">
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     {% if reservas_futuras %}
@@ -575,6 +602,7 @@
                                     <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
                                     <th style="width: 20%;">Monitor</th>
+                                    <th style="width: 15%;">Status</th>
                                     <th style="width: 20%;">Frequência</th>
                                     <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
@@ -602,6 +630,21 @@
                                         {% else %}
                                             <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
                                             Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.status_aprovacao == 'A' %}
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                                <i class="fas fa-check mr-1"></i> Aprovada
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'P' %}
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'R' %}
+                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times mr-1"></i> Rejeitada
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td style="vertical-align: middle;">
@@ -663,10 +706,15 @@
 
         <div class="tab-pane fade" id="hoje" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-day mr-2"></i>Reservas de Hoje
                     </h3>
+                    <div class="card-tools">
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     {% if reservas_hoje %}
@@ -678,6 +726,7 @@
                                     <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
                                     <th style="width: 20%;">Monitor</th>
+                                    <th style="width: 15%;">Status</th>
                                     <th style="width: 20%;">Frequência</th>
                                     <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
@@ -705,6 +754,21 @@
                                         {% else %}
                                             <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
                                             Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.status_aprovacao == 'A' %}
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                                <i class="fas fa-check mr-1"></i> Aprovada
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'P' %}
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'R' %}
+                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times mr-1"></i> Rejeitada
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td style="vertical-align: middle;">
@@ -766,10 +830,15 @@
 
         <div class="tab-pane fade" id="passadas" role="tabpanel">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-calendar-check mr-2"></i>Reservas Passadas
                     </h3>
+                    <div class="card-tools">
+                        <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     {% if reservas_passadas %}
@@ -781,6 +850,7 @@
                                     <th style="width: 15%;">Horário</th>
                                     <th style="width: 15%;">Laboratório</th>
                                     <th style="width: 20%;">Monitor</th>
+                                    <th style="width: 15%;">Status</th>
                                     <th style="width: 20%;">Frequência</th>
                                     <th style="width: 15%;" class="text-center">Ações</th>
                                 </tr>
@@ -808,6 +878,21 @@
                                         {% else %}
                                             <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
                                             Não definido
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        {% if reserva.status_aprovacao == 'A' %}
+                                            <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+                                                <i class="fas fa-check mr-1"></i> Aprovada
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'P' %}
+                                            <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+                                                <i class="fas fa-clock mr-1"></i> Pendente
+                                            </span>
+                                        {% elif reserva.status_aprovacao == 'R' %}
+                                            <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                                <i class="fas fa-times mr-1"></i> Rejeitada
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td style="vertical-align: middle;">
