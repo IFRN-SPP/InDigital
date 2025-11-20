@@ -414,52 +414,64 @@ def criar_disponibilidade(request):
 @admin_required
 def editar_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
-    
+
+    action_url = f"/laboratorio/{laboratorio.id}/editar"
+
     if request.method == 'POST':
         try:
             print("=== DEBUG POST ===")
             print(f"Dados POST: {dict(request.POST)}")
-            
+
             form = LaboratorioForm(request.POST, instance=laboratorio)
             print(f"Formulário válido: {form.is_valid()}")
-            
+
             if form.is_valid():
                 print("Salvando laboratório...")
                 laboratorio = form.save()
                 print("Laboratório salvo!")
+
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
+
                 
                 messages.success(request, f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!')
                 return redirect('listar_laboratorios')
+
             else:
                 print(f"Erros do formulário: {form.errors}")
-                
+
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     num_lab_errors = form.errors.get('num_laboratorio', [])
                     capacidade_errors = form.errors.get('capacidade', [])
-                    
+
                     form_html = f"""
-                    <form id="formEditarLaboratorio" method="POST" action="/editar-laboratorio/{laboratorio.id}/">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="{request.META.get('CSRF_COOKIE', '')}">
+                    <form id="formEditarLaboratorio" method="POST" action="{action_url}">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{request.COOKIES.get('csrftoken', '')}">
+                        
                         <div class="form-field">
                             <label for="id_num_laboratorio" class="form-label">
                                 <i class="fas fa-hashtag mr-1"></i>Número do Laboratório *
                             </label>
-                            <input type="text" name="num_laboratorio" id="id_num_laboratorio" class="form-control {'is-invalid' if num_lab_errors else ''}" 
-                                   value="{request.POST.get('num_laboratorio', laboratorio.num_laboratorio)}" placeholder="Ex: L001, LAB-01" required maxlength="10">
-                            {"".join(f'<div class="error-message">{error}</div>' for error in num_lab_errors)}
+                            <input type="text" name="num_laboratorio" id="id_num_laboratorio"
+                                   class="form-control {'is-invalid' if num_lab_errors else ''}" 
+                                   value="{request.POST.get('num_laboratorio', laboratorio.num_laboratorio)}"
+                                   placeholder="Ex: L001, LAB-01" required maxlength="10">
+                            {"".join(f'<div class="error-message">{e}</div>' for e in num_lab_errors)}
                         </div>
+
                         <div class="form-field">
                             <label for="id_capacidade" class="form-label">
                                 <i class="fas fa-users mr-1"></i>Capacidade *
                             </label>
-                            <input type="number" name="capacidade" id="id_capacidade" class="form-control {'is-invalid' if capacidade_errors else ''}" 
-                                   value="{request.POST.get('capacidade', laboratorio.capacidade)}" min="1" max="1000" required>
-                            {"".join(f'<div class="error-message">{error}</div>' for error in capacidade_errors)}
+                            <input type="number" name="capacidade" id="id_capacidade" 
+                                   class="form-control {'is-invalid' if capacidade_errors else ''}" 
+                                   value="{request.POST.get('capacidade', laboratorio.capacidade)}"
+                                   min="1" max="1000" required>
+                            {"".join(f'<div class="error-message">{e}</div>' for e in capacidade_errors)}
                             <small class="text-muted">Número máximo de pessoas que o laboratório suporta</small>
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="fas fa-times mr-2"></i>Cancelar
@@ -470,41 +482,53 @@ def editar_laboratorio(request, laboratorio_id):
                         </div>
                     </form>
                     """
+
                     return JsonResponse({'success': False, 'form_html': form_html})
-                
+
                 messages.error(request, 'Erro ao editar laboratório!')
-        
+
         except Exception as e:
             print(f" ERRO NO POST: {str(e)}")
             import traceback
             print(traceback.format_exc())
+
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
             
             messages.error(request, f'Erro: {str(e)}')
             return redirect('listar_laboratorios')
+
     
-    else: 
+    else:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+
             form_html = f"""
-            <form id="formEditarLaboratorio" method="POST" action="/editar-laboratorio/{laboratorio.id}/">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{request.META.get('CSRF_COOKIE', '')}">
+            <form id="formEditarLaboratorio" method="POST" action="{action_url}">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{request.COOKIES.get('csrftoken', '')}">
+
                 <div class="form-field">
                     <label for="id_num_laboratorio" class="form-label">
                         <i class="fas fa-hashtag mr-1"></i>Número do Laboratório *
                     </label>
-                    <input type="text" name="num_laboratorio" id="id_num_laboratorio" class="form-control" 
-                           value="{laboratorio.num_laboratorio}" placeholder="Ex: L001, LAB-01" required maxlength="10">
+                    <input type="text" name="num_laboratorio" id="id_num_laboratorio"
+                           class="form-control"
+                           value="{laboratorio.num_laboratorio}"
+                           required maxlength="10">
                 </div>
+
                 <div class="form-field">
                     <label for="id_capacidade" class="form-label">
                         <i class="fas fa-users mr-1"></i>Capacidade *
                     </label>
-                    <input type="number" name="capacidade" id="id_capacidade" class="form-control" 
-                           value="{laboratorio.capacidade}" min="1" max="1000" required>
+                    <input type="number" name="capacidade" id="id_capacidade" 
+                           class="form-control"
+                           value="{laboratorio.capacidade}"
+                           min="1" max="1000" required>
                     <small class="text-muted">Número máximo de pessoas que o laboratório suporta</small>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times mr-2"></i>Cancelar
@@ -515,14 +539,13 @@ def editar_laboratorio(request, laboratorio_id):
                 </div>
             </form>
             """
+
             return HttpResponse(form_html)
+
         
         form = LaboratorioForm(instance=laboratorio)
-        context = {
-            'form': form,
-            'laboratorio': laboratorio
-        }
-        return render(request, 'listar_laboratorios.html', context)
+        return render(request, 'listar_laboratorios.html', {'form': form, 'laboratorio': laboratorio})
+
 
 @login_required
 @admin_required
@@ -600,12 +623,25 @@ def criar_laboratorio(request):
 @admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+
     if request.method == "POST":
+
         laboratorio.delete()
+
+        
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": True,
+                "message": "Laboratório excluído com sucesso!"
+            })
+
+        
         messages.success(request, "Laboratório excluído com sucesso!")
-        return redirect('listar_laboratorios')
-    else:
-        return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+        return redirect("listar_laboratorios")
+
+    
+    return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+
     
 # horarios e reservas
 @login_required

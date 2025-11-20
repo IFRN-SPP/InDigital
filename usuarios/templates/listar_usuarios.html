@@ -453,13 +453,23 @@
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
                                         <div class="action-buttons">
-                                            <!-- Botão Editar -->
-                                            <a href="{% url 'editar_usuario' usuario.id %}" 
-                                               class="action-btn btn-edit" 
-                                               title="Editar usuário"
-                                               data-toggle="tooltip">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+
+                                            <td class="text-center">
+    <div class="action-buttons d-flex gap-2 justify-content-center">
+
+        <!-- Botão de modificar perfil -->
+        <div class="btn-group">
+            <button class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                Perfil
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=outro">Outro</a></li>
+                <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=aluno">Aluno</a></li>
+                <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=monitor">Monitor</a></li>
+                <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=administrador">Administrador</a></li>
+            </ul>
+        </div>
+
 
                                             <!-- Botão Deletar -->
                                             <button type="button" 
@@ -475,24 +485,6 @@
                                                 </span>
                                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
                                             </button>
-                                            
-                                            <!-- Botão Definir como Monitor -->
-                                            {% if usuario.perfil != 'monitor' and not usuario.is_superuser %}
-                                                <a href="{% url 'tornar_monitor' usuario.id %}" 
-                                                   class="action-btn btn-monitor" 
-                                                   title="Definir como Monitor"
-                                                   data-toggle="tooltip">
-                                                    <i class="fas fa-user-cog"></i>
-                                                </a>
-                                            {% elif usuario.perfil == 'monitor' %}
-                                                <!-- Botão Remover Monitor -->
-                                                <a href="{% url 'remover_monitor' usuario.id %}" 
-                                                   class="action-btn btn-remove-monitor" 
-                                                   title="Remover Monitor"
-                                                   data-toggle="tooltip">
-                                                    <i class="fas fa-user-minus"></i>
-                                                </a>
-                                            {% endif %}
                                             
                                             <!-- Botão Ver Reservas -->
                                             <a href="{% url 'reservas_por_usuario' usuario.id %}" 
@@ -643,106 +635,110 @@
 
 {% block extra_js %}
 <script>
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function () {
     let usuarioIdAtual = null;
     const csrfToken = '{{ csrf_token }}';
 
-    $('[data-toggle="tooltip"]').tooltip();
-
-    $('.btn-modal-excluir').on('click', function() {
-        usuarioIdAtual = $(this).data('usuario-id');
-        
-        $('#modalExcluirNome').text($(this).data('usuario-nome'));
-        $('#modalExcluirEmail').text($(this).data('usuario-email'));
-        $('#modalExcluirPerfil').text($(this).data('usuario-perfil'));
-        
-        $('#modalExcluirUsuario').modal('show');
+    // Tooltip BS5
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    $('#btnConfirmarExclusao').on('click', function() {
-        const $btn = $(this);
-        $btn.prop('disabled', true).addClass('loading');
-        
-        // Fazer requisição AJAX
-        $.ajax({
-            url: '{% url "deletar_usuario" 0 %}'.replace('0', usuarioIdAtual),
-            type: 'POST',
-            data: {
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                $('#modalExcluirUsuario').modal('hide');
-                
-                $(`#usuario-${usuarioIdAtual}`).fadeOut(300, function() {
-                    $(this).remove();
-                    
-                    const usuariosRestantes = $('tbody tr').length;
-                    if (usuariosRestantes === 0) {
-                        location.reload();
-                    } else {
-                        mostrarResultado('success', 'Usuário Excluído!', 'O usuário foi excluído com sucesso.', false);
-                    }
-                });
-            },
-            error: function(xhr) {
-                $('#modalExcluirUsuario').modal('hide');
-                let mensagem = 'Erro ao excluir usuário. Tente novamente.';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    mensagem = xhr.responseJSON.error;
-                }
-                mostrarResultado('error', 'Erro na Exclusão', mensagem, true);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).removeClass('loading');
-            }
+    // Modal BS5
+    const modalExcluir = new bootstrap.Modal(document.getElementById("modalExcluirUsuario"));
+    const modalResultado = new bootstrap.Modal(document.getElementById("modalResultado"));
+
+    // Abrir modal de exclusão
+    document.querySelectorAll('.btn-modal-excluir').forEach(btn => {
+        btn.addEventListener('click', function () {
+
+            usuarioIdAtual = this.dataset.usuarioId;
+
+            document.getElementById("modalExcluirNome").textContent = this.dataset.usuarioNome;
+            document.getElementById("modalExcluirEmail").textContent = this.dataset.usuarioEmail;
+            document.getElementById("modalExcluirPerfil").textContent = this.dataset.usuarioPerfil;
+
+            modalExcluir.show();
         });
     });
 
-    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
-        const $modal = $('#modalResultado');
-        const $icon = $('#resultadoIcon');
-        const $titulo = $('#resultadoTitulo');
-        const $mensagem = $('#resultadoMensagem');
-        const $header = $('#modalResultadoLabel');
-        const $btn = $modal.find('.btn-primary');
+// Confirma exclusão
+document.getElementById("btnConfirmarExclusao").addEventListener("click", function () {
 
-        switch(tipo) {
-            case 'success':
-                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
-                $header.text('Sucesso');
-                break;
-            case 'error':
-                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
-                $header.text('Erro');
-                break;
-            case 'warning':
-                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
-                $header.text('Atenção');
-                break;
+    const btn = this;
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    fetch(`{% url 'deletar_usuario' 0 %}`.replace("0", usuarioIdAtual), {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrfToken
         }
+    })
+    .then(res => {
+        if (!res.ok) throw res;
+        return Promise.resolve();   // ⬅️ EVITA ERRO DE JSON
+    })
+    .then(() => {
+        modalExcluir.hide();
 
-        $titulo.text(titulo);
-        $mensagem.text(mensagem);
-        
-        if (recarregar) {
-            $btn.html('<i class="fas fa-sync-alt mr-1"></i> Atualizar Página');
-            $btn.off('click').on('click', function() {
+        const linha = document.getElementById(`usuario-${usuarioIdAtual}`);
+        linha.style.transition = "0.3s";
+        linha.style.opacity = "0";
+
+        setTimeout(() => {
+            linha.remove();
+
+            if (document.querySelectorAll("tbody tr").length === 0) {
                 location.reload();
-            });
-        } else {
-            $btn.html('<i class="fas fa-check mr-1"></i> Entendido');
-            $btn.off('click').on('click', function() {
-                $modal.modal('hide');
-            });
-        }
-        
-        $modal.modal('show');
-    }
-
-    $('#modalExcluirUsuario').on('hidden.bs.modal', function() {
-        usuarioIdAtual = null;
-        $('#btnConfirmarExclusao').prop('disabled', false).removeClass('loading');
+            } else {
+                mostrarResultado('success', 'Usuário Excluído!', 'O usuário foi excluído com sucesso.', false);
+            }
+        }, 300);
+    })
+    .catch(() => {
+        modalExcluir.hide();
+        mostrarResultado('error', 'Erro na Exclusão', 'Ocorreu um erro ao excluir o usuário.', true);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
     });
 });
+
+
+    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
+
+        const icon = document.getElementById("resultadoIcon");
+        const tituloElem = document.getElementById("resultadoTitulo");
+        const msgElem = document.getElementById("resultadoMensagem");
+        const btn = document.querySelector("#modalResultado .btn-primary");
+        const header = document.getElementById("modalResultadoLabel");
+
+        if (tipo === "success") {
+            icon.innerHTML = '<i class="fas fa-check-circle" style="color:#28a745;"></i>';
+            header.textContent = "Sucesso";
+        }
+        if (tipo === "error") {
+            icon.innerHTML = '<i class="fas fa-times-circle" style="color:#dc3545;"></i>';
+            header.textContent = "Erro";
+        }
+
+        tituloElem.textContent = titulo;
+        msgElem.textContent = mensagem;
+
+        if (recarregar) {
+            btn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i> Atualizar Página';
+            btn.onclick = () => location.reload();
+        } else {
+            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Entendido';
+            btn.onclick = () => modalResultado.hide();
+        }
+
+        modalResultado.show();
+    }
+});
 </script>
+
 {% endblock %}
