@@ -220,7 +220,21 @@ def editar_disponibilidade(request, reserva_id):
         if form.is_valid():
             disponibilidade = form.save(commit=False)
 
-            # Validação: horário de início deve ser menor que horário de fim
+            # VALIDAÇÃO: Número de vagas não pode ser maior que a capacidade do laboratório
+            if disponibilidade.vagas > disponibilidade.laboratorio.capacidade:
+                error_msg = f"O número de vagas não pode ser maior que a capacidade máxima do laboratório: {disponibilidade.laboratorio.capacidade} vagas."
+                form.add_error('vagas', error_msg)
+                context["form"] = form
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False, 
+                        'errors': {'vagas': error_msg}
+                    }, status=400)
+
+                messages.error(request, error_msg)
+                return render(request, "editar_disponibilidade.html", context)
+
             if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
                 form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
                 context["form"] = form
@@ -232,7 +246,6 @@ def editar_disponibilidade(request, reserva_id):
                 messages.error(request, "O horário de início deve ser menor que o horário de fim.")
                 return render(request, "editar_disponibilidade.html", context)
 
-            # Verifica conflito de horários, excluindo a própria disponibilidade que está sendo editada
             conflito = Disponibilidade.objects.filter(
                 laboratorio=disponibilidade.laboratorio,
                 data=disponibilidade.data,
@@ -241,11 +254,10 @@ def editar_disponibilidade(request, reserva_id):
             ).exclude(id=disponibilidade.id).exists()
 
             if conflito:
-                # Adiciona erro ao formulário para feedback e mantém o formulário preenchido
                 form.add_error(None, "Já existe uma disponibilidade nesse horário para este laboratório.")
                 context["form"] = form
 
-                # Se for requisição AJAX, retorna o HTML do modal com erros
+                
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     form_html = render_to_string('modal_form.html', {'form': form}, request=request)
                     return JsonResponse({'success': False, 'form_html': form_html})
@@ -253,12 +265,28 @@ def editar_disponibilidade(request, reserva_id):
                 messages.error(request, "Já existe uma disponibilidade nesse horário para este laboratório.")
                 return render(request, "editar_disponibilidade.html", context)
 
-            # Sem conflito: salva e retorna
+            
             disponibilidade.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Disponibilidade atualizada com sucesso!'
+                })
+                
             messages.success(request, "Disponibilidade editada com sucesso!")
             return redirect('listar_disponibilidades')
         else:
             context["form"] = form
+            
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                errors = {field: error[0] for field, error in form.errors.items()}
+                return JsonResponse({
+                    'success': False, 
+                    'errors': errors
+                }, status=400)
+                
             messages.error(request, "Erro ao editar disponibilidade!")
 
     return render(request, "editar_disponibilidade.html", context)
@@ -1011,38 +1039,46 @@ def sair_fila_espera(request, fila_id):
 @aluno_required
 def minha_fila_espera(request):
     minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio', 'disponibilidade__monitor').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
+    
     # Filtros
     laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status = request.GET.get('status')
+    
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         minhas_filas = minhas_filas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
     if data_inicio:
         try:
             data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             minhas_filas = minhas_filas.filter(disponibilidade__data__gte=data_inicio_obj)
         except ValueError:
             messages.error(request, "Data de início inválida.")
+    
     if data_fim:
         try:
             data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
             minhas_filas = minhas_filas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
+    
     dados_filas = []
     today = date.today()
     agora = timezone.localtime(timezone.now())
+    
     for fila in minhas_filas:
         fila_geral = FilaEspera.objects.filter(disponibilidade=fila.disponibilidade).order_by('data_solicitacao')
         usuarios_em_ordem = list(fila_geral.values_list('usuario_id', flat=True))
         posicao = usuarios_em_ordem.index(request.user.id) + 1
+        
         # Determinar o status da fila
         if fila.disponibilidade.data < today:
             status_fila = 'processado'
         else:
             status_fila = 'ativo'
+        
         # Determinar se o usuário ainda pode sair da fila (horário não passou e status ativo)
         try:
             can_sair = (fila.disponibilidade.end_datetime() > agora) and (status_fila == 'ativo')
@@ -1057,13 +1093,16 @@ def minha_fila_espera(request):
             'status': status_fila,
             'can_sair': can_sair,
         }
+        
         # Aplicar filtro de status se especificado
         if not status or status == 'todos' or status == status_fila:
             dados_filas.append(item)
+    
     # Paginação
     paginator = Paginator(dados_filas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     # Dados para os filtros
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
     
@@ -1077,6 +1116,38 @@ def minha_fila_espera(request):
         'today': today,
     }
     return render(request, 'minha_fila_espera.html', context)
+
+
+@login_required
+@aluno_required
+def sair_fila_espera(request, fila_id):
+    if request.method == 'POST':
+        try:
+            fila = FilaEspera.objects.get(id=fila_id, usuario=request.user)
+            
+            today = date.today()
+            agora = timezone.localtime(timezone.now())
+            
+            try:
+                can_sair = (fila.disponibilidade.end_datetime() > agora) and (fila.disponibilidade.data >= today)
+            except Exception:
+                can_sair = False
+            
+            if can_sair:
+                laboratorio_num = fila.disponibilidade.laboratorio.num_laboratorio
+                data_fila = fila.disponibilidade.data
+                fila.delete()
+                messages.success(request, f'Você saiu da fila de espera do laboratório {laboratorio_num} para o dia {data_fila.strftime("%d/%m/%Y")}.')
+            else:
+                messages.error(request, 'Não é possível sair desta fila. O horário já passou ou a reserva já foi processada.')
+                
+        except FilaEspera.DoesNotExist:
+            messages.error(request, 'Erro: Solicitação não encontrada ou você não tem permissão para esta ação.')
+        
+        return redirect('minha_fila_espera')
+    
+    
+    return redirect('minha_fila_espera')
 
 # detalhes da reserva e usuarios
 @login_required

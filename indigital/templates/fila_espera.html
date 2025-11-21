@@ -425,31 +425,6 @@ $(document).ready(function() {
     let currentAction = null;
     const csrfToken = '{{ csrf_token }}';
 
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            } else if ($(this).css('background-color') === 'rgb(220, 53, 69)') {
-                $(this).css('background-color', '#c82333');
-            } else if ($(this).css('background-color') === 'rgb(40, 167, 69)') {
-                $(this).css('background-color', '#218838');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            } else if ($(this).css('background-color') === 'rgb(200, 35, 51)') {
-                $(this).css('background-color', '#1ad458ff');
-            } else if ($(this).css('background-color') === 'rgba(33, 136, 56, 1)') {
-                $(this).css('background-color', '#dc3545');
-            }
-        }
-    );
-
     $('.btn-aprovar').on('click', function() {
         currentFilaId = $(this).data('fila-id');
         const usuarioNome = $(this).data('usuario-nome');

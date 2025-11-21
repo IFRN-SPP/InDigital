@@ -319,6 +319,69 @@
         border-radius: 0 0 8px 8px;
         overflow: hidden;
     }
+
+    .table-responsive {
+        position: relative;
+        overflow: visible !important; 
+    }
+
+    .btn-group {
+        position: static; 
+    }
+
+    .dropdown-menu {
+        z-index: 1060; 
+        position: absolute;
+    }
+
+    .btn-group .dropdown-menu {
+        min-width: 180px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border: 1px solid #86B5E1;
+        border-radius: 6px;
+    }
+
+    .btn-group .dropdown-item {
+        padding: 8px 16px;
+        color: #20597F;
+        transition: all 0.2s ease;
+    }
+
+    .btn-group .dropdown-item:hover {
+        background-color: #86B5E1;
+        color: white;
+    }
+
+    .btn-group .dropdown-item:active {
+        background-color: #20597F;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #000 !important;
+        font-size: 0.875rem;
+        padding: 6px 12px;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800 !important;
+        border-color: #e0a800 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .table-responsive {
+            overflow-x: auto !important;
+        }
+        
+        .btn-group .dropdown-menu {
+            position: fixed !important;
+            z-index: 9999;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -452,17 +515,14 @@
                                         </span>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
-                                        <div class="action-buttons">
-
-                                            <td class="text-center">
     <div class="action-buttons d-flex gap-2 justify-content-center">
 
-        <!-- Botão de modificar perfil -->
+        <!-- Botão modificar perfil -->
         <div class="btn-group">
-            <button class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 Perfil
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=outro">Outro</a></li>
                 <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=aluno">Aluno</a></li>
                 <li><a class="dropdown-item" href="{% url 'ajustar_perfil' usuario.id %}?perfil=monitor">Monitor</a></li>
@@ -470,31 +530,26 @@
             </ul>
         </div>
 
+        <!-- Botão Deletar -->
+        <button type="button" 
+                class="action-btn btn-delete btn-modal-excluir"
+                data-usuario-id="{{ usuario.id }}"
+                data-usuario-nome="{% if usuario.first_name or usuario.last_name %}{{ usuario.first_name }} {{ usuario.last_name }}{% else %}Usuário #{{ usuario.id }}{% endif %}"
+                data-usuario-email="{{ usuario.email }}"
+                data-usuario-perfil="{% if usuario.is_superuser %}Superusuário{% else %}{{ usuario.get_perfil_display }}{% endif %}"
+                title="Deletar usuário">
+            <i class="fas fa-trash"></i>
+        </button>
 
-                                            <!-- Botão Deletar -->
-                                            <button type="button" 
-                                                    class="action-btn btn-delete btn-modal-excluir"
-                                                    data-usuario-id="{{ usuario.id }}"
-                                                    data-usuario-nome="{% if usuario.first_name or usuario.last_name %}{{ usuario.first_name }} {{ usuario.last_name }}{% else %}Usuário #{{ usuario.id }}{% endif %}"
-                                                    data-usuario-email="{{ usuario.email }}"
-                                                    data-usuario-perfil="{% if usuario.is_superuser %}Superusuário{% else %}{{ usuario.get_perfil_display }}{% endif %}"
-                                                    title="Deletar usuário"
-                                                    data-toggle="tooltip">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-trash"></i>
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                            
-                                            <!-- Botão Ver Reservas -->
-                                            <a href="{% url 'reservas_por_usuario' usuario.id %}" 
-                                               class="action-btn btn-reservas" 
-                                               title="Ver Reservas"
-                                               data-toggle="tooltip">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+        <!-- Botão Ver Reservas -->
+        <a href="{% url 'reservas_por_usuario' usuario.id %}" 
+           class="action-btn btn-reservas" 
+           title="Ver Reservas">
+            <i class="fas fa-calendar-alt"></i>
+        </a>
+
+    </div>
+</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -623,11 +678,6 @@
                 <h4 id="resultadoTitulo" class="mb-3"></h4>
                 <p id="resultadoMensagem"></p>
             </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">
-                    <i class="fas fa-sync-alt mr-1"></i> Atualizar Página
-                </button>
-            </div>
         </div>
     </div>
 </div>
@@ -639,17 +689,17 @@ document.addEventListener("DOMContentLoaded", function () {
     let usuarioIdAtual = null;
     const csrfToken = '{{ csrf_token }}';
 
-    // Tooltip BS5
+    
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Modal BS5
+    
     const modalExcluir = new bootstrap.Modal(document.getElementById("modalExcluirUsuario"));
     const modalResultado = new bootstrap.Modal(document.getElementById("modalResultado"));
 
-    // Abrir modal de exclusão
+    
     document.querySelectorAll('.btn-modal-excluir').forEach(btn => {
         btn.addEventListener('click', function () {
 
@@ -663,7 +713,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-// Confirma exclusão
+
 document.getElementById("btnConfirmarExclusao").addEventListener("click", function () {
 
     const btn = this;
@@ -678,7 +728,7 @@ document.getElementById("btnConfirmarExclusao").addEventListener("click", functi
     })
     .then(res => {
         if (!res.ok) throw res;
-        return Promise.resolve();   // ⬅️ EVITA ERRO DE JSON
+        return Promise.resolve();   
     })
     .then(() => {
         modalExcluir.hide();
