@@ -211,7 +211,7 @@
                                         <option value="todos" {% if not monitor_id or monitor_id == 'todos' %}selected{% endif %}>Todos os monitores</option>
                                         {% for monitor in monitores %}
                                             <option value="{{ monitor.id }}" {% if monitor_id == monitor.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ monitor.suap_nome_completo }}
+                                                {{ monitor.get_full_name }}
                                             </option>
                                         {% endfor %}
                                     </select>

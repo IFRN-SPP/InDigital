@@ -153,6 +153,45 @@
         background-color: #c82333;
         color: white;
     }
+    .btn-primary {
+    background-color: #20597F;
+    border-color: #20597F;
+}
+
+    .btn-primary:hover {
+    background-color: #16466d;
+    border-color: #16466d;
+}
+
+    .btn-secondary {
+    background-color: #86B5E1;
+    border-color: #86B5E1;
+    color: #20597F;
+}
+
+    .btn-secondary:hover {
+    background-color: #76a5d9;
+    border-color: #76a5d9;
+    color: #20597F;
+}
+.card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        background-color: #20597F !important;
+        color: white !important;
+        border-bottom: 1px solid #86B5E1;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -171,8 +210,8 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -186,16 +225,22 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="usuario_nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome:</label>
-                                    <input type="text" id="usuario_nome" name="usuario_nome" class="form-control form-control-sm" 
-                                           value="{{ usuario_nome|default:'' }}" placeholder="Buscar por nome"
-                                           style="border-color: #86B5E1;">
+                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <input type="date" name="data_inicio" id="data_inicio" 
+                                           class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <input type="date" name="data_fim" id="data_fim" 
+                                           class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                    <select name="laboratorio_id" id="laboratorio_id" class="form-control form-control-sm" style="border-color: #86B5E1;">
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
                                         <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
                                             <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
@@ -206,26 +251,27 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
-                                    <input type="date" name="data_inicio" id="data_inicio" 
-                                           class="form-control form-control-sm" value="{{ data_inicio }}" style="border-color: #86B5E1;">
-                                </div>
+                            <div class="form-group">
+                                <label for="usuario" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                <select class="form-select" id="usuario" name="usuario_id" style="border-color: #86B5E1;">
+                                    <option value="todos" {% if usuario_id == 'todos' or not usuario_id %}selected{% endif %}>
+                                        Todos os usuários
+                                    </option>
+                                    {% for user in usuarios %}
+                                        <option value="{{ user.id }}" {% if usuario_id == user.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ user.get_full_name|default:user.first_name|default:user.username }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
-                                    <input type="date" name="data_fim" id="data_fim" 
-                                           class="form-control form-control-sm" value="{{ data_fim }}" style="border-color: #86B5E1;">
-                                </div>
-                            </div>
+                        </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search mr-1"></i> Filtrar
                                 </button>
-                                <a href="{% url 'fila_espera' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                <a href="{% url 'fila_espera' %}" class="btn btn-secondary">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
                             </div>

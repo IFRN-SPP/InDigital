@@ -212,6 +212,45 @@
     @keyframes spin {
         to { transform: rotate(360deg); }
     }
+    .btn-primary {
+    background-color: #20597F;
+    border-color: #20597F;
+    }
+
+    .btn-primary:hover {
+    background-color: #16466d;
+    border-color: #16466d;
+    }
+
+    .btn-secondary {
+    background-color: #86B5E1;
+    border-color: #86B5E1;
+    color: #20597F;
+    }
+
+    .btn-secondary:hover {
+    background-color: #76a5d9;
+    border-color: #76a5d9;
+    color: #20597F;
+    }
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        background-color: #20597F !important;
+        color: white !important;
+        border-bottom: 1px solid #86B5E1;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -229,8 +268,8 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -240,39 +279,52 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="get" class="form-horizontal">
+                    <form method="GET" class="form-horizontal">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="num_laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Número do Laboratório:</label>
-                                    <input type="text" id="num_laboratorio" name="num_laboratorio" class="form-control form-control-sm" 
-                                           value="{{ num_laboratorio|default:'' }}" placeholder="Buscar por número"
-                                           style="border-color: #86B5E1;">
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                                        {% for lab in laboratorios %}
+                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ lab.num_laboratorio }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="capacidade_min" class="form-label" style="color: #20597F; font-weight: 600;">Capacidade Mínima:</label>
-                                    <input type="number" id="capacidade_min" name="capacidade_min" class="form-control form-control-sm" 
-                                           value="{{ capacidade_min|default:'' }}" placeholder="Ex: 20" min="1"
-                                           style="border-color: #86B5E1;">
+                                    <input type="number"
+                                        name="capacidade_min"
+                                        id="capacidade_min"
+                                        class="form-control"
+                                        value="{{ capacidade_min }}"
+                                        placeholder="Ex: 20"
+                                        style="border-color: #86B5E1;">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="capacidade_max" class="form-label" style="color: #20597F; font-weight: 600;">Capacidade Máxima:</label>
-                                    <input type="number" id="capacidade_max" name="capacidade_max" class="form-control form-control-sm" 
-                                           value="{{ capacidade_max|default:'' }}" placeholder="Ex: 50" min="1"
-                                           style="border-color: #86B5E1;">
+                                    <input type="number"
+                                        name="capacidade_max"
+                                        id="capacidade_max"
+                                        class="form-control"
+                                        value="{{ capacidade_max }}"
+                                        placeholder="Ex: 40"
+                                        style="border-color: #86B5E1;">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search mr-1"></i> Filtrar
                                 </button>
-                                <a href="{% url 'listar_laboratorios' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                <a href="{% url 'listar_laboratorios' %}" class="btn btn-secondary">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
                                 <button type="button" class="btn btn-sm float-end" style="background-color: #28a745; color: white; border: none;" 
@@ -350,7 +402,7 @@
                             <i class="fas fa-flask fa-4x mb-3" style="color: #86B5E1;"></i>
                             <h4 style="color: #20597F;">Nenhum laboratório encontrado</h4>
                             <p class="text-muted">
-                                {% if num_laboratorio or capacidade_min or capacidade_max %}
+                                        {% if laboratorio_id or capacidade_min or capacidade_max %}
                                     Tente ajustar os filtros ou <a href="{% url 'listar_laboratorios' %}" style="color: #20597F;">limpar os filtros</a> para ver todos os laboratórios.
                                 {% else %}
                                     Não há laboratórios cadastrados no sistema.
@@ -366,13 +418,13 @@
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                <a class="page-link" href="?page=1{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-left"></i>
                                 </a>
@@ -386,7 +438,7 @@
                                 </li>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                    <a class="page-link" href="?page={{ num }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
                                        style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
                                 </li>
                             {% endif %}
@@ -394,13 +446,13 @@
 
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if num_laboratorio %}&num_laboratorio={{ num_laboratorio }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if capacidade_min %}&capacidade_min={{ capacidade_min }}{% endif %}{% if capacidade_max %}&capacidade_max={{ capacidade_max }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-right"></i>
                                 </a>
