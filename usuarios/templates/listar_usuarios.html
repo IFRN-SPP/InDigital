@@ -452,12 +452,9 @@
                                         </span>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
-                                        <div class="action-buttons">
-
-                                            <td class="text-center">
     <div class="action-buttons d-flex gap-2 justify-content-center">
 
-        <!-- Botão de modificar perfil -->
+        <!-- Botão modificar perfil -->
         <div class="btn-group">
             <button class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                 Perfil
@@ -470,32 +467,27 @@
             </ul>
         </div>
 
+        <!-- Botão Deletar -->
+        <button type="button" 
+                class="action-btn btn-delete btn-modal-excluir"
+                data-usuario-id="{{ usuario.id }}"
+                data-usuario-nome="{% if usuario.first_name or usuario.last_name %}{{ usuario.first_name }} {{ usuario.last_name }}{% else %}Usuário #{{ usuario.id }}{% endif %}"
+                data-usuario-email="{{ usuario.email }}"
+                data-usuario-perfil="{% if usuario.is_superuser %}Superusuário{% else %}{{ usuario.get_perfil_display }}{% endif %}"
+                title="Deletar usuário">
+            <i class="fas fa-trash"></i>
+        </button>
 
-                                            <!-- Botão Deletar -->
-                                            <button type="button" 
-                                                    class="action-btn btn-delete btn-modal-excluir"
-                                                    data-usuario-id="{{ usuario.id }}"
-                                                    data-usuario-nome="{% if usuario.first_name or usuario.last_name %}{{ usuario.first_name }} {{ usuario.last_name }}{% else %}Usuário #{{ usuario.id }}{% endif %}"
-                                                    data-usuario-email="{{ usuario.email }}"
-                                                    data-usuario-perfil="{% if usuario.is_superuser %}Superusuário{% else %}{{ usuario.get_perfil_display }}{% endif %}"
-                                                    title="Deletar usuário"
-                                                    data-toggle="tooltip">
-                                                <span class="btn-text">
-                                                    <i class="fas fa-trash"></i>
-                                                </span>
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                            </button>
-                                            
-                                            <!-- Botão Ver Reservas -->
-                                            <a href="{% url 'reservas_por_usuario' usuario.id %}" 
-                                               class="action-btn btn-reservas" 
-                                               title="Ver Reservas"
-                                               data-toggle="tooltip">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+        <!-- Botão Ver Reservas -->
+        <a href="{% url 'reservas_por_usuario' usuario.id %}" 
+           class="action-btn btn-reservas" 
+           title="Ver Reservas">
+            <i class="fas fa-calendar-alt"></i>
+        </a>
+
+    </div>
+</td>
+
                                 {% endfor %}
                             </tbody>
                         </table>

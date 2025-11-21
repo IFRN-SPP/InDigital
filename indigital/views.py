@@ -995,38 +995,46 @@ def sair_fila_espera(request, fila_id):
 @aluno_required
 def minha_fila_espera(request):
     minhas_filas = FilaEspera.objects.filter(usuario=request.user).select_related('disponibilidade__laboratorio', 'disponibilidade__monitor').order_by('disponibilidade__data', 'disponibilidade__horario_inicio')
+    
     # Filtros
     laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status = request.GET.get('status')
+    
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         minhas_filas = minhas_filas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
     if data_inicio:
         try:
             data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             minhas_filas = minhas_filas.filter(disponibilidade__data__gte=data_inicio_obj)
         except ValueError:
             messages.error(request, "Data de início inválida.")
+    
     if data_fim:
         try:
             data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
             minhas_filas = minhas_filas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
+    
     dados_filas = []
     today = date.today()
     agora = timezone.localtime(timezone.now())
+    
     for fila in minhas_filas:
         fila_geral = FilaEspera.objects.filter(disponibilidade=fila.disponibilidade).order_by('data_solicitacao')
         usuarios_em_ordem = list(fila_geral.values_list('usuario_id', flat=True))
         posicao = usuarios_em_ordem.index(request.user.id) + 1
+        
         # Determinar o status da fila
         if fila.disponibilidade.data < today:
             status_fila = 'processado'
         else:
             status_fila = 'ativo'
+        
         # Determinar se o usuário ainda pode sair da fila (horário não passou e status ativo)
         try:
             can_sair = (fila.disponibilidade.end_datetime() > agora) and (status_fila == 'ativo')
@@ -1041,13 +1049,16 @@ def minha_fila_espera(request):
             'status': status_fila,
             'can_sair': can_sair,
         }
+        
         # Aplicar filtro de status se especificado
         if not status or status == 'todos' or status == status_fila:
             dados_filas.append(item)
+    
     # Paginação
     paginator = Paginator(dados_filas, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     # Dados para os filtros
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
     
@@ -1061,6 +1072,38 @@ def minha_fila_espera(request):
         'today': today,
     }
     return render(request, 'minha_fila_espera.html', context)
+
+
+@login_required
+@aluno_required
+def sair_fila_espera(request, fila_id):
+    if request.method == 'POST':
+        try:
+            fila = FilaEspera.objects.get(id=fila_id, usuario=request.user)
+            
+            today = date.today()
+            agora = timezone.localtime(timezone.now())
+            
+            try:
+                can_sair = (fila.disponibilidade.end_datetime() > agora) and (fila.disponibilidade.data >= today)
+            except Exception:
+                can_sair = False
+            
+            if can_sair:
+                laboratorio_num = fila.disponibilidade.laboratorio.num_laboratorio
+                data_fila = fila.disponibilidade.data
+                fila.delete()
+                messages.success(request, f'Você saiu da fila de espera do laboratório {laboratorio_num} para o dia {data_fila.strftime("%d/%m/%Y")}.')
+            else:
+                messages.error(request, 'Não é possível sair desta fila. O horário já passou ou a reserva já foi processada.')
+                
+        except FilaEspera.DoesNotExist:
+            messages.error(request, 'Erro: Solicitação não encontrada ou você não tem permissão para esta ação.')
+        
+        return redirect('minha_fila_espera')
+    
+    
+    return redirect('minha_fila_espera')
 
 # detalhes da reserva e usuarios
 @login_required
