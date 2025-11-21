@@ -549,54 +549,9 @@
                     </div>
                     {% endif %}
                 </div>
+                <!-- CONTADOR TODAS AS RESERVAS -->
                 {% if page_obj %}
-                <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                    {% if page_obj.has_other_pages %}
-                    <ul class="pagination pagination-sm m-0 float-right">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
-                                </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}{% if laboratorio_id %}&laboratorio={{ laboratorio_id }}{% endif %}" 
-                                   style="color: #20597F; border-color: #86B5E1;">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    {% endif %}
+                <div class="card-footer" style="background-color: #f8f9fa; border-color: #86B5E1;">
                 </div>
                 {% endif %}
             </div>
@@ -610,7 +565,7 @@
                     </h3>
                     <div class="card-tools">
                         <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                            {{ reservas_futuras|length }} reserva{{ reservas_futuras|length|pluralize:"s" }}
                         </span>
                     </div>
                 </div>
@@ -723,6 +678,11 @@
                     </div>
                     {% endif %}
                 </div>
+                <!-- CONTADOR RESERVAS FUTURAS -->
+                {% if reservas_futuras %}
+                <div class="card-footer" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -734,7 +694,7 @@
                     </h3>
                     <div class="card-tools">
                         <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                            {{ reservas_hoje|length }} reserva{{ reservas_hoje|length|pluralize:"s" }}
                         </span>
                     </div>
                 </div>
@@ -847,6 +807,11 @@
                     </div>
                     {% endif %}
                 </div>
+                <!-- CONTADOR RESERVAS DE HOJE -->
+                {% if reservas_hoje %}
+                <div class="card-footer" style="background-color: #f8f9fa; border-color: #86B5E1;">
+               </div>
+                {% endif %}
             </div>
         </div>
 
@@ -858,7 +823,7 @@
                     </h3>
                     <div class="card-tools">
                         <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
-                            {{ page_obj.paginator.count }} reserva{{ page_obj.paginator.count|pluralize:"s" }}
+                            {{ reservas_passadas|length }} reserva{{ reservas_passadas|length|pluralize:"s" }}
                         </span>
                     </div>
                 </div>
@@ -953,60 +918,18 @@
                         </p>
                     </div>
                     {% endif %}
-                    {% if page_obj.has_other_pages %}
-                    <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
-                                    </li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                           style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if laboratorio_id %}&laboratorio_id={{ laboratorio_id }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-                                       style="color: #20597F; border-color: #86B5E1;">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    {% endif %}
                 </div>
+                <!-- CONTADOR RESERVAS PASSADAS -->
+                {% if reservas_passadas %}
+                <div class="card-footer" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal de Cancelamento -->
 <div class="modal fade confirmation-modal" id="modalCancelamento" tabindex="-1" aria-labelledby="modalCancelamentoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -1169,7 +1092,8 @@ $(document).ready(function() {
         const futurasTbody = $('#futuras tbody');
         if (futurasTbody.length && futurasTbody.find('tr').length === 0) {
             $('#futuras .table-responsive').remove();
-            $('#futuras').append(`
+            $('#futuras .card-footer').remove();
+            $('#futuras .card-body').append(`
                 <div class="text-center py-5">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
                     <h4 style="color: #20597F;">Nenhuma reserva futura encontrada</h4>
@@ -1183,7 +1107,8 @@ $(document).ready(function() {
         const hojeTbody = $('#hoje tbody');
         if (hojeTbody.length && hojeTbody.find('tr').length === 0) {
             $('#hoje .table-responsive').remove();
-            $('#hoje').append(`
+            $('#hoje .card-footer').remove();
+            $('#hoje .card-body').append(`
                 <div class="text-center py-5">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
                     <h4 style="color: #20597F;">Nenhuma reserva para hoje</h4>
@@ -1198,7 +1123,7 @@ $(document).ready(function() {
         if (todasTbody.length && todasTbody.find('tr').length === 0) {
             $('#todas .table-responsive').remove();
             $('#todas .card-footer').remove();
-            $('#todas').append(`
+            $('#todas .card-body').append(`
                 <div class="text-center py-5">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
                     <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
