@@ -396,14 +396,11 @@
         </td>
         <td class="text-center" style="border-color: #86B5E1; vertical-align: middle;">
             {% if fila.can_sair %}
-                <form method="post" action="{% url 'sair_fila_espera' fila.id %}" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="action-btn btn-rejeitar"
-                            onclick="return confirm('Tem certeza que deseja sair da fila de espera?')"
-                            title="Sair da fila">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </form>
+                <button type="button" class="action-btn btn-rejeitar" 
+                        onclick="abrirModalConfirmacao('{{ fila.id }}')"
+                        title="Sair da fila">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             {% else %}
                 <span class="text-muted">-</span>
             {% endif %}
@@ -482,10 +479,49 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalConfirmacaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacaoLabel" style="color: #20597F;">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair da Fila de Espera
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja sair da fila de espera?</p>
+                <p class="text-muted small">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Não
+                </button>
+                <form id="formSairFila" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check mr-1"></i> Sim
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+function abrirModalConfirmacao(filaId) {
+    
+    var url = "{% url 'sair_fila_espera' 0 %}".replace('0', filaId);
+    document.getElementById('formSairFila').action = url;
+    
+    
+    var modal = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+    modal.show();
+}
+
 $(document).ready(function() {
     
     $('.btn').hover(

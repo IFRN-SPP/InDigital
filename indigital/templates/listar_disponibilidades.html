@@ -230,6 +230,7 @@
         margin-bottom: 15px;
         font-weight: 600;
     }
+<<<<<<< HEAD
     .btn-primary {
     background-color: #20597F;
     border-color: #20597F;
@@ -267,6 +268,17 @@
     .card-header h3 {
         margin: 0;
         font-size: 1.25rem;
+=======
+
+    .capacidade-info {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .capacidade-alerta {
+        color: #dc3545;
+>>>>>>> c426a031e1fd7d303f6f05d1a47f038d677a0033
         font-weight: 600;
     }
 </style>
@@ -439,7 +451,8 @@
                                            data-disponibilidade-horario-fim="{{ reserva.horario_fim|time:'H:i' }}"
                                            data-disponibilidade-laboratorio="{{ reserva.laboratorio.id }}"
                                            data-disponibilidade-monitor="{{ reserva.monitor.id|default:'' }}"
-                                           data-disponibilidade-vagas="{{ reserva.vagas }}">
+                                           data-disponibilidade-vagas="{{ reserva.vagas }}"
+                                           data-disponibilidade-capacidade="{{ reserva.laboratorio.capacidade }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
 
@@ -536,6 +549,8 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     {{ form|crispy }}
+                    <div class="capacidade-info" id="infoCapacidade">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -597,16 +612,35 @@
 $(document).ready(function() {
     let currentDisponibilidadeId = null;
     const csrfToken = '{{ csrf_token }}';
+    
+    
+    const capacidadesLaboratorios = {
+        {% for lab in laboratorios %}
+            '{{ lab.id }}': {{ lab.capacidade }},
+        {% endfor %}
+    };
 
     function validarFormularioDisponibilidade(form) {
         const inicio = form.find('[name="horario_inicio"]').val();
         const fim = form.find('[name="horario_fim"]').val();
         const vagas = parseInt(form.find('[name="vagas"]').val());
+        const laboratorioId = form.find('[name="laboratorio"]').val();
+        
         
         if (vagas <= 0 || isNaN(vagas)) {
             showAlert('O número de vagas deve ser maior que zero.', 'error');
             return false;
         }
+        
+        
+        if (laboratorioId && capacidadesLaboratorios[laboratorioId]) {
+            const capacidadeMaxima = capacidadesLaboratorios[laboratorioId];
+            if (vagas > capacidadeMaxima) {
+                showAlert(`O número de vagas não pode ser maior que a capacidade máxima do laboratório: ${capacidadeMaxima} vagas.`, 'error');
+                return false;
+            }
+        }
+        
         
         if (inicio && fim && inicio >= fim) {
             showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
@@ -615,6 +649,45 @@ $(document).ready(function() {
         
         return true;
     }
+
+    
+    $(document).on('change', '#id_laboratorio, #laboratorio', function() {
+        const laboratorioId = $(this).val();
+        const capacidade = capacidadesLaboratorios[laboratorioId];
+        const infoElement = $('#infoCapacidade');
+        
+        if (capacidade) {
+            infoElement.html(`
+                <i class="fas fa-info-circle"></i>
+                Capacidade máxima do laboratório: <strong>${capacidade} vagas</strong>
+            `);
+        } else {
+            infoElement.html('');
+        }
+    });
+
+    
+    $(document).on('change', '#formCriarDisponibilidade [name="vagas"], #vagas', function() {
+        const vagas = parseInt($(this).val());
+        const laboratorioId = $(this).closest('form').find('[name="laboratorio"]').val();
+        
+        if (vagas <= 0 || isNaN(vagas)) {
+            showAlert('O número de vagas deve ser maior que zero.', 'error');
+            $(this).focus();
+            $(this).select();
+            return;
+        }
+        
+        
+        if (laboratorioId && capacidadesLaboratorios[laboratorioId]) {
+            const capacidadeMaxima = capacidadesLaboratorios[laboratorioId];
+            if (vagas > capacidadeMaxima) {
+                showAlert(`O número de vagas não pode ser maior que a capacidade máxima do laboratório: ${capacidadeMaxima} vagas.`, 'error');
+                $(this).focus();
+                $(this).select();
+            }
+        }
+    });
 
     $(document).on('submit', '#formCriarDisponibilidade', function(e) {
         e.preventDefault(); 
@@ -658,15 +731,6 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('change', '#formCriarDisponibilidade [name="vagas"]', function() {
-        const vagas = parseInt($(this).val());
-        if (vagas <= 0 || isNaN(vagas)) {
-            showAlert('O número de vagas deve ser maior que zero.', 'error');
-            $(this).focus();
-            $(this).select();
-        }
-    });
-
     $('.btn-editar').on('click', function(e) {
         e.preventDefault();
         currentDisponibilidadeId = $(this).data('disponibilidade-id');
@@ -679,7 +743,8 @@ $(document).ready(function() {
             horario_fim: $(this).data('disponibilidade-horario-fim'),
             laboratorio: $(this).data('disponibilidade-laboratorio'),
             monitor: $(this).data('disponibilidade-monitor'),
-            vagas: $(this).data('disponibilidade-vagas')
+            vagas: $(this).data('disponibilidade-vagas'),
+            capacidade: $(this).data('disponibilidade-capacidade')
         };
         
         console.log('Dados coletados:', disponibilidadeData);
@@ -721,11 +786,15 @@ $(document).ready(function() {
                                 <select class="form-control" id="laboratorio" name="laboratorio" required>
                                     <option value="">Selecione um laboratório</option>
                                     {% for lab in laboratorios %}
-                                        <option value="{{ lab.id }}" ${disponibilidadeData.laboratorio == '{{ lab.id }}' ? 'selected' : ''}>
+                                        <option value="{{ lab.id }}" ${disponibilidadeData.laboratorio == '{{ lab.id }}' ? 'selected' : ''} data-capacidade="{{ lab.capacidade }}">
                                             {{ lab.num_laboratorio }}
                                         </option>
                                     {% endfor %}
                                 </select>
+                                <div class="capacidade-info" id="infoCapacidadeEdicao">
+                                    <i class="fas fa-info-circle"></i>
+                                    Capacidade máxima do laboratório: <strong>${disponibilidadeData.capacidade} vagas</strong>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -751,6 +820,10 @@ $(document).ready(function() {
                             <div class="mb-3">
                                 <label for="vagas" class="form-label">Número de Vagas:</label>
                                 <input type="number" class="form-control" id="vagas" name="vagas" value="${disponibilidadeData.vagas}" min="1" required>
+                                <div class="capacidade-info" id="infoVagas">
+                                    <i class="fas fa-info-circle"></i>
+                                    Máximo permitido: <span id="maxVagasText">${disponibilidadeData.capacidade}</span> vagas
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -771,6 +844,27 @@ $(document).ready(function() {
         $('#modalEditarDisponibilidade').modal('show');
         
         aplicarValidacaoHorarios();
+        
+        
+        $(document).on('change', '#laboratorio', function() {
+            const selectedOption = $(this).find('option:selected');
+            const capacidade = selectedOption.data('capacidade');
+            const infoElement = $('#infoCapacidadeEdicao');
+            const maxVagasText = $('#maxVagasText');
+            
+            if (capacidade) {
+                infoElement.html(`
+                    <i class="fas fa-info-circle"></i>
+                    Capacidade máxima do laboratório: <strong>${capacidade} vagas</strong>
+                `);
+                maxVagasText.text(capacidade);
+                
+                const currentVagas = parseInt($('#vagas').val());
+                if (currentVagas > capacidade) {
+                    showAlert(`O número de vagas atual (${currentVagas}) excede a capacidade do novo laboratório (${capacidade}). Por favor, ajuste manualmente.`, 'warning');
+                }
+            }
+        });
     });
 
     function aplicarValidacaoHorarios() {
@@ -786,13 +880,24 @@ $(document).ready(function() {
             }
         });
 
-        
         $(document).on('change', '#vagas', function() {
             const vagas = parseInt($(this).val());
+            const laboratorioId = $('#laboratorio').val();
+            
             if (vagas <= 0 || isNaN(vagas)) {
                 showAlert('O número de vagas deve ser maior que zero.', 'error');
                 $(this).focus();
                 $(this).select();
+                return;
+            }
+            
+            if (laboratorioId && capacidadesLaboratorios[laboratorioId]) {
+                const capacidadeMaxima = capacidadesLaboratorios[laboratorioId];
+                if (vagas > capacidadeMaxima) {
+                    showAlert(`O número de vagas não pode ser maior que a capacidade máxima do laboratório: ${capacidadeMaxima} vagas.`, 'error');
+                    $(this).focus();
+                    $(this).select();
+                }
             }
         });
     }
@@ -811,16 +916,30 @@ $(document).ready(function() {
         const inicio = $('#horario_inicio').val();
         const fim = $('#horario_fim').val();
         const vagas = parseInt($('#vagas').val());
+        const laboratorioId = $('#laboratorio').val();
         
+        let hasError = false;
         
         if (vagas <= 0 || isNaN(vagas)) {
             showAlert('O número de vagas deve ser maior que zero.', 'error');
-            return; 
+            hasError = true;
+        }
+        
+        if (laboratorioId && capacidadesLaboratorios[laboratorioId]) {
+            const capacidadeMaxima = capacidadesLaboratorios[laboratorioId];
+            if (vagas > capacidadeMaxima) {
+                showAlert(`O número de vagas não pode ser maior que a capacidade máxima do laboratório: ${capacidadeMaxima} vagas.`, 'error');
+                hasError = true;
+            }
         }
         
         if (inicio && fim && inicio >= fim) {
             showAlert('O horário de fim deve ser posterior ao horário de início!', 'error');
-            return; 
+            hasError = true;
+        }
+        
+        if (hasError) {
+            return false;
         }
         
         submitButton.addClass('btn-loading').prop('disabled', true);
@@ -839,6 +958,18 @@ $(document).ready(function() {
             },
             success: function(response) {
                 console.log('Sucesso:', response);
+                
+                if (response.errors) {
+                    if (response.errors.vagas) {
+                        showAlert(response.errors.vagas, 'error');
+                    } else if (response.errors.__all__) {
+                        showAlert(response.errors.__all__, 'error');
+                    } else {
+                        showAlert('Erro ao atualizar disponibilidade. Verifique os dados.', 'error');
+                    }
+                    return;
+                }
+                
                 modal.modal('hide');
                 showAlert('Disponibilidade atualizada com sucesso!', 'success');
                 
@@ -848,8 +979,29 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.log('Erro:', error);
-                modal.modal('hide');
-                showAlert('Erro ao atualizar disponibilidade. Verifique os dados.', 'error');
+                
+                let errorMessage = 'Erro ao atualizar disponibilidade. Verifique os dados.';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMessage = response.message;
+                    } else if (response.errors && response.errors.vagas) {
+                        errorMessage = response.errors.vagas;
+                    } else if (response.errors && response.errors.__all__) {
+                        errorMessage = response.errors.__all__;
+                    }
+                } catch (e) {
+                    // Se não conseguir parsear JSON, usar a resposta textual
+                    if (xhr.responseText.includes('vagas') || xhr.responseText.includes('capacidade')) {
+                        errorMessage = 'O número de vagas excede a capacidade do laboratório.';
+                    } else if (xhr.responseText.includes('horário') || xhr.responseText.includes('início')) {
+                        errorMessage = 'Erro nos horários informados.';
+                    } else if (xhr.responseText.includes('conflito') || xhr.responseText.includes('já existe')) {
+                        errorMessage = 'Já existe uma disponibilidade nesse horário para este laboratório.';
+                    }
+                }
+                
+                showAlert(errorMessage, 'error');
             },
             complete: function() {
                 submitButton.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
@@ -857,6 +1009,7 @@ $(document).ready(function() {
         });
     });
 
+    
     function processarErroExclusao(xhr) {
         let errorMessage = 'Erro ao excluir disponibilidade.';
         
@@ -897,7 +1050,6 @@ $(document).ready(function() {
         $('#confirmModal').modal('show');
     });
 
-    
     $('#confirmDelete').on('click', function() {
         if (!currentDisponibilidadeId) return;
 
@@ -908,7 +1060,6 @@ $(document).ready(function() {
 
         const url = '{% url "excluir_disponibilidade" 0 %}'.replace('0', currentDisponibilidadeId);
 
-        
         $.ajax({
             url: url,
             type: 'POST',

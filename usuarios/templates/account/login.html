@@ -12,26 +12,25 @@
                  alt="Logo InDigital" 
                  class="img-fluid">
         </div>
-
         <div class="login-wrap">
             <h2>Login</h2>
-            
+
+<div id="top-messages">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if 'error' in message.tags %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                <i class="fas fa-{% if 'error' in message.tags %}exclamation-circle{% else %}check-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
             <div class="text-center mb-4">
                 <h5>Acesso ao Sistema</h5>
                 <p>Utilize sua conta do SUAP ou credenciais locais</p>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    {% if 'login' in message.tags %}
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showError('email', '{{ message }}');
-                        });
-                    </script>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
 
             {% if form.errors %}
                 <script>
@@ -124,7 +123,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Remove classes do layout que interferem no login
     document.body.classList.remove(
         'sidebar-open',
         'sidebar-collapse',
@@ -133,14 +131,11 @@ document.addEventListener('DOMContentLoaded', function() {
         'hold-transition'
     );
 
-    // Adiciona classe que pode ser estilizada no CSS
     document.body.classList.add('login-page');
 
-    // Remove efeitos do wrapper mas sem quebrar o layout
     const wrapper = document.querySelector('.wrapper');
     if (wrapper) wrapper.style.minHeight = "100vh";
 
-    // Remove o content-wrapper das páginas internas
     const contentWrapper = document.querySelector('.content-wrapper');
     if (contentWrapper) {
         contentWrapper.style.margin = "0";
@@ -148,13 +143,19 @@ document.addEventListener('DOMContentLoaded', function() {
         contentWrapper.style.width = "100%";
     }
 
-    // Limpar erros ao digitar
     document.getElementById('email').addEventListener('input', () => clearError('email'));
     document.getElementById('password').addEventListener('input', () => clearError('password'));
 
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+
 });
 
-// Funções de erro
 function showError(field, message) {
     const err = document.getElementById(field + 'Error');
     const inp = document.getElementById(field);
@@ -259,6 +260,27 @@ function clearError(field) {
     a[href*="cadastro"]:hover {
         color: #1a4a6b !important;
         text-decoration: underline;
+    }
+
+    /* Estilos para as mensagens */
+    #top-messages {
+        margin-bottom: 1.5rem;
+    }
+
+    .alert {
+        border-radius: 0.5rem;
+        border: none;
+        padding: 0.75rem 1rem;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border-left: 4px solid #0f5132;
+    }
+
+    .btn-close:focus {
+        box-shadow: none;
     }
 </style>
 {% endblock %}
