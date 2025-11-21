@@ -750,7 +750,7 @@ def cancelar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
     if reserva.status_aprovacao == 'R':
         messages.error(request, "Não é possível cancelar uma reserva rejeitada.")
-        return redirect("minhas_reservas")
+        return redirect('historico_reservas')
     disponibilidade = reserva.disponibilidade
     # Só devolver vaga se a reserva estava aprovada
     if reserva.status_aprovacao == 'A':
@@ -758,77 +758,7 @@ def cancelar_reserva(request, reserva_id):
         disponibilidade.save()
     reserva.delete()
     messages.success(request, "Sua reserva foi cancelada com sucesso!")
-    return redirect("minhas_reservas")
-
-@login_required
-@aluno_required
-def minhas_reservas(request):
-    reservas = Reserva.objects.filter(usuario=request.user).select_related(
-        'disponibilidade__laboratorio', 'disponibilidade__monitor'
-    ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
-    from django.utils import timezone
-    agora = timezone.localtime(timezone.now())
-    # Filtros
-    data_inicio = request.GET.get('data_inicio')
-    data_fim = request.GET.get('data_fim')
-    laboratorio_id = request.GET.get('laboratorio_id')
-    status = request.GET.get('status')
-    # Aplicar filtros
-    if data_inicio:
-        try:
-            data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_parsed)
-        except ValueError:
-            pass
-    if data_fim:
-        try:
-            data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_parsed)
-        except ValueError:
-            pass
-    if laboratorio_id and laboratorio_id != 'todos':
-        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    if status and status != 'todos':
-        # Filtrar por status considerando a hora de término da disponibilidade
-        from django.utils import timezone
-        agora = timezone.localtime(timezone.now())
-        reservas_list = list(reservas)
-        if status == 'futuras':
-            reservas = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
-        elif status == 'hoje':
-            reservas = [r for r in reservas_list if r.disponibilidade.data == agora.date()]
-        elif status == 'passadas':
-            reservas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
-    # Para templates, marcar se cada reserva já expirou (considerando end_datetime)
-    try:
-        # reservas pode ser QuerySet or list; normalizamos para lista para iterar
-        reservas_iter = list(reservas)
-    except Exception:
-        reservas_iter = reservas
-    for r in reservas_iter:
-        try:
-            r.expirada = (r.disponibilidade.end_datetime() <= agora)
-        except Exception:
-            r.expirada = False
-    reservas = reservas_iter
-    # Paginação
-    # Paginador aceita QuerySet ou lista
-    paginator = Paginator(reservas, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    # Buscar laboratórios para o filtro
-    laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
-    
-    context = {
-        'page_obj': page_obj,
-        'laboratorios': laboratorios,
-        'today': date.today(),
-        'data_inicio': data_inicio,
-        'data_fim': data_fim,
-        'laboratorio_id': laboratorio_id,
-        'status': status,
-    }
-    return render(request, 'minhas_reservas.html', context)
+    return redirect('historico_reservas')
 
 @login_required
 @monitor_required
@@ -1181,10 +1111,9 @@ def usuarios_da_reserva(request, disponibilidade_id):
 def listar_disponibilidades_monitor(request):
     disponibilidades = Disponibilidade.objects.filter(monitor=request.user).select_related('laboratorio').order_by('-data', 'horario_inicio')
     # Filtros
-    laboratorio_id = request.GET.get('laboratorio')
+    laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-    vagas_min = request.GET.get('vagas_min')
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
@@ -1200,11 +1129,6 @@ def listar_disponibilidades_monitor(request):
             disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
-    if vagas_min:
-        try:
-            disponibilidades = disponibilidades.filter(vagas__gte=int(vagas_min))
-        except ValueError:
-            messages.error(request, "Número mínimo de vagas deve ser um número.")
     # Paginação
     paginator = Paginator(disponibilidades, 5)
     page_number = request.GET.get('page')
@@ -1220,7 +1144,6 @@ def listar_disponibilidades_monitor(request):
         'laboratorio_id': laboratorio_id,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
-        'vagas_min': vagas_min,
     }
     return render(request, 'listar_disponibilidades_monitor.html', context)
 

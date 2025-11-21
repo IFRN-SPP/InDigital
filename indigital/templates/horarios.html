@@ -779,6 +779,16 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#modalReserva').modal('hide');
+                // Atualizar o botão na listagem para indicar que a solicitação está pendente
+                try {
+                    const selector = `.btn-reservar[data-disponibilidade-id="${disponibilidadeIdAtual}"]`;
+                    const $btnOrig = $(selector);
+                    if ($btnOrig.length) {
+                        $btnOrig.replaceWith(`<span class="btn btn-sm btn-warning disabled"><i class="fas fa-clock mr-1"></i> Aguardando Aprovação</span>`);
+                    }
+                } catch (e) {
+                    console.error('Erro ao atualizar botão após reserva:', e);
+                }
                 mostrarResultado('success', 'Reserva Confirmada!', 'Sua reserva foi realizada com sucesso e está aguardando aprovação.');
             },
             error: function(xhr) {

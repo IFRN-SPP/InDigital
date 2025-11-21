@@ -235,6 +235,10 @@
         background-color: #c82333;
         color: white;
     }
+    .card-title {
+    font-size: 1.30rem !important;
+    font-weight: normal !important;
+    }
 </style>
 {% endblock %}
 
@@ -253,8 +257,8 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -266,19 +270,6 @@
                 <div class="card-body">
                     <form method="GET" class="form-horizontal">
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
-                                        {% for lab in laboratorios %}
-                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ lab.num_laboratorio }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
@@ -293,13 +284,16 @@
                                            class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="status" class="form-label" style="color: #20597F; font-weight: 600;">Status:</label>
-                                    <select name="status" id="status" class="form-select" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if not status or status == 'todos' %}selected{% endif %}>Todos os status</option>
-                                        <option value="ativo" {% if status == 'ativo' %}selected{% endif %}>Ativo</option>
-                                        <option value="processado" {% if status == 'processado' %}selected{% endif %}>Processado</option>
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                                        {% for lab in laboratorios %}
+                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ lab.num_laboratorio }}
+                                            </option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -345,7 +339,6 @@
                         <table class="table table-hover">
                             <thead style="background-color: #86B5E1; color: #20597F !important;">
                                 <tr>
-                                    <th style="width: 10%; border-color: #20597F; color: #20597F !important;">ID</th>
                                     <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Data</th>
                                     <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Horário</th>
                                     <th style="width: 15%; border-color: #20597F; color: #20597F !important;">Laboratório</th>
@@ -358,9 +351,6 @@
                             <tbody>
     {% for fila in page_obj %}
     <tr class="{% if fila.disponibilidade.data < today %}table-light{% elif fila.disponibilidade.data == today %}table-info{% endif %}">
-        <td style="border-color: #86B5E1; vertical-align: middle;">
-            <span class="text-muted">{{ fila.id }}</span>
-        </td>
         <td style="border-color: #86B5E1; vertical-align: middle;">
             <i class="fas fa-calendar mr-2" style="color: #20597F;"></i>
             {{ fila.disponibilidade.data|date:"d/m/Y" }}

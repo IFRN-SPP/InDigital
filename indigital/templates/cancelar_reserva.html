@@ -16,7 +16,7 @@
     <form action="{% url 'cancelar_reserva' reserva.id %}" method="POST">
         {% csrf_token %}
         <button type="submit" class="btn delete">Confirmar</button>
-        <a href="{% url 'minhas_reservas' %}" class="btn cancel">Cancelar</a>
+        <a href="{% url 'historico_reservas' %}" class="btn cancel">Cancelar</a>
     </form>
 </div>
 {% endblock content %}

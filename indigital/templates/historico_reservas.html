@@ -286,6 +286,9 @@
         background-color: #c82333;
         color: white;
     }
+    .card-title {
+    font-weight: normal !important;
+    }
 </style>
 {% endblock %}
 
@@ -302,10 +305,10 @@
 
     <!-- Filtros -->
     <div class="row mb-4">
-    <div class="col-12">
-        <div class="card" style="border-color: #86B5E1;">
-            <div class="card-header">
-                    <h3 class="card-title">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -321,25 +324,14 @@
                                 <div class="form-group">
                                     <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
                                     <input type="date" name="data_inicio" id="data_inicio" 
-                                           class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                        class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
                                     <input type="date" name="data_fim" id="data_fim" 
-                                           class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Frequência:</label>
-                                    <select class="form-select" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todas as frequências</option>
-                                        <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
-                                        <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
-                                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
-                                    </select>
+                                        class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -352,6 +344,17 @@
                                                 {{ lab.num_laboratorio }}
                                             </option>
                                         {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Frequência:</label>
+                                    <select class="form-select" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todas as frequências</option>
+                                        <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
+                                        <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
+                                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
                                     </select>
                                 </div>
                             </div>
@@ -400,7 +403,7 @@
             <div class="card" style="border-color: #86B5E1;">
                 <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-list mr-2"></i>Todas as Minhas Reservas
+                        <i class="fas fa-list mr-2"></i>Todas as Reservas
                     </h3>
                     <div class="card-tools">
                         <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">

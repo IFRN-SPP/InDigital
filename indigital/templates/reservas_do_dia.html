@@ -122,11 +122,11 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                    <select name="laboratorio" id="laboratorio" class="form-control form-control-sm" style="border-color: #86B5E1;">
+                                    <label for="id_laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio" id="id_laboratorio" class="form-control" style="border-color: #86B5E1;">
                                         <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
                                         {% for lab in laboratorios %}
-                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                            <option value="{{ lab.id }}" data-capacidade="{{ lab.capacidade }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
                                                 {{ lab.num_laboratorio }}
                                             </option>
                                         {% endfor %}
