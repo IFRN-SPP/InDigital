@@ -402,8 +402,7 @@
                     </div>
                 </div>
                 
-                <!-- Estatísticas apenas para usuários do SUAP, monitores, e superusuários -->
-                {% if usuario.suap_id or usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or user.is_superuser %}
+                {% if usuario.perfil == 'monitor' or usuario.perfil == 'administrador' or usuario.perfil == 'aluno' or user.is_superuser %}
                 <div class="col-md-6">
                     <div class="card info-card">
                         <div class="card-header">
@@ -414,17 +413,17 @@
                         
                         <div class="card-body">
                             <div class="info-item">
-                                <span class="info-label">Total de Reservas</span>
+                                <span class="info-label">{{ total_label }}</span>
                                 <span class="info-value">{{ total_reservas|default:"0" }}</span>
                             </div>
                             
                             <div class="info-item">
-                                <span class="info-label">Reservas Aprovadas</span>
+                                <span class="info-label">{{ approved_label }}</span>
                                 <span class="info-value">{{ reservas_aprovadas|default:"0" }}</span>
                             </div>
                             
                             <div class="info-item">
-                                <span class="info-label">Solicitações Pendentes</span>
+                                <span class="info-label">{{ pending_label }}</span>
                                 <span class="info-value">{{ solicitacao_pendente|default:"0" }}</span>
                             </div>
                         </div>

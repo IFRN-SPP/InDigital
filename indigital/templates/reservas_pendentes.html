@@ -321,6 +321,18 @@
         background-color: #c82333;
         color: white;
     }
+    
+    .btn-secondary {
+    background-color: #86B5E1;
+    border-color: #86B5E1;
+    color: #20597F;
+    }
+
+    .btn-secondary:hover {
+    background-color: #76a5d9;
+    border-color: #76a5d9;
+    color: #20597F;
+    }
 </style>
 {% endblock %}
 
@@ -336,69 +348,83 @@
             <i class="fas fa-hourglass-half"></i>
         </div>
     </div>
-
-    <!-- Filtros -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card" style="border-color: #86B5E1;">
-            <div class="card-header" style="background-color: #20597F; color: white;">
-                <h3 class="card-title">
-                    <i class="fas fa-filter mr-2"></i>Filtros de Busca
-                </h3>
-            </div>
-            <div class="card-body">
-                <form method="GET" class="form-horizontal">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data início:</label>
-                                <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio }}" style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data fim:</label>
-                                <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim }}" style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                <select class="form-select" id="laboratorio_id" name="laboratorio_id" style="border-color: #86B5E1;">
-                                    <option value="">Todos</option>
-                                    {% for lab in laboratorios %}
-                                        <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>{{ lab.num_laboratorio }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="status" class="form-label" style="color: #20597F; font-weight: 600;">Status:</label>
-                                <select name="status" id="status" class="form-select" style="border-color: #86B5E1;">
-                                    <option value="todos" {% if not status or status == 'todos' %}selected{% endif %}>Todos os status</option>
-                                    <option value="ativo" {% if status == 'ativo' %}selected{% endif %}>Ativo</option>
-                                    <option value="processado" {% if status == 'processado' %}selected{% endif %}>Processado</option>
-                                </select>
-                            </div>
-                        </div>
+<!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
-                                <i class="fas fa-search mr-1"></i> Filtrar
-                            </button>
-                            <a href="{% url 'minha_fila_espera' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
-                                <i class="fas fa-times mr-1"></i> Limpar Filtros
-                            </a>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <input type="date" name="data_inicio" id="data_inicio" 
+                                           class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <input type="date" name="data_fim" id="data_fim" 
+                                           class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                                        {% for lab in laboratorios %}
+                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ lab.num_laboratorio }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="usuario_id" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                    <select name="usuario_id" id="usuario_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not usuario_id or usuario_id == 'todos' %}selected{% endif %}>Todos os usuários</option>
+                                        {% for usuario in usuarios %}
+                                            <option value="{{ usuario.id }}" {% if usuario_id == usuario.id|stringformat:"s" %}selected{% endif %}>
+                                                {% if usuario.get_full_name != "None None" %}
+                                                    {{ usuario.get_full_name }}
+                                                {% else %}
+                                                    {{ usuario.username }}
+                                                {% endif %}
+                                            </option>
+                                        {% endfor %}    
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
+                                <a href="{% url 'reservas_pendentes' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
     <div class="row">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
