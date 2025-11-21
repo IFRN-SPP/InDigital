@@ -51,15 +51,35 @@ def cadastro(request):
 @login_required
 def perfil(request):
     usuario = request.user
-    #Estatísticas
-    total_reservas = Reserva.objects.count()
-    reservas_aprovadas = Reserva.objects.filter(status_aprovacao='A').count()
-    solicitacao_pendente = Reserva.objects.filter(status_aprovacao='P').count()
+    # Estatísticas por tipo de usuário
+    total_reservas = reservas_aprovadas = solicitacao_pendente = 0
+    total_label = "Total de Reservas"
+    approved_label = "Reservas Aprovadas"
+    pending_label = "Solicitações Pendentes"
+
+    if usuario.is_superuser or usuario.perfil == 'administrador':
+        total_reservas = Reserva.objects.count()
+        reservas_aprovadas = Reserva.objects.filter(status_aprovacao='A').count()
+        solicitacao_pendente = Reserva.objects.filter(status_aprovacao='P').count()
+        total_label = "Total de Reservas"
+    else:
+        # Aluno/outro: estatísticas pessoais
+        reservas_qs = Reserva.objects.filter(usuario=usuario)
+        total_reservas = reservas_qs.count()
+        reservas_aprovadas = reservas_qs.filter(status_aprovacao='A').count()
+        solicitacao_pendente = reservas_qs.filter(status_aprovacao='P').count()
+        total_label = "Minhas Reservas"
+        approved_label = "Minhas Reservas Aprovadas"
+        pending_label = "Minhas Solicitações Pendentes"
+
     context = {
         'usuario': usuario,
         'total_reservas': total_reservas,
         'reservas_aprovadas': reservas_aprovadas,
         'solicitacao_pendente': solicitacao_pendente,
+        'total_label': total_label,
+        'approved_label': approved_label,
+        'pending_label': pending_label,
     }
     return render(request, "perfil.html", context)
 

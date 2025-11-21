@@ -251,7 +251,7 @@
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
                 <div class="card-header">
-                    <h3 class="card-title">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -290,16 +290,12 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <div class="form-group w-100">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-search mr-1"></i> Filtrar
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
                                 <a href="{% url 'horarios' %}" class="btn btn-secondary">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>

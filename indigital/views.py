@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db import transaction
+from django.db.models import Q
 from django.views.decorators.http import require_POST
 
 
@@ -89,6 +90,20 @@ def admin_required(view_func):
     
     return _wrapped_view
 
+
+def filter_by_status(queryset, status):
+    """Aplica filtro de `status_frequencia` tratando `N` e string vazia como equivalentes.
+
+    - Se `status` for 'N', filtra registros com 'N' ou '' (vazio).
+    - Se `status` for outro valor válido ('P' ou 'F'), filtra por esse valor.
+    - Se `status` for falsy ou 'todos', retorna o queryset sem alterações.
+    """
+    if status and status != 'todos':
+        if status == 'N':
+            return queryset.filter(Q(status_frequencia='N') | Q(status_frequencia=''))
+        return queryset.filter(status_frequencia=status)
+    return queryset
+
 @login_required
 @admin_required
 def admin_dashboard(request):
@@ -149,9 +164,8 @@ def monitor_dashboard(request):
     reservas_presentes = minhas_reservas.filter(status_frequencia='P').count()
     reservas_faltas = minhas_reservas.filter(status_frequencia='F').count()
     reservas_pendentes = minhas_reservas.filter(
-        disponibilidade__data__gte=date.today(),
-        status_frequencia = ''
-    ).count()
+        disponibilidade__data__gte=date.today()
+    ).filter(Q(status_frequencia='') | Q(status_frequencia='N')).count()
     
     context = {
         'total_reservas': total_reservas,
@@ -179,9 +193,8 @@ def index(request):
     reservas_presentes = minhas_reservas.filter(status_frequencia='P').count()
     reservas_faltas = minhas_reservas.filter(status_frequencia='F').count()
     reservas_pendentes = minhas_reservas.filter(
-        disponibilidade__data__gte=date.today(),
-        status_frequencia = ''
-    ).count()
+        disponibilidade__data__gte=date.today()
+    ).filter(Q(status_frequencia='') | Q(status_frequencia='N')).count()
 
     context = {
         'total_reservas': total_reservas,
@@ -780,20 +793,20 @@ def reservas_do_dia(request):
         ).select_related('usuario', 'disponibilidade__laboratorio', 'disponibilidade__monitor')
     else:
         reservas = Reserva.objects.none()
+    
     # Filtros
-    laboratorio_id = request.GET.get('laboratorio')
-    usuario_nome = request.GET.get('usuario_nome')
-    monitor_id = request.GET.get('monitor')
+    laboratorio_id = request.GET.get('laboratorio_id')
     status_frequencia = request.GET.get('status_frequencia')
+    usuario_id = request.GET.get('usuario_id')
+    monitor_id = request.GET.get('monitor_id')
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    if usuario_nome:
-        reservas = reservas.filter(usuario__suap_nome_completo__icontains=usuario_nome)
+    reservas = filter_by_status(reservas, status_frequencia)
+    if usuario_id and usuario_id != 'todos':
+        reservas = reservas.filter(usuario_id=usuario_id)
     if monitor_id and monitor_id != 'todos' and (request.user.is_superuser or request.user.perfil == 'administrador'):
         reservas = reservas.filter(disponibilidade__monitor_id=monitor_id)
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
     # Paginação
     paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
@@ -802,20 +815,23 @@ def reservas_do_dia(request):
     if request.user.is_superuser or request.user.perfil == 'administrador':
         laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
         monitores = User.objects.filter(perfil='monitor').order_by('username')
+        usuarios = User.objects.filter(reserva__disponibilidade__data=date.today()).distinct().order_by('username')
     else:
         laboratorios = Laboratorio.objects.filter(
             disponibilidade__monitor=request.user
         ).distinct().order_by('num_laboratorio')
         monitores = None
+        usuarios = User.objects.filter(reserva__disponibilidade__monitor=request.user, reserva__disponibilidade__data=date.today()).distinct().order_by('username')
     
     context = {
         'page_obj': page_obj,
         'laboratorios': laboratorios,
         'monitores': monitores,
+        'usuarios': usuarios,
         'laboratorio_id': laboratorio_id,
-        'usuario_nome': usuario_nome,
         'monitor_id': monitor_id,
         'status_frequencia': status_frequencia,
+        'usuario_id': usuario_id,
         'today': date.today(),
     }
     return render(request, 'reservas_do_dia.html', context)
@@ -1082,8 +1098,7 @@ def usuarios_da_reserva(request, disponibilidade_id):
     # Aplicar filtros nas reservas se fornecidos
     if usuario_nome:
         reservas = reservas.filter(usuario__suap_nome_completo__icontains=usuario_nome)
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
+    reservas = filter_by_status(reservas, status_frequencia)
     # Aplicar filtro na fila de espera
     if usuario_nome:
         fila_espera = fila_espera.filter(usuario__suap_nome_completo__icontains=usuario_nome)
@@ -1197,8 +1212,7 @@ def reservas_por_usuario(request, usuario_id):
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
+    reservas = filter_by_status(reservas, status_frequencia)
     # Paginação
     paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
@@ -1244,11 +1258,7 @@ def historico_reservas(request):
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
-    if status_frequencia and status_frequencia != 'todos':
-        if status_frequencia == 'N':  
-            reservas = reservas.filter(status_frequencia='')
-        else:
-            reservas = reservas.filter(status_frequencia=status_frequencia)
+    reservas = filter_by_status(reservas, status_frequencia)
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     # Separar reservas por categoria considerando horário de término (tempo local)
@@ -1314,8 +1324,7 @@ def historico_geral_reservas(request):
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
+    reservas = filter_by_status(reservas, status_frequencia)
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     # Paginação
@@ -1350,23 +1359,22 @@ def reservas_pendentes(request):
     data_fim = request.GET.get('data_fim')
     laboratorio_id = request.GET.get('laboratorio_id')
     usuario_id = request.GET.get('usuario_id')
-    # Aplicar filtros
     if data_inicio:
         try:
             data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             reservas = reservas.filter(disponibilidade__data__gte=data_inicio_parsed)
         except ValueError:
-            pass
+            messages.error(request, "Data de início inválida.")
     if data_fim:
         try:
             data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_parsed)
         except ValueError:
-            pass
-    if laboratorio_id:
-        reservas = reservas.filter(disponibilidade__laboratorio__id=laboratorio_id)
-    if usuario_id:
-        reservas = reservas.filter(usuario__id=usuario_id)
+            messages.error(request, "Data de fim inválida.")
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    if usuario_id and usuario_id != 'todos':
+        reservas = reservas.filter(usuario_id=usuario_id)
     # Paginação
     paginator = Paginator(reservas, 5)
     page_number = request.GET.get('page')
