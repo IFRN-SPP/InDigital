@@ -207,7 +207,21 @@ def editar_disponibilidade(request, reserva_id):
         if form.is_valid():
             disponibilidade = form.save(commit=False)
 
-            # Validação: horário de início deve ser menor que horário de fim
+            # VALIDAÇÃO: Número de vagas não pode ser maior que a capacidade do laboratório
+            if disponibilidade.vagas > disponibilidade.laboratorio.capacidade:
+                error_msg = f"O número de vagas não pode ser maior que a capacidade máxima do laboratório: {disponibilidade.laboratorio.capacidade} vagas."
+                form.add_error('vagas', error_msg)
+                context["form"] = form
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False, 
+                        'errors': {'vagas': error_msg}
+                    }, status=400)
+
+                messages.error(request, error_msg)
+                return render(request, "editar_disponibilidade.html", context)
+
             if disponibilidade.horario_inicio >= disponibilidade.horario_fim:
                 form.add_error(None, "O horário de início deve ser menor que o horário de fim.")
                 context["form"] = form
@@ -219,7 +233,6 @@ def editar_disponibilidade(request, reserva_id):
                 messages.error(request, "O horário de início deve ser menor que o horário de fim.")
                 return render(request, "editar_disponibilidade.html", context)
 
-            # Verifica conflito de horários, excluindo a própria disponibilidade que está sendo editada
             conflito = Disponibilidade.objects.filter(
                 laboratorio=disponibilidade.laboratorio,
                 data=disponibilidade.data,
@@ -228,11 +241,10 @@ def editar_disponibilidade(request, reserva_id):
             ).exclude(id=disponibilidade.id).exists()
 
             if conflito:
-                # Adiciona erro ao formulário para feedback e mantém o formulário preenchido
                 form.add_error(None, "Já existe uma disponibilidade nesse horário para este laboratório.")
                 context["form"] = form
 
-                # Se for requisição AJAX, retorna o HTML do modal com erros
+                
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     form_html = render_to_string('modal_form.html', {'form': form}, request=request)
                     return JsonResponse({'success': False, 'form_html': form_html})
@@ -240,12 +252,28 @@ def editar_disponibilidade(request, reserva_id):
                 messages.error(request, "Já existe uma disponibilidade nesse horário para este laboratório.")
                 return render(request, "editar_disponibilidade.html", context)
 
-            # Sem conflito: salva e retorna
+            
             disponibilidade.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Disponibilidade atualizada com sucesso!'
+                })
+                
             messages.success(request, "Disponibilidade editada com sucesso!")
             return redirect('listar_disponibilidades')
         else:
             context["form"] = form
+            
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                errors = {field: error[0] for field, error in form.errors.items()}
+                return JsonResponse({
+                    'success': False, 
+                    'errors': errors
+                }, status=400)
+                
             messages.error(request, "Erro ao editar disponibilidade!")
 
     return render(request, "editar_disponibilidade.html", context)
