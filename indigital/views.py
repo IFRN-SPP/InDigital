@@ -645,6 +645,7 @@ def excluir_laboratorio(request, laboratorio_id):
 @aluno_required
 def horarios(request):
     disponibilidades = Disponibilidade.objects.all().select_related('laboratorio', 'monitor').order_by('data', 'horario_inicio')
+    
     # Filtros
     laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
@@ -652,6 +653,7 @@ def horarios(request):
     monitor_id = request.GET.get('monitor')
     vagas_minimas = request.GET.get('vagas_minimas')
     apenas_com_vagas = request.GET.get('apenas_com_vagas')
+    
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
         disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
@@ -676,41 +678,91 @@ def horarios(request):
         disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
     if apenas_com_vagas == 'sim':
         disponibilidades = disponibilidades.filter(vagas__gt=0)
-    # Remover disponibilidades cujo horário de início já passou (tempo local)
-    # Convertendo queryset em lista filtrada para usar o método is_passada()
+    
+    # Remover disponibilidades cujo horário de início já passou
     from django.utils import timezone
     agora = timezone.localtime(timezone.now())
-    disponibilidades = [d for d in disponibilidades if not d.is_passada()]
-    # marcar flag para templates
+    
+    # Criar listas separadas para cada aba
+    disponibilidades_todos = []
+    disponibilidades_hoje = []
+    disponibilidades_futuro = []
+    
+    hoje = date.today()
+    
     for d in disponibilidades:
-        d.expirada = d.is_passada()
-    # Paginação 
-    paginator = Paginator(disponibilidades, 5) 
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+        if not d.is_passada():  
+            d.expirada = d.is_passada()
+            disponibilidades_todos.append(d)
+            
+            if d.data == hoje:
+                disponibilidades_hoje.append(d)
+            elif d.data > hoje:
+                disponibilidades_futuro.append(d)
+    
+    # Determinar aba ativa
+    active_tab = request.GET.get('tab', 'todos')
+    
+    # Paginação para cada aba
+    page = request.GET.get('page', 1)
+    page_hoje = request.GET.get('page_hoje', 1)
+    page_futuro = request.GET.get('page_futuro', 1)
+    
+    paginator_todos = Paginator(disponibilidades_todos, 5)
+    paginator_hoje = Paginator(disponibilidades_hoje, 5)
+    paginator_futuro = Paginator(disponibilidades_futuro, 5)
+    
+    try:
+        page_obj = paginator_todos.page(page)
+    except PageNotAnInteger:
+        page_obj = paginator_todos.page(1)
+    except EmptyPage:
+        page_obj = paginator_todos.page(paginator_todos.num_pages)
+        
+    try:
+        page_obj_hoje = paginator_hoje.page(page_hoje)
+    except PageNotAnInteger:
+        page_obj_hoje = paginator_hoje.page(1)
+    except EmptyPage:
+        page_obj_hoje = paginator_hoje.page(paginator_hoje.num_pages)
+        
+    try:
+        page_obj_futuro = paginator_futuro.page(page_futuro)
+    except PageNotAnInteger:
+        page_obj_futuro = paginator_futuro.page(1)
+    except EmptyPage:
+        page_obj_futuro = paginator_futuro.page(paginator_futuro.num_pages)
+    
     # Buscar reservas e filas do usuário para verificar status
     reservas_em_fila = FilaEspera.objects.filter(usuario=request.user).values_list('disponibilidade_id', flat=True)
+    
     # Buscar reservas do usuário (pendentes e aprovadas)
     minhas_reservas = Reserva.objects.filter(
         usuario=request.user,
         status_aprovacao__in=['P', 'A']
     ).values_list('disponibilidade_id', flat=True)
+    
     # Buscar reservas pendentes específicas para mostrar status
     reservas_pendentes = Reserva.objects.filter(
         usuario=request.user,
         status_aprovacao='P'
     ).values_list('disponibilidade_id', flat=True)
-    # Buscar reservas rejeitadas para mostrar feedback
+    
+    
     reservas_rejeitadas = Reserva.objects.filter(
         usuario=request.user,
         status_aprovacao='R'
     ).values_list('disponibilidade_id', flat=True)
+    
     # Dados para os filtros
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
     monitores = User.objects.filter(perfil='monitor').order_by('username')
     
     context = {
         'page_obj': page_obj,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_futuro': page_obj_futuro,
+        'active_tab': active_tab,
         'reservas_em_fila': reservas_em_fila,
         'minhas_reservas': minhas_reservas,
         'reservas_pendentes': reservas_pendentes,
@@ -723,7 +775,7 @@ def horarios(request):
         'vagas_minimas': vagas_minimas,
         'monitor_id': monitor_id,
         'apenas_com_vagas': apenas_com_vagas,
-        'today': date.today(),
+        'today': hoje,
         'now_time': agora.strftime('%H:%M'),
     }
     return render(request, "horarios.html", context)
@@ -1286,11 +1338,14 @@ def historico_reservas(request):
     reservas = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
     # Filtros
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
     laboratorio_id = request.GET.get('laboratorio_id')
+    active_tab = request.GET.get('tab', 'todas')  
+    
     # Aplicar filtros
     if data_inicio:
         try:
@@ -1298,38 +1353,66 @@ def historico_reservas(request):
             reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
         except ValueError:
             messages.error(request, "Data de início inválida.")
+    
     if data_fim:
         try:
             data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
         except ValueError:
             messages.error(request, "Data de fim inválida.")
+    
     reservas = filter_by_status(reservas, status_frequencia)
+    
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    # Separar reservas por categoria considerando horário de término (tempo local)
+    
+    # Separar reservas por categoria considerando horário de término
     from django.utils import timezone
     agora = timezone.localtime(timezone.now())
+    
+    
     reservas_list = list(reservas)
-    # marcar atributo expirada para uso nos templates
+    
+    
     for r in reservas_list:
         try:
             r.expirada = (r.disponibilidade.end_datetime() <= agora)
         except Exception:
             r.expirada = False
+    
     reservas_futuras = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
     reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
     reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
-    # Paginação
-    paginator = Paginator(reservas_list, 5)
+    
+    # Paginação para todas as reservas
+    paginator = Paginator(reservas_list, 4)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
+    # Paginação para reservas futuras
+    paginator_futuras = Paginator(reservas_futuras, 4)
+    page_number_futuras = request.GET.get('page_futuras')
+    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    
+    # Paginação para reservas de hoje
+    paginator_hoje = Paginator(reservas_hoje, 4)
+    page_number_hoje = request.GET.get('page_hoje')
+    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    
+    # Paginação para reservas passadas
+    paginator_passadas = Paginator(reservas_passadas, 4)
+    page_number_passadas = request.GET.get('page_passadas')
+    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    
     # Laboratórios para o filtro
     laboratorios = Laboratorio.objects.all()
     hoje = agora.date()
     
     context = {
         'page_obj': page_obj,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
         'reservas_futuras': reservas_futuras,
         'reservas_passadas': reservas_passadas,
         'reservas_hoje': reservas_hoje,
@@ -1339,7 +1422,9 @@ def historico_reservas(request):
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
         'today': hoje,
+        'active_tab': active_tab,  
     }
+    
     return render(request, 'historico_reservas.html', context)
 
 @login_required
