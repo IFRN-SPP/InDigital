@@ -104,21 +104,6 @@
         z-index: 0;
     }
     
-    .btn-primary {
-        background-color: var(--cor-primaria) !important;
-        border-color: var(--cor-primaria) !important;
-        padding: 10px 25px;
-        font-weight: 600;
-        border-radius: 6px;
-    }
-    
-    .btn-primary:hover {
-        background-color: #16466c !important;
-        border-color: #16466c !important;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(32, 89, 127, 0.3);
-    }
-    
     .stats-card {
         background: linear-gradient(120deg, var(--cor-primaria), var(--cor-intermediaria2));
         color: white;
@@ -382,6 +367,49 @@
             z-index: 9999;
         }
     }
+    .card-title {
+    font-weight: normal !important;
+    }
+
+    .btn-primary {
+    background-color: #20597F;
+    border-color: #20597F;
+    }
+
+    .btn-primary:hover {
+    background-color: #16466d;
+    border-color: #16466d;
+    }
+
+    .btn-secondary {
+    background-color: #86B5E1;
+    border-color: #86B5E1;
+    color: #20597F;
+    }
+
+    .btn-secondary:hover {
+    background-color: #76a5d9;
+    border-color: #76a5d9;
+    color: #20597F;
+    }
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        background-color: #20597F !important;
+        color: white !important;
+        border-bottom: 1px solid #86B5E1;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -397,69 +425,79 @@
     </div>
 
     <!-- Filtros -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card" style="border-color: #86B5E1;">
-            <div class="card-header" style="background-color: #20597F; color: white;">
-                <h3 class="card-title">
-                    <i class="fas fa-filter mr-2"></i>Filtros de Busca
-                </h3>
-            </div>
-            <div class="card-body">
-                <form method="GET" class="form-horizontal">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome:</label>
-                                <input type="text" id="nome" name="nome" class="form-control" 
-                                       value="{{ nome|default:'' }}" placeholder="Buscar por nome"
-                                       style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="matricula" class="form-label" style="color: #20597F; font-weight: 600;">Matrícula:</label>
-                                <input type="text" id="matricula" name="matricula" class="form-control" 
-                                       value="{{ matricula|default:'' }}" placeholder="Buscar por matrícula"
-                                       style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="email" class="form-label" style="color: #20597F; font-weight: 600;">Email:</label>
-                                <input type="email" id="email" name="email" class="form-control" 
-                                       value="{{ email|default:'' }}" placeholder="Buscar por email"
-                                       style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="perfil" class="form-label" style="color: #20597F; font-weight: 600;">Perfil:</label>
-                                <select name="perfil" id="perfil" class="form-select" style="border-color: #86B5E1;">
-                                    <option value="todos" {% if not perfil or perfil == 'todos' %}selected{% endif %}>Todos os perfis</option>
-                                    <option value="aluno" {% if perfil == 'aluno' %}selected{% endif %}>Aluno</option>
-                                    <option value="monitor" {% if perfil == 'monitor' %}selected{% endif %}>Monitor</option>
-                                    <option value="administrador" {% if perfil == 'administrador' %}selected{% endif %}>Administrador</option>
-                                    <option value="outro" {% if perfil == 'outro' %}selected{% endif %}>Outro</option>
-                                </select>
-                            </div>
-                        </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-sm" style="background-color: #20597F; color: white; border: none;">
-                                <i class="fas fa-search mr-1"></i> Filtrar
-                            </button>
-                            <a href="{% url 'listar_usuarios' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
-                                <i class="fas fa-times mr-1"></i> Limpar Filtros
-                            </a>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome:</label>
+                                    <input type="text" id="nome" name="nome" class="form-control"
+                                        value="{{ nome|default:'' }}" placeholder="Buscar por nome"
+                                        style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="matricula" class="form-label" style="color: #20597F; font-weight: 600;">Matrícula:</label>
+                                    <input type="text" id="matricula" name="matricula" class="form-control"
+                                        value="{{ matricula|default:'' }}" placeholder="Buscar por matrícula"
+                                        style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="email" class="form-label" style="color: #20597F; font-weight: 600;">Email:</label>
+                                    <input type="email" id="email" name="email" class="form-control"
+                                        value="{{ email|default:'' }}" placeholder="Buscar por email"
+                                        style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="perfil" class="form-label" style="color: #20597F; font-weight: 600;">Perfil:</label>
+                                    <select name="perfil" id="perfil" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not perfil or perfil == 'todos' %}selected{% endif %}>Todos os perfis</option>
+                                        <option value="aluno" {% if perfil == 'aluno' %}selected{% endif %}>Aluno</option>
+                                        <option value="monitor" {% if perfil == 'monitor' %}selected{% endif %}>Monitor</option>
+                                        <option value="administrador" {% if perfil == 'administrador' %}selected{% endif %}>Administrador</option>
+                                        <option value="outro" {% if perfil == 'outro' %}selected{% endif %}>Outro</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </form>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
+                                <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                                </a>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-12">

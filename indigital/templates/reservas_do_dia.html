@@ -278,12 +278,12 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.usuario.suap_nome_completo }}
+                                        {{ reserva.usuario.get_nome_completo }}
                                     </td>
                                     {% if user.is_superuser or user.perfil == 'administrador' %}
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                                        {{ reserva.disponibilidade.monitor.suap_nome_completo|default:"Não definido" }}
+                                        {{ reserva.disponibilidade.monitor.get_nome_completo|default:"Não definido" }}
                                     </td>
                                     {% endif %}
                                     <td style="border-color: #86B5E1; vertical-align: middle;">

@@ -109,7 +109,12 @@ def listar_usuarios(request):
     email = request.GET.get('email')
     perfil = request.GET.get('perfil')
     if nome:
-        usuarios = usuarios.filter(suap_nome_completo__icontains=nome)
+        usuarios = [
+        u for u in usuarios
+        if (u.suap_nome_completo and nome.lower() in u.suap_nome_completo.lower())
+        or (u.first_name and nome.lower() in u.first_name.lower())
+        or (u.last_name and nome.lower() in u.last_name.lower())
+        or (u.get_full_name() and nome.lower() in u.get_full_name().lower())]
     if matricula:
         usuarios = usuarios.filter(suap_id__icontains=matricula)  
     if email:

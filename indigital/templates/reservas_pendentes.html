@@ -499,7 +499,7 @@
         <td style="vertical-align: middle;">
             {% if reserva.disponibilidade.monitor %}
                 <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
-                {{ reserva.disponibilidade.monitor.suap_nome_completo }}
+                {{ reserva.disponibilidade.monitor.get_nome_completo }}
             {% else %}
                 <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
                 Não definido

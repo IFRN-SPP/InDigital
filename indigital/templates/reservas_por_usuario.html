@@ -159,6 +159,30 @@
         font-weight: 500;
         padding: 4px 8px;
     }
+    .btn-primary {
+    background-color: #20597F;
+    border-color: #20597F;
+}
+
+    .btn-primary:hover {
+    background-color: #16466d;
+    border-color: #16466d;
+}
+
+    .btn-secondary {
+    background-color: #86B5E1;
+    border-color: #86B5E1;
+    color: #20597F;
+}
+
+    .btn-secondary:hover {
+    background-color: #76a5d9;
+    border-color: #76a5d9;
+    color: #20597F;
+}
+    .card-title {
+    font-weight: normal !important;
+    }
 </style>
 {% endblock %}
 
@@ -180,78 +204,76 @@
     </div>
 
     <!-- Filtros -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card" style="border-color: #86B5E1;">
-            <div class="card-header" style="background-color: #20597F; color: white;">
-                <h3 class="card-title">
-                    <i class="fas fa-filter mr-2"></i>Filtros de Busca
-                </h3>
-            </div>
-            <div class="card-body">
-                <form method="GET" class="form-horizontal">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="id_laboratorio" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
-                                <select name="laboratorio" id="id_laboratorio" class="form-select" style="border-color: #86B5E1;">
-                                    <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
-                                    {% for lab in laboratorios %}
-                                        <option value="{{ lab.id }}" data-capacidade="{{ lab.capacidade }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
-                                            {{ lab.num_laboratorio }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="border-color: #86B5E1;">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
+                        <i class="fas fa-filter mr-2"></i>Filtros de Busca
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" style="color: white;" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
+                                    <input type="date" name="data_inicio" id="data_inicio" 
+                                           class="form-control" value="{{ data_inicio }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
+                                    <input type="date" name="data_fim" id="data_fim" 
+                                           class="form-control" value="{{ data_fim }}" style="border-color: #86B5E1;">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="laboratorio_id" class="form-label" style="color: #20597F; font-weight: 600;">Laboratório:</label>
+                                    <select name="laboratorio_id" id="laboratorio_id" class="form-select" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if not laboratorio_id or laboratorio_id == 'todos' %}selected{% endif %}>Todos os laboratórios</option>
+                                        {% for lab in laboratorios %}
+                                            <option value="{{ lab.id }}" {% if laboratorio_id == lab.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ lab.num_laboratorio }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Frequência:</label>
+                                    <select class="form-select" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todas as frequências</option>
+                                        <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
+                                        <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
+                                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="data_inicio" class="form-label" style="color: #20597F; font-weight: 600;">Data Início:</label>
-                                <input type="date" id="data_inicio" name="data_inicio" class="form-control" 
-                                       value="{{ data_inicio|default:'' }}" style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="data_fim" class="form-label" style="color: #20597F; font-weight: 600;">Data Fim:</label>
-                                <input type="date" id="data_fim" name="data_fim" class="form-control" 
-                                       value="{{ data_fim|default:'' }}" style="border-color: #86B5E1;">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Status Frequência:</label>
-                                <select name="status_frequencia" id="status_frequencia" class="form-select" style="border-color: #86B5E1;">
-                                    <option value="todos" {% if not status_frequencia or status_frequencia == 'todos' %}selected{% endif %}>Todos os status</option>
-                                    <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
-                                    <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
-                                    <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não registrado</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <div class="form-group w-100">
-                                <button type="submit" class="btn btn-sm w-100" style="background-color: #20597F; color: white; border: none;">
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search mr-1"></i> Filtrar
                                 </button>
+                                <a href="{% url 'reservas_por_usuario' usuario.id %}" class="btn btn-secondary">
+                                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                                </a>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <a href="{% url 'reservas_por_usuario' usuario.id %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
-                                <i class="fas fa-times mr-1"></i> Limpar Filtros
-                            </a>
-                            <a href="{% url 'historico_geral_reservas' %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
-                                <i class="fas fa-history mr-1"></i> Histórico Geral
-                            </a>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-12">
@@ -324,9 +346,7 @@
                                                 <i class="fas fa-question mr-1"></i> Não Registrado
                                             </span>
                                         {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
-                                                <i class="fas fa-clock mr-1"></i> Pendente
-                                            </span>
+                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Não registrado</span>
                                         {% endif %}
                                     </td>
                                 </tr>

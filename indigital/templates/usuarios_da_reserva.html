@@ -194,7 +194,7 @@
                             <div>
                                 <strong>Monitor:</strong><br>
                                 {% if disponibilidade.monitor %}
-                                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.suap_nome_completo }}</span>
+                                    <span style="color: #20597F; font-weight: 600;">{{ disponibilidade.monitor.get_nome_completo }}</span>
                                 {% else %}
                                     <span class="text-muted">Sem monitor</span>
                                 {% endif %}
@@ -206,12 +206,12 @@
         </div>
     </div>
 
-    <!-- Filtros -->
+<!-- Filtros -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card" style="border-color: #86B5E1;">
-                <div class="card-header" style="background-color: #20597F; color: white;">
-                    <h3 class="card-title">
+                <div class="card-header">
+                    <h3 class="card-title" style="font-weight: normal; font-size: 1.30rem;">
                         <i class="fas fa-filter mr-2"></i>Filtros de Busca
                     </h3>
                     <div class="card-tools">
@@ -223,36 +223,37 @@
                 <div class="card-body">
                     <form method="GET" class="form-horizontal">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="usuario_nome" class="form-label" style="color: #20597F; font-weight: 600;">Nome do Usuário:</label>
-                                    <input type="text" name="usuario_nome" id="usuario_nome" 
-                                           class="form-control form-control-sm" placeholder="Digite o nome do usuário"
-                                           value="{{ usuario_nome }}" style="border-color: #86B5E1;">
-                                </div>
+                            <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="usuario" class="form-label" style="color: #20597F; font-weight: 600;">Usuário:</label>
+                                <select class="form-select" id="usuario" name="usuario" style="border-color: #86B5E1;">
+                                    <option value="todos" {% if usuario_id == 'todos' or not usuario_id %}selected{% endif %}>Todos os usuários</option>
+                                    {% for user in usuarios %}
+                                        <option value="{{ user.id }}" {% if usuario_id == user.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ user.get_full_name|default:user.first_name|default:user.username }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-4">
+                        </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Status Frequência:</label>
-                                    <select name="status_frequencia" id="status_frequencia" class="form-control form-control-sm" style="border-color: #86B5E1;">
-                                        <option value="todos" {% if not status_frequencia or status_frequencia == 'todos' %}selected{% endif %}>Todos os status</option>
+                                    <label for="status_frequencia" class="form-label" style="color: #20597F; font-weight: 600;">Frequência:</label>
+                                    <select class="form-select" id="status_frequencia" name="status_frequencia" style="border-color: #86B5E1;">
+                                        <option value="todos" {% if status_frequencia == 'todos' or not status_frequencia %}selected{% endif %}>Todas as frequências</option>
                                         <option value="P" {% if status_frequencia == 'P' %}selected{% endif %}>Presente</option>
                                         <option value="F" {% if status_frequencia == 'F' %}selected{% endif %}>Faltou</option>
-                                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não registrado</option>
+                                        <option value="N" {% if status_frequencia == 'N' %}selected{% endif %}>Não Registrado</option>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <div class="form-group w-100">
-                                    <button type="submit" class="btn btn-sm w-100" style="background-color: #20597F; color: white; border: none;">
-                                        <i class="fas fa-search mr-1"></i> Filtrar
-                                    </button>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <a href="{% url 'usuarios_da_reserva' disponibilidade.id %}" class="btn btn-sm" style="background-color: #86B5E1; color: #20597F; border: none;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i> Filtrar
+                                </button>
+                                <a href="{% url 'usuarios_da_reserva' disponibilidade.id %}" class="btn btn-secondary">
                                     <i class="fas fa-times mr-1"></i> Limpar Filtros
                                 </a>
                             </div>
@@ -295,7 +296,7 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ reserva.usuario.suap_nome_completo }}</strong>
+                                        <strong>{{ reserva.usuario.get_nome_completo }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         {% if reserva.status_frequencia == 'P' %}
@@ -311,9 +312,7 @@
                                                 <i class="fas fa-question mr-1"></i> Não Registrado
                                             </span>
                                         {% else %}
-                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
-                                                <i class="fas fa-clock mr-1"></i> Pendente
-                                            </span>
+                                            <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Não registrado</span>
                                         {% endif %}
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
@@ -335,15 +334,15 @@
                         </span>
                     </div>
                     <ul class="pagination pagination-sm m-0 float-right">
-                        {% if reservas_page_obj.has_previous %}
+                                {% if reservas_page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?reservas_page=1{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                <a class="page-link" href="?reservas_page=1{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.previous_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.previous_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-left"></i>
                                 </a>
@@ -355,9 +354,9 @@
                                 <li class="page-item active">
                                     <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
                                 </li>
-                            {% elif num > reservas_page_obj.number|add:'-3' and num < reservas_page_obj.number|add:'3' %}
+                                {% elif num > reservas_page_obj.number|add:'-3' and num < reservas_page_obj.number|add:'3' %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?reservas_page={{ num }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                    <a class="page-link" href="?reservas_page={{ num }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                        style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
                                 </li>
                             {% endif %}
@@ -365,13 +364,13 @@
 
                         {% if reservas_page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.next_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.next_page_number }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.paginator.num_pages }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                <a class="page-link" href="?reservas_page={{ reservas_page_obj.paginator.num_pages }}{% if fila_page_obj.number %}&fila_page={{ fila_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-right"></i>
                                 </a>
@@ -431,7 +430,7 @@
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-user mr-2" style="color: #20597F;"></i>
-                                        <strong>{{ fila.usuario.username }}</strong>
+                                        <strong>{{ fila.usuario.get_nome_completo }}</strong>
                                     </td>
                                     <td style="border-color: #86B5E1; vertical-align: middle;">
                                         <i class="fas fa-calendar-plus mr-2" style="color: #20597F;"></i>
@@ -454,13 +453,13 @@
                     <ul class="pagination pagination-sm m-0 float-right">
                         {% if fila_page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?fila_page=1{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                          <a class="page-link" href="?fila_page=1{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?fila_page={{ fila_page_obj.previous_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                          <a class="page-link" href="?fila_page={{ fila_page_obj.previous_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-left"></i>
                                 </a>
@@ -474,7 +473,7 @@
                                 </li>
                             {% elif num > fila_page_obj.number|add:'-3' and num < fila_page_obj.number|add:'3' %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?fila_page={{ num }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                                                        <a class="page-link" href="?fila_page={{ num }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                        style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
                                 </li>
                             {% endif %}
@@ -482,13 +481,13 @@
 
                         {% if fila_page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?fila_page={{ fila_page_obj.next_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                          <a class="page-link" href="?fila_page={{ fila_page_obj.next_page_number }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?fila_page={{ fila_page_obj.paginator.num_pages }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_nome %}&usuario_nome={{ usuario_nome }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
+                                          <a class="page-link" href="?fila_page={{ fila_page_obj.paginator.num_pages }}{% if reservas_page_obj.number %}&reservas_page={{ reservas_page_obj.number }}{% endif %}{% if usuario_id %}&usuario={{ usuario_id }}{% endif %}{% if status_frequencia %}&status_frequencia={{ status_frequencia }}{% endif %}" 
                                    style="color: #20597F; border-color: #86B5E1;">
                                     <i class="fas fa-angle-double-right"></i>
                                 </a>

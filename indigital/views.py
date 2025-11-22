@@ -1190,17 +1190,22 @@ def usuarios_da_reserva(request, disponibilidade_id):
     # Buscar reservas e fila de espera para esta disponibilidade
     reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario').order_by('usuario__username')
     fila_espera = FilaEspera.objects.filter(disponibilidade=disponibilidade).select_related('usuario').order_by('data_solicitacao')
+    # Lista de usuários envolvidos (reservas ou fila) para popular o filtro
+    usuarios_from_reservas = User.objects.filter(reserva__disponibilidade=disponibilidade)
+    usuarios_from_fila = User.objects.filter(filaespera__disponibilidade=disponibilidade)
+    usuarios = (usuarios_from_reservas | usuarios_from_fila).distinct().order_by('username')
     # Filtros
-    usuario_nome = request.GET.get('usuario_nome')
+    usuario_id = request.GET.get('usuario')
     status_frequencia = request.GET.get('status_frequencia')
     # Aplicar filtros nas reservas se fornecidos
-    if usuario_nome:
-        reservas = reservas.filter(usuario__suap_nome_completo__icontains=usuario_nome)
-    reservas = filter_by_status(reservas, status_frequencia)
-    # Aplicar filtro na fila de espera
-    if usuario_nome:
-        fila_espera = fila_espera.filter(usuario__suap_nome_completo__icontains=usuario_nome)
-    # Paginação para reservas e fila de espera
+    if usuario_id and usuario_id != "todos":
+        reservas = reservas.filter(usuario_id=usuario_id)
+        fila_espera = fila_espera.filter(usuario_id=usuario_id)
+    if status_frequencia and status_frequencia != 'todos':
+        if status_frequencia == 'N':
+            reservas = reservas.filter(status_frequencia__in=['N', ''])
+        else:
+            reservas = reservas.filter(status_frequencia=status_frequencia)
     reservas_paginator = Paginator(reservas, 5)
     reservas_page_number = request.GET.get('reservas_page')
     reservas_page_obj = reservas_paginator.get_page(reservas_page_number)
@@ -1214,8 +1219,9 @@ def usuarios_da_reserva(request, disponibilidade_id):
         'fila_page_obj': fila_page_obj,
         'reservas_count': reservas.count(),
         'fila_count': fila_espera.count(),
-        'usuario_nome': usuario_nome,
+        'usuario_id': usuario_id,
         'status_frequencia': status_frequencia,
+        'usuarios': usuarios,
     }
     return render(request, 'usuarios_da_reserva.html', context)
 
@@ -1291,7 +1297,7 @@ def reservas_por_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
     reservas = Reserva.objects.filter(usuario=usuario).select_related('disponibilidade__laboratorio').order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
     # Filtros
-    laboratorio_id = request.GET.get('laboratorio')
+    laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
