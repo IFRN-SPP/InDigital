@@ -1298,25 +1298,104 @@ def listar_disponibilidades_monitor(request):
 @login_required
 @monitor_required
 def registrar_frequencias(request, disponibilidade_id):
+    from datetime import date
+    
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
-    reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    
+    # Verificar permissão
     if disponibilidade.monitor != request.user:
         messages.error(request, "Você não tem permissão para registrar frequências para esta disponibilidade.")
         return redirect('listar_disponibilidades_monitor')
+    
+    # Buscar todas as reservas para esta disponibilidade
+    reservas_base = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    
+    # Data atual para comparações
+    today = date.today()
+    
+    # Separar reservas por categoria baseada na data da disponibilidade
+    if disponibilidade.data > today:
+        # Disponibilidade futura
+        reservas_futuras = reservas_base
+        reservas_hoje = Reserva.objects.none()
+        reservas_passadas = Reserva.objects.none()
+    elif disponibilidade.data == today:
+        # Disponibilidade de hoje
+        reservas_futuras = Reserva.objects.none()
+        reservas_hoje = reservas_base
+        reservas_passadas = Reserva.objects.none()
+    else:
+        # Disponibilidade passada
+        reservas_futuras = Reserva.objects.none()
+        reservas_hoje = Reserva.objects.none()
+        reservas_passadas = reservas_base
+    
+    # Parâmetros de paginação
+    active_tab = request.GET.get('tab', 'todas')
+    items_per_page = 5
+    
+    # Paginação para cada categoria
+    paginator_todas = Paginator(reservas_base, items_per_page)
+    page_number_todas = request.GET.get('page')
+    page_obj_todas = paginator_todas.get_page(page_number_todas)
+    
+    paginator_futuras = Paginator(reservas_futuras, items_per_page)
+    page_number_futuras = request.GET.get('page_futuras')
+    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    
+    paginator_hoje = Paginator(reservas_hoje, items_per_page)
+    page_number_hoje = request.GET.get('page_hoje')
+    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    
+    paginator_passadas = Paginator(reservas_passadas, items_per_page)
+    page_number_passadas = request.GET.get('page_passadas')
+    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    
+    # Processar POST para registrar frequência
     if request.method == "POST":
         reserva_id = request.POST.get("reserva_id")
         status = request.POST.get("status")
         reserva = get_object_or_404(Reserva, id=reserva_id, disponibilidade=disponibilidade)
+        
         if status in ['P', 'F', 'N']:
             reserva.status_frequencia = status
             reserva.save()
-            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {'Presente' if status == 'P' else 'Faltou' if status == 'F' else 'Não registrado'}.")
-        return redirect('registrar_frequencias', disponibilidade_id=disponibilidade.id)
-    # Paginação
-    paginator = Paginator(reservas, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, "registrar_frequencias.html", {"disponibilidade": disponibilidade, "page_obj": page_obj})
+            
+            status_text = {
+                'P': 'Presente',
+                'F': 'Faltou', 
+                'N': 'Não registrado'
+            }.get(status, 'Desconhecido')
+            
+            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {status_text}.")
+        
+        # Manter a aba ativa após o POST
+        active_tab = request.GET.get('tab', 'todas')
+        redirect_url = f"{reverse('registrar_frequencias', args=[disponibilidade.id])}?tab={active_tab}"
+        
+        # Manter parâmetros de paginação se existirem
+        if active_tab == 'futuras' and page_number_futuras:
+            redirect_url += f"&page_futuras={page_number_futuras}"
+        elif active_tab == 'hoje' and page_number_hoje:
+            redirect_url += f"&page_hoje={page_number_hoje}"
+        elif active_tab == 'passadas' and page_number_passadas:
+            redirect_url += f"&page_passadas={page_number_passadas}"
+        elif page_number_todas:
+            redirect_url += f"&page={page_number_todas}"
+            
+        return redirect(redirect_url)
+    
+    context = {
+        'disponibilidade': disponibilidade,
+        'page_obj': page_obj_todas,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
+        'active_tab': active_tab,
+        'today': today,
+    }
+    
+    return render(request, 'registrar_frequencias.html', context)
 
 # detalhes do usuario e suas reservas
 @login_required
