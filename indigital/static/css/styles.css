@@ -220,3 +220,86 @@ body.login-page .col-md-6 {
         font-size: 1.5rem;
     }
 }
+
+/* SCROLL HORIZONTAL PARA TODAS AS TABELAS DO SISTEMA */
+.card-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table {
+    min-width: 100%;
+    width: auto;
+}
+
+/* Estilo personalizado para a barra de scroll */
+.card-body::-webkit-scrollbar {
+    height: 8px;
+}
+
+.card-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    background: var(--cor-intermediaria2);
+    border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-primaria);
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--cor-intermediaria2);
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-primaria);
+}
+
+.card-body > .table {
+    margin-bottom: 0;
+}
+
+.content-wrapper,
+.container,
+.container-fluid {
+    overflow-x: visible !important;
+}
+
+
+.table th,
+.table td {
+    white-space: nowrap;
+}
+
+/* Para tabelas dentro de tabs */
+.tab-content .card-body {
+    overflow-x: auto;
+}
+
+/* Para tabelas em modais */
+.modal-body .table {
+    min-width: 100%;
+}
+
+.modal-body {
+    overflow-x: auto;
+}

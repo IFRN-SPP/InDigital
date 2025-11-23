@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.db import transaction
 from django.db.models import Q
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 
 
 @login_required
@@ -297,6 +298,7 @@ def listar_disponibilidades(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     monitor_id = request.GET.get('monitor_id')
+    active_tab = request.GET.get('tab', 'todas')
     
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
@@ -319,10 +321,34 @@ def listar_disponibilidades(request):
     if monitor_id and monitor_id != 'todos':
         disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
     
-    # Paginação
-    paginator = Paginator(disponibilidades, 5)
+    # Data atual para filtros
+    today = date.today()
+    
+    # Separar as disponibilidades por categoria
+    disponibilidades_todas = disponibilidades
+    
+    disponibilidades_futuras = disponibilidades.filter(data__gt=today)
+    
+    disponibilidades_hoje = disponibilidades.filter(data=today)
+    
+    disponibilidades_passadas = disponibilidades.filter(data__lt=today)
+    
+    # Paginação para cada categoria
+    paginator_todas = Paginator(disponibilidades_todas, 5)
+    paginator_futuras = Paginator(disponibilidades_futuras, 5)
+    paginator_hoje = Paginator(disponibilidades_hoje, 5)
+    paginator_passadas = Paginator(disponibilidades_passadas, 5)
+    
+    # Obter página para cada categoria
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_futuras = request.GET.get('page_futuras')
+    page_hoje = request.GET.get('page_hoje')
+    page_passadas = request.GET.get('page_passadas')
+    
+    page_obj = paginator_todas.get_page(page_number)
+    page_obj_futuras = paginator_futuras.get_page(page_futuras)
+    page_obj_hoje = paginator_hoje.get_page(page_hoje)
+    page_obj_passadas = paginator_passadas.get_page(page_passadas)
     
     # Filtros para o template
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
@@ -330,6 +356,9 @@ def listar_disponibilidades(request):
     
     context = {
         'page_obj': page_obj,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
         'laboratorios': laboratorios,
         'monitores': monitores,
         'laboratorio_id': laboratorio_id,
@@ -337,11 +366,11 @@ def listar_disponibilidades(request):
         'data_fim': data_fim,
         'monitor_id': monitor_id,
         'form': form,
-        'today': date.today(),
+        'today': today,
+        'active_tab': active_tab,
     }
     
     return render(request, "listar_disponibilidades.html", context)
-
 @login_required
 @admin_required
 def excluir_disponibilidade(request, disponibilidade_id):
@@ -1270,25 +1299,104 @@ def listar_disponibilidades_monitor(request):
 @login_required
 @monitor_required
 def registrar_frequencias(request, disponibilidade_id):
+    from datetime import date
+    
     disponibilidade = get_object_or_404(Disponibilidade, id=disponibilidade_id)
-    reservas = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    
+    # Verificar permissão
     if disponibilidade.monitor != request.user:
         messages.error(request, "Você não tem permissão para registrar frequências para esta disponibilidade.")
         return redirect('listar_disponibilidades_monitor')
+    
+    # Buscar todas as reservas para esta disponibilidade
+    reservas_base = Reserva.objects.filter(disponibilidade=disponibilidade).select_related('usuario')
+    
+    # Data atual para comparações
+    today = date.today()
+    
+    # Separar reservas por categoria baseada na data da disponibilidade
+    if disponibilidade.data > today:
+        # Disponibilidade futura
+        reservas_futuras = reservas_base
+        reservas_hoje = Reserva.objects.none()
+        reservas_passadas = Reserva.objects.none()
+    elif disponibilidade.data == today:
+        # Disponibilidade de hoje
+        reservas_futuras = Reserva.objects.none()
+        reservas_hoje = reservas_base
+        reservas_passadas = Reserva.objects.none()
+    else:
+        # Disponibilidade passada
+        reservas_futuras = Reserva.objects.none()
+        reservas_hoje = Reserva.objects.none()
+        reservas_passadas = reservas_base
+    
+    # Parâmetros de paginação
+    active_tab = request.GET.get('tab', 'todas')
+    items_per_page = 5
+    
+    # Paginação para cada categoria
+    paginator_todas = Paginator(reservas_base, items_per_page)
+    page_number_todas = request.GET.get('page')
+    page_obj_todas = paginator_todas.get_page(page_number_todas)
+    
+    paginator_futuras = Paginator(reservas_futuras, items_per_page)
+    page_number_futuras = request.GET.get('page_futuras')
+    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    
+    paginator_hoje = Paginator(reservas_hoje, items_per_page)
+    page_number_hoje = request.GET.get('page_hoje')
+    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    
+    paginator_passadas = Paginator(reservas_passadas, items_per_page)
+    page_number_passadas = request.GET.get('page_passadas')
+    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    
+    # Processar POST para registrar frequência
     if request.method == "POST":
         reserva_id = request.POST.get("reserva_id")
         status = request.POST.get("status")
         reserva = get_object_or_404(Reserva, id=reserva_id, disponibilidade=disponibilidade)
+        
         if status in ['P', 'F', 'N']:
             reserva.status_frequencia = status
             reserva.save()
-            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {'Presente' if status == 'P' else 'Faltou' if status == 'F' else 'Não registrado'}.")
-        return redirect('registrar_frequencias', disponibilidade_id=disponibilidade.id)
-    # Paginação
-    paginator = Paginator(reservas, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, "registrar_frequencias.html", {"disponibilidade": disponibilidade, "page_obj": page_obj})
+            
+            status_text = {
+                'P': 'Presente',
+                'F': 'Faltou', 
+                'N': 'Não registrado'
+            }.get(status, 'Desconhecido')
+            
+            messages.success(request, f"Frequência de {reserva.usuario.username} registrada como {status_text}.")
+        
+        # Manter a aba ativa após o POST
+        active_tab = request.GET.get('tab', 'todas')
+        redirect_url = f"{reverse('registrar_frequencias', args=[disponibilidade.id])}?tab={active_tab}"
+        
+        # Manter parâmetros de paginação se existirem
+        if active_tab == 'futuras' and page_number_futuras:
+            redirect_url += f"&page_futuras={page_number_futuras}"
+        elif active_tab == 'hoje' and page_number_hoje:
+            redirect_url += f"&page_hoje={page_number_hoje}"
+        elif active_tab == 'passadas' and page_number_passadas:
+            redirect_url += f"&page_passadas={page_number_passadas}"
+        elif page_number_todas:
+            redirect_url += f"&page={page_number_todas}"
+            
+        return redirect(redirect_url)
+    
+    context = {
+        'disponibilidade': disponibilidade,
+        'page_obj': page_obj_todas,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
+        'active_tab': active_tab,
+        'today': today,
+    }
+    
+    return render(request, 'registrar_frequencias.html', context)
 
 # detalhes do usuario e suas reservas
 @login_required
@@ -1436,44 +1544,65 @@ def historico_reservas(request):
 @login_required
 @admin_required
 def historico_geral_reservas(request):
-    # Buscar todas as reservas
-    reservas = Reserva.objects.all().select_related(
+    from datetime import date
+    
+    # Data atual para comparações
+    today = date.today()
+    
+    # Buscar todas as reservas base
+    reservas_base = Reserva.objects.all().select_related(
         'usuario', 'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
+    
     # Filtros
     usuario_id = request.GET.get('usuario')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
     laboratorio_id = request.GET.get('laboratorio_id')
-    # Aplicar filtros
-    if usuario_id and usuario_id != 'todos':
-        reservas = reservas.filter(usuario_id=usuario_id)
-    if data_inicio:
-        try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
-        except ValueError:
-            messages.error(request, "Data de início inválida.")
-    if data_fim:
-        try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
-        except ValueError:
-            messages.error(request, "Data de fim inválida.")
-    reservas = filter_by_status(reservas, status_frequencia)
-    if laboratorio_id and laboratorio_id != 'todos':
-        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    # Paginação
-    paginator = Paginator(reservas, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    active_tab = request.GET.get('tab', 'todas')
+    
+    # Aplicar filtros na base
+    reservas_filtradas = aplicar_filtros_reservas(
+        reservas_base, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id
+    )
+    
+    # Separar reservas por categoria
+    reservas_futuras = reservas_filtradas.filter(disponibilidade__data__gt=today)
+    reservas_hoje = reservas_filtradas.filter(disponibilidade__data=today)
+    reservas_passadas = reservas_filtradas.filter(disponibilidade__data__lt=today)
+    
+    items_per_page = 4  
+    
+    # Todas as reservas
+    paginator_todas = Paginator(reservas_filtradas, 5)
+    page_number_todas = request.GET.get('page')
+    page_obj_todas = paginator_todas.get_page(page_number_todas)
+    
+    # Reservas futuras
+    paginator_futuras = Paginator(reservas_futuras, 5)
+    page_number_futuras = request.GET.get('page_futuras')
+    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    
+    # Reservas de hoje
+    paginator_hoje = Paginator(reservas_hoje, 5)
+    page_number_hoje = request.GET.get('page_hoje')
+    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    
+    # Reservas passadas
+    paginator_passadas = Paginator(reservas_passadas, 5)
+    page_number_passadas = request.GET.get('page_passadas')
+    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    
     # Dados para os filtros
     usuarios = User.objects.all().order_by('username')
     laboratorios = Laboratorio.objects.all()
     
     context = {
-        'page_obj': page_obj,
+        'page_obj': page_obj_todas,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
         'usuarios': usuarios,
         'laboratorios': laboratorios,
         'usuario_id': usuario_id,
@@ -1481,8 +1610,47 @@ def historico_geral_reservas(request):
         'data_fim': data_fim,
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
+        'active_tab': active_tab,
+        'today': today,
+        'items_per_page': items_per_page,
     }
     return render(request, 'historico_geral_reservas.html', context)
+
+def aplicar_filtros_reservas(reservas, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id):
+    """Aplica filtros às reservas"""
+    from datetime import datetime
+    
+    if usuario_id and usuario_id != 'todos':
+        reservas = reservas.filter(usuario_id=usuario_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+        except ValueError:
+            pass  
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+        except ValueError:
+            pass  
+    
+    # Filtro por status de frequência
+    if status_frequencia and status_frequencia != 'todos':
+        reservas = reservas.filter(status_frequencia=status_frequencia)
+    
+    if laboratorio_id and laboratorio_id != 'todos':
+        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+    
+    return reservas
+
+def filter_by_status(reservas, status_frequencia):
+    """Filtra reservas por status de frequência (mantida para compatibilidade)"""
+    if status_frequencia and status_frequencia != 'todos':
+        return reservas.filter(status_frequencia=status_frequencia)
+    return reservas
 
 # reservas pendentes
 @login_required
