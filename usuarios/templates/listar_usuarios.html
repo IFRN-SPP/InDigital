@@ -410,6 +410,12 @@
         font-size: 1.25rem;
         font-weight: 600;
     }
+    .card-body,
+    .table-responsive,
+    table {
+        overflow: visible !important;
+        position: static !important;
+    }
 </style>
 {% endblock %}
 
@@ -556,7 +562,7 @@
     <div class="action-buttons d-flex gap-2 justify-content-center">
 
         <!-- Botão modificar perfil -->
-        <div class="btn-group">
+        <div class="btn-group position-static">
             <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 Perfil
             </button>
