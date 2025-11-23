@@ -297,6 +297,7 @@ def listar_disponibilidades(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     monitor_id = request.GET.get('monitor_id')
+    active_tab = request.GET.get('tab', 'todas')
     
     # Aplicar filtros
     if laboratorio_id and laboratorio_id != 'todos':
@@ -319,10 +320,34 @@ def listar_disponibilidades(request):
     if monitor_id and monitor_id != 'todos':
         disponibilidades = disponibilidades.filter(monitor_id=monitor_id)
     
-    # Paginação
-    paginator = Paginator(disponibilidades, 5)
+    # Data atual para filtros
+    today = date.today()
+    
+    # Separar as disponibilidades por categoria
+    disponibilidades_todas = disponibilidades
+    
+    disponibilidades_futuras = disponibilidades.filter(data__gt=today)
+    
+    disponibilidades_hoje = disponibilidades.filter(data=today)
+    
+    disponibilidades_passadas = disponibilidades.filter(data__lt=today)
+    
+    # Paginação para cada categoria
+    paginator_todas = Paginator(disponibilidades_todas, 5)
+    paginator_futuras = Paginator(disponibilidades_futuras, 5)
+    paginator_hoje = Paginator(disponibilidades_hoje, 5)
+    paginator_passadas = Paginator(disponibilidades_passadas, 5)
+    
+    # Obter página para cada categoria
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_futuras = request.GET.get('page_futuras')
+    page_hoje = request.GET.get('page_hoje')
+    page_passadas = request.GET.get('page_passadas')
+    
+    page_obj = paginator_todas.get_page(page_number)
+    page_obj_futuras = paginator_futuras.get_page(page_futuras)
+    page_obj_hoje = paginator_hoje.get_page(page_hoje)
+    page_obj_passadas = paginator_passadas.get_page(page_passadas)
     
     # Filtros para o template
     laboratorios = Laboratorio.objects.all().order_by('num_laboratorio')
@@ -330,6 +355,9 @@ def listar_disponibilidades(request):
     
     context = {
         'page_obj': page_obj,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
         'laboratorios': laboratorios,
         'monitores': monitores,
         'laboratorio_id': laboratorio_id,
@@ -337,11 +365,11 @@ def listar_disponibilidades(request):
         'data_fim': data_fim,
         'monitor_id': monitor_id,
         'form': form,
-        'today': date.today(),
+        'today': today,
+        'active_tab': active_tab,
     }
     
     return render(request, "listar_disponibilidades.html", context)
-
 @login_required
 @admin_required
 def excluir_disponibilidade(request, disponibilidade_id):
