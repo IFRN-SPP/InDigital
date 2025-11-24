@@ -17,21 +17,87 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
     <style>
-        .nav-link[onclick*="logout"] {
-            background-color: transparent !important;
-            border: none !important;
+        :root {
+            --cor-primaria: #20597F;
+            --cor-secundaria: #20597F;
+            --cor-intermediaria1: #20597F;
+            --cor-intermediaria2: #86B5E1;
+            --cor-intermediaria3: #20597F;
         }
-        
+
+        /* ESTILOS DO HEADER */
         .main-header .navbar-nav .nav-link {
-        color: var(--cor-primaria);
-    }
+            color: var(--cor-primaria);
+        }
     
         .main-header .navbar-nav .nav-link:hover {
-        color: var(--cor-intermediaria2);
-    }
+            color: var(--cor-intermediaria2);
+        }
+
         .brand-text {
             font-weight: 600 !important;
             font-size: 1.3rem !important;
+        }
+
+        .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link {
+            color: #c2c7d0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+            background-color: var(--cor-primaria);
+            color: #ffffff;
+        }
+
+        .nav-link[onclick*="logout"] {
+            background-color: transparent !important;
+            border: none !important;
+            color: #c2c7d0 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-link[onclick*="logout"]:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            transform: translateX(5px) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* Estilo para os headers do menu */
+        .nav-header {
+            color: #86B5E1 !important;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+
+        /* Estilo para ícones do menu */
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .nav-sidebar .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-sidebar .nav-link {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin: 2px 8px;
         }
     </style>
 
@@ -101,26 +167,26 @@
                             
                             <li class="nav-header">ADMINISTRAÇÃO</li>
 
-<li class="nav-item">
-    <a href="{% url 'reservas_pendentes' %}" class="nav-link">
-        <i class="nav-icon fas fa-check-circle"></i>
-        <p>Aprovar Reservas</p>
-    </a>
-</li>
+                            <li class="nav-item">
+                                <a href="{% url 'reservas_pendentes' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-check-circle"></i>
+                                    <p>Aprovar Reservas</p>
+                                </a>
+                            </li>
 
-<li class="nav-item">
-    <a href="{% url 'reservas_do_dia' %}" class="nav-link">
-        <i class="nav-icon fas fa-calendar-day"></i>
-        <p>Reservas do Dia</p>
-    </a>
-</li>
+                            <li class="nav-item">
+                                <a href="{% url 'reservas_do_dia' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-calendar-day"></i>
+                                    <p>Reservas do Dia</p>
+                                </a>
+                            </li>
 
-<li class="nav-item">
-    <a href="{% url 'listar_disponibilidades' %}" class="nav-link">
-        <i class="nav-icon fas fa-clock"></i>
-        <p>Gerenciar Disponibilidades</p>
-    </a>
-</li>
+                            <li class="nav-item">
+                                <a href="{% url 'listar_disponibilidades' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-clock"></i>
+                                    <p>Gerenciar Disponibilidades</p>
+                                </a>
+                            </li>
                             
                             <li class="nav-item">
                                 <a href="{% url 'listar_laboratorios' %}" class="nav-link">
@@ -262,10 +328,27 @@
         {% if messages and request.resolver_match.url_name != 'account_login' and request.resolver_match.url_name != 'suap_login' and request.resolver_match.url_name != 'cadastro' %}
             <div class="container mt-3">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                    {% if "faltou" in message|lower or "rejeit" in message|lower or "recus" in message|lower or "negad" in message|lower %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-times-circle me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endif %}

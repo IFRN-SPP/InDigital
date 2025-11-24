@@ -371,6 +371,7 @@ def listar_disponibilidades(request):
     }
     
     return render(request, "listar_disponibilidades.html", context)
+
 @login_required
 @admin_required
 def excluir_disponibilidade(request, disponibilidade_id):
@@ -1257,43 +1258,92 @@ def usuarios_da_reserva(request, disponibilidade_id):
 @login_required
 @monitor_required
 def listar_disponibilidades_monitor(request):
-    disponibilidades = Disponibilidade.objects.filter(monitor=request.user).select_related('laboratorio').order_by('-data', 'horario_inicio')
+    from datetime import date
+
+    today = date.today()
+    
+    # Buscar todas as disponibilidades do monitor
+    disponibilidades_base = Disponibilidade.objects.filter(monitor=request.user).select_related('laboratorio').order_by('-data', 'horario_inicio')
+    
     # Filtros
     laboratorio_id = request.GET.get('laboratorio_id')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-    # Aplicar filtros
-    if laboratorio_id and laboratorio_id != 'todos':
-        disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
-    if data_inicio:
-        try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
-        except ValueError:
-            messages.error(request, "Data de início inválida.")
-    if data_fim:
-        try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
-        except ValueError:
-            messages.error(request, "Data de fim inválida.")
+    active_tab = request.GET.get('tab', 'todas')
+    
+    # Aplicar filtros na base
+    disponibilidades_filtradas = aplicar_filtros_disponibilidades(
+        disponibilidades_base, laboratorio_id, data_inicio, data_fim
+    )
+    
+    # Separar disponibilidades por categoria
+    disponibilidades_futuras = disponibilidades_filtradas.filter(data__gt=today)
+    disponibilidades_hoje = disponibilidades_filtradas.filter(data=today)
+    disponibilidades_passadas = disponibilidades_filtradas.filter(data__lt=today)
+    
     # Paginação
-    paginator = Paginator(disponibilidades, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    # Dados para os filtros (apenas laboratórios que o monitor tem disponibilidades)
+    items_per_page = 5
+    
+    # Todas as disponibilidades
+    paginator_todas = Paginator(disponibilidades_filtradas, items_per_page)
+    page_number_todas = request.GET.get('page')
+    page_obj_todas = paginator_todas.get_page(page_number_todas)
+    
+    # Disponibilidades futuras
+    paginator_futuras = Paginator(disponibilidades_futuras, items_per_page)
+    page_number_futuras = request.GET.get('page_futuras')
+    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    
+    # Disponibilidades de hoje
+    paginator_hoje = Paginator(disponibilidades_hoje, items_per_page)
+    page_number_hoje = request.GET.get('page_hoje')
+    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    
+    # Disponibilidades passadas
+    paginator_passadas = Paginator(disponibilidades_passadas, items_per_page)
+    page_number_passadas = request.GET.get('page_passadas')
+    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    
     laboratorios = Laboratorio.objects.filter(
         disponibilidade__monitor=request.user
     ).distinct().order_by('num_laboratorio')
     
     context = {
-        'page_obj': page_obj,
+        'page_obj': page_obj_todas,
+        'page_obj_futuras': page_obj_futuras,
+        'page_obj_hoje': page_obj_hoje,
+        'page_obj_passadas': page_obj_passadas,
         'laboratorios': laboratorios,
         'laboratorio_id': laboratorio_id,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
+        'active_tab': active_tab,
+        'today': today,
     }
     return render(request, 'listar_disponibilidades_monitor.html', context)
+
+def aplicar_filtros_disponibilidades(disponibilidades, laboratorio_id, data_inicio, data_fim):
+    """Aplica filtros às disponibilidades"""
+    from datetime import datetime
+    
+    if laboratorio_id and laboratorio_id != 'todos':
+        disponibilidades = disponibilidades.filter(laboratorio_id=laboratorio_id)
+    
+    if data_inicio:
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__gte=data_inicio_obj)
+        except ValueError:
+            pass  
+    
+    if data_fim:
+        try:
+            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            disponibilidades = disponibilidades.filter(data__lte=data_fim_obj)
+        except ValueError:
+            pass  
+    
+    return disponibilidades
 
 # registrar frequencias
 @login_required
