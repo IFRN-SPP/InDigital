@@ -18,13 +18,20 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC), com o 
 
 ## TECNOLOGIAS UTILIZADAS
 
-![Django](https://img.shields.io/badge/-Django-0d1117?style=for-the-badge&logo=Django&logoColor=green)
-![Python](https://img.shields.io/badge/-Python-0d1117?style=for-the-badge&logo=Python)
-![HTML](https://img.shields.io/badge/-HTML5-0d1117?style=for-the-badge&logo=html5&logoColor)
-![JavaScript](https://img.shields.io/badge/-JavaScript-0d1117?style=for-the-badge&logo=javascript&logoColor)
-![Bootstrap](https://img.shields.io/badge/-Bootstrap-0d1117?style=for-the-badge&logo=bootstrap&logoColor)
-![CSS3](https://img.shields.io/badge/-CSS3-0d1117?style=for-the-badge&logo=css3&logoColor=blue)
-![AJAX](https://img.shields.io/badge/-AJAX-0d1117?style=for-the-badge&logo=ajax&logoColor)
+![Django]
+![Python]
+![HTML]
+![JavaScript]
+![Bootstrap]
+![CSS3]
+![AJAX]
+
+## Pré-requisitos
+
+- Python 3.8 ou superior
+- MySQL
+- Git
+- VS Code
 
 ## INSTALAÇÃO
 
@@ -129,3 +136,39 @@ python manage.py runserver
 ```bash
 http://127.0.0.1:8000
 ```
+
+## Estrutura do projeto
+
+```
+InDigital/
+│
+├── config/                      # Configurações principais do Django (settings, urls, wsgi, asgi)
+│
+├── docs/                        # Documentação do projeto
+│
+├── indigital/                   # Aplicação principal do sistema
+│
+├── usuarios/                    # App responsável pelos usuários
+│
+├── venv/                        # Ambiente virtual Python (NÃO vai para o Git)
+│
+├── manage.py                    # Script principal do Django
+├── requirements.txt             # Dependências do projeto
+├── .env exemplo                 # Modelo de variáveis de ambiente
+├── .env                         # Variáveis de ambiente reais (NÃO vai para o Git)
+├── .gitignore                   # Arquivos ignorados pelo Git
+├── README.md                    # Documentação inicial do projeto
+
+```
+
+## Funcionalidades
+- consulte o [Manual do Usuário](docs/manual/index.html)
+
+## Autores
+
+- Adaylla Alannis
+- Giulliana Beatriz
+
+## Orientador
+
+- Prof. Diego Cirilo
