@@ -18,13 +18,14 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC), com o 
 
 ## TECNOLOGIAS UTILIZADAS
 
-![Django]
-![Python]
-![HTML]
-![JavaScript]
-![Bootstrap]
-![CSS3]
-![AJAX]
+**DJANGO** &nbsp;•&nbsp;
+**PYTHON** &nbsp;•&nbsp;
+**HTML5** &nbsp;•&nbsp;
+**CSS3** &nbsp;•&nbsp;
+**JAVASCRIPT** &nbsp;•&nbsp;
+**JQUERY** &nbsp;•&nbsp;
+**AJAX** &nbsp;•&nbsp;
+**BOOTSTRAP**
 
 ## Pré-requisitos
 
@@ -162,7 +163,7 @@ InDigital/
 ```
 
 ## Funcionalidades
-- consulte o [Manual do Usuário](docs/manual/index.html)
+- Consulte o Manual do Usuário em: docs/manual/index.html
 
 ## Autores
 
