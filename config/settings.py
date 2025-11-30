@@ -90,12 +90,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if BUILD_ENV == "local":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+        }
+    }
 
 
 # Password validation
@@ -143,11 +155,10 @@ LOGOUT_REDIRECT_URL = "index"
 
 ACCOUNT_ADAPTER = "usuarios.adapters.CustomAccountAdapter"
 ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_SESSION_REMEMBER = True
 OPEN_FOR_SIGNUP = True
 
@@ -188,12 +199,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_ROOT = BASE_DIR / 'media/'
-MEDIA_URL = 'media/'
+# URL para arquivos estáticos
+STATIC_URL = "static/"
+MEDIA_URL = "media/"
 
-STATIC_ROOT = BASE_DIR / 'staticfiles/'
-STATICFILES_DIRS = [BASE_DIR / 'static/']
+# Diretórios adicionais para arquivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# Diretório onde os arquivos estáticos coletados serão armazenados
+if BUILD_ENV == "local":
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+    MEDIA_ROOT = BASE_DIR / "media"
+else:
+    STATIC_ROOT = os.getenv("STATIC_ROOT")
+    MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
