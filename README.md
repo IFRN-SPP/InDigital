@@ -82,7 +82,7 @@ python manage.py migrate
 .env 
 ```
 
-> Crie um arquivo `.env` na raiz do projeto, baseado no exemplo `.env exemplo`.
+> Crie um arquivo `.env` na raiz do projeto, baseado no exemplo `.env.exemplo`.
 
 ### Autenticação com SUAP
 
