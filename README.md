@@ -163,7 +163,7 @@ InDigital/
 ```
 
 ## Funcionalidades
-- Consulte o Manual do Usuário em: docs/manual/index.html
+- Consulte o Manual do Usuário em: [manual do usuário](https://adaylla.github.io/InDigital/)
 
 ## Autores
 
