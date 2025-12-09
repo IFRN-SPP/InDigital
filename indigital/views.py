@@ -1535,13 +1535,14 @@ def historico_reservas(request):
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
     laboratorio_id = request.GET.get('laboratorio_id')
-    active_tab = request.GET.get('tab', 'todas')  
+    active_tab = request.GET.get('tab', 'todas')
     
     # Aplicar filtros
     if data_inicio:
         try:
             data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+            print(f"Filtro data_inicio: {data_inicio_obj}")
         except ValueError:
             messages.error(request, "Data de início inválida.")
     
@@ -1549,6 +1550,7 @@ def historico_reservas(request):
         try:
             data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
             reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+            print(f"Filtro data_fim: {data_fim_obj}")
         except ValueError:
             messages.error(request, "Data de fim inválida.")
     
@@ -1556,27 +1558,31 @@ def historico_reservas(request):
     
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
+        print(f"Filtro laboratorio_id: {laboratorio_id}")
     
-    # Separar reservas por categoria considerando horário de término
+    # Data atual
+    hoje = date.today()
+    print(f"Data de hoje: {hoje}")
+    print(f"Total de reservas após filtros: {reservas.count()}")
+    
+    # Para reservas futuras: data > hoje
+    reservas_futuras = reservas.filter(disponibilidade__data__gt=hoje)
+    print(f"Reservas futuras (data > {hoje}): {reservas_futuras.count()}")
+    
+    # Para reservas de hoje: data == hoje
+    reservas_hoje = reservas.filter(disponibilidade__data=hoje)
+    print(f"Reservas de hoje (data == {hoje}): {reservas_hoje.count()}")
+    
+    # Para reservas passadas: data < hoje
+    reservas_passadas = reservas.filter(disponibilidade__data__lt=hoje)
+    print(f"Reservas passadas (data < {hoje}): {reservas_passadas.count()}")
+    
+    # Adicionar atributo expirada para cada reserva
     from django.utils import timezone
     agora = timezone.localtime(timezone.now())
     
-    
-    reservas_list = list(reservas)
-    
-    
-    for r in reservas_list:
-        try:
-            r.expirada = (r.disponibilidade.end_datetime() <= agora)
-        except Exception:
-            r.expirada = False
-    
-    reservas_futuras = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
-    reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
-    reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
-    
     # Paginação para todas as reservas
-    paginator = Paginator(reservas_list, 4)
+    paginator = Paginator(reservas, 4)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -1597,7 +1603,6 @@ def historico_reservas(request):
     
     # Laboratórios para o filtro
     laboratorios = Laboratorio.objects.all()
-    hoje = agora.date()
     
     context = {
         'page_obj': page_obj,
@@ -1613,8 +1618,14 @@ def historico_reservas(request):
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
         'today': hoje,
-        'active_tab': active_tab,  
+        'active_tab': active_tab,
     }
+    
+    print(f"Contexto enviado ao template:")
+    print(f"  page_obj_futuras tem {page_obj_futuras.paginator.count} itens")
+    print(f"  page_obj_hoje tem {page_obj_hoje.paginator.count} itens")
+    print(f"  page_obj_passadas tem {page_obj_passadas.paginator.count} itens")
+    print("=" * 50)
     
     return render(request, 'historico_reservas.html', context)
 
