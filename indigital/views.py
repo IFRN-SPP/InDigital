@@ -495,7 +495,10 @@ def editar_laboratorio(request, laboratorio_id):
                 print("Laboratório salvo!")
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': True})
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!'
+                    })
                 
                 messages.success(request, f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!')
                 return redirect('listar_laboratorios')
@@ -536,9 +539,17 @@ def editar_laboratorio(request, laboratorio_id):
                         </div>
                     </form>
                     """
-                    return JsonResponse({'success': False, 'form_html': form_html})
+                    return JsonResponse({
+                        'success': False, 
+                        'form_html': form_html,
+                        'message': 'Erro ao atualizar laboratório. Corrija os campos abaixo.'
+                    })
                 
                 messages.error(request, 'Erro ao editar laboratório!')
+                return render(request, 'editar_laboratorio.html', {
+                    'form': form,
+                    'laboratorio': laboratorio
+                })
         
         except Exception as e:
             print(f" ERRO NO POST: {str(e)}")
@@ -546,7 +557,11 @@ def editar_laboratorio(request, laboratorio_id):
             print(traceback.format_exc())
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+                return JsonResponse({
+                    'success': False, 
+                    'error': str(e),
+                    'message': 'Erro interno ao editar laboratório.'
+                }, status=500)
             
             messages.error(request, f'Erro: {str(e)}')
             return redirect('listar_laboratorios')
@@ -588,7 +603,7 @@ def editar_laboratorio(request, laboratorio_id):
             'form': form,
             'laboratorio': laboratorio
         }
-        return render(request, 'listar_laboratorios.html', context)
+        return render(request, 'editar_laboratorio.html', context)
 
 @login_required
 @admin_required
@@ -636,39 +651,51 @@ def criar_laboratorio(request):
         form = LaboratorioForm(request.POST)
         if form.is_valid():
             laboratorio = form.save()
-            
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
-            
             messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
             return redirect('listar_laboratorios')
         else:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
-                return JsonResponse({'success': False, 'form_html': form_html})
+            laboratorios = Laboratorio.objects.all()
+            paginator = Paginator(laboratorios, 10)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
             
-            messages.error(request, 'Erro ao criar laboratório!')
-            return redirect('listar_laboratorios')
+            return render(request, 'listar_laboratorios.html', {
+                'form': form,
+                'laboratorios': laboratorios,
+                'page_obj': page_obj
+            })
     
-    else:
-        form = LaboratorioForm()
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
-            return HttpResponse(form_html)
-        
-        return redirect('listar_laboratorios')
+    return redirect('listar_laboratorios')
 
 @login_required
 @admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    
+    # Verificar se existem disponibilidades associadas
+    if Disponibilidade.objects.filter(laboratorio=laboratorio).exists():
+        messages.error(request, "Não é possível excluir este laboratório pois existem disponibilidades criadas para ele.")
+        return redirect('listar_laboratorios')
+    
     if request.method == "POST":
         laboratorio.delete()
         messages.success(request, "Laboratório excluído com sucesso!")
         return redirect('listar_laboratorios')
-    else:
-        return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+    
+    return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+
+
+@login_required
+@admin_required
+def verificar_disponibilidades(request, laboratorio_id):
+    laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    
+    # Verificar se existem disponibilidades
+    disponibilidades_existem = Disponibilidade.objects.filter(laboratorio=laboratorio).exists()
+    
+    return JsonResponse({
+        'disponibilidades_existem': disponibilidades_existem
+    })
     
 # horarios e reservas
 @login_required
@@ -1498,8 +1525,10 @@ def reservas_por_usuario(request, usuario_id):
 @login_required
 @aluno_required
 def historico_reservas(request):
+    from datetime import datetime, date
+
     # Buscar todas as reservas do usuário logado
-    reservas = Reserva.objects.filter(usuario=request.user).select_related(
+    reservas_base = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
     
@@ -1508,20 +1537,19 @@ def historico_reservas(request):
     data_fim = request.GET.get('data_fim')
     status_frequencia = request.GET.get('status_frequencia')
     laboratorio_id = request.GET.get('laboratorio_id')
-    active_tab = request.GET.get('tab', 'todas')  
+    active_tab = request.GET.get('tab', 'todas')
     
     # Aplicar filtros
+    reservas = reservas_base
     if data_inicio:
         try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
+            reservas = reservas.filter(disponibilidade__data__gte=datetime.strptime(data_inicio, '%Y-%m-%d').date())
         except ValueError:
             messages.error(request, "Data de início inválida.")
     
     if data_fim:
         try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
+            reservas = reservas.filter(disponibilidade__data__lte=datetime.strptime(data_fim, '%Y-%m-%d').date())
         except ValueError:
             messages.error(request, "Data de fim inválida.")
     
@@ -1530,76 +1558,63 @@ def historico_reservas(request):
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
     
-    # Separar reservas por categoria considerando horário de término
-    from django.utils import timezone
-    agora = timezone.localtime(timezone.now())
+    hoje = date.today()
+
+    reservas_canceladas = reservas.filter(status_aprovacao='R')
+
+    reservas_validas = reservas.exclude(status_aprovacao='R')
+
+    reservas_futuras = reservas_validas.filter(disponibilidade__data__gt=hoje)
+    reservas_hoje = reservas_validas.filter(disponibilidade__data=hoje)
+    reservas_passadas = reservas_validas.filter(disponibilidade__data__lt=hoje)
+
+    # Paginação
+    paginator = Paginator(reservas_validas, 4)
+    page_obj = paginator.get_page(request.GET.get('page'))
     
-    
-    reservas_list = list(reservas)
-    
-    
-    for r in reservas_list:
-        try:
-            r.expirada = (r.disponibilidade.end_datetime() <= agora)
-        except Exception:
-            r.expirada = False
-    
-    reservas_futuras = [r for r in reservas_list if r.disponibilidade.end_datetime() > agora]
-    reservas_passadas = [r for r in reservas_list if r.disponibilidade.end_datetime() <= agora]
-    reservas_hoje = [r for r in reservas_list if r.disponibilidade.data == agora.date() and r.disponibilidade.end_datetime() > agora]
-    
-    # Paginação para todas as reservas
-    paginator = Paginator(reservas_list, 4)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # Paginação para reservas futuras
     paginator_futuras = Paginator(reservas_futuras, 4)
-    page_number_futuras = request.GET.get('page_futuras')
-    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    page_obj_futuras = paginator_futuras.get_page(request.GET.get('page_futuras'))
     
-    # Paginação para reservas de hoje
     paginator_hoje = Paginator(reservas_hoje, 4)
-    page_number_hoje = request.GET.get('page_hoje')
-    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    page_obj_hoje = paginator_hoje.get_page(request.GET.get('page_hoje'))
     
-    # Paginação para reservas passadas
     paginator_passadas = Paginator(reservas_passadas, 4)
-    page_number_passadas = request.GET.get('page_passadas')
-    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    page_obj_passadas = paginator_passadas.get_page(request.GET.get('page_passadas'))
+
+    paginator_canceladas = Paginator(reservas_canceladas, 4)
+    page_obj_canceladas = paginator_canceladas.get_page(request.GET.get('page_canceladas'))
     
-    # Laboratórios para o filtro
     laboratorios = Laboratorio.objects.all()
-    hoje = agora.date()
     
     context = {
         'page_obj': page_obj,
         'page_obj_futuras': page_obj_futuras,
         'page_obj_hoje': page_obj_hoje,
         'page_obj_passadas': page_obj_passadas,
-        'reservas_futuras': reservas_futuras,
-        'reservas_passadas': reservas_passadas,
-        'reservas_hoje': reservas_hoje,
+        'page_obj_canceladas': page_obj_canceladas,
+
+        'reservas_canceladas': reservas_canceladas,
+
         'laboratorios': laboratorios,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
         'today': hoje,
-        'active_tab': active_tab,  
+        'active_tab': active_tab,
     }
     
     return render(request, 'historico_reservas.html', context)
+
 
 @login_required
 @admin_required
 def historico_geral_reservas(request):
     from datetime import date
+    from django.db.models import Q
     
-    # Data atual para comparações
     today = date.today()
     
-    # Buscar todas as reservas base
     reservas_base = Reserva.objects.all().select_related(
         'usuario', 'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
@@ -1612,39 +1627,46 @@ def historico_geral_reservas(request):
     laboratorio_id = request.GET.get('laboratorio_id')
     active_tab = request.GET.get('tab', 'todas')
     
-    # Aplicar filtros na base
+    # Aplicar filtros
     reservas_filtradas = aplicar_filtros_reservas(
-        reservas_base, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id
+        reservas_base, usuario_id, data_inicio, data_fim,
+        status_frequencia, laboratorio_id
     )
+
+    # Reservas canceladas
+    reservas_canceladas = reservas_filtradas.filter(status_aprovacao='R')
+
+    # Reservas válidas
+    reservas_validas = reservas_filtradas.exclude(status_aprovacao='R')
+
+    # Todas
+    reservas_todas = reservas_validas
+
+    # Futuras
+    reservas_futuras = reservas_validas.filter(disponibilidade__data__gt=today)
+
+    # Hoje
+    reservas_hoje = reservas_validas.filter(disponibilidade__data=today)
+
+    # Passadas
+    reservas_passadas = reservas_validas.filter(disponibilidade__data__lt=today)
+
+    # Paginação
+    paginator_todas = Paginator(reservas_todas, 5)
+    page_obj_todas = paginator_todas.get_page(request.GET.get('page'))
     
-    # Separar reservas por categoria
-    reservas_futuras = reservas_filtradas.filter(disponibilidade__data__gt=today)
-    reservas_hoje = reservas_filtradas.filter(disponibilidade__data=today)
-    reservas_passadas = reservas_filtradas.filter(disponibilidade__data__lt=today)
-    
-    items_per_page = 4  
-    
-    # Todas as reservas
-    paginator_todas = Paginator(reservas_filtradas, 5)
-    page_number_todas = request.GET.get('page')
-    page_obj_todas = paginator_todas.get_page(page_number_todas)
-    
-    # Reservas futuras
     paginator_futuras = Paginator(reservas_futuras, 5)
-    page_number_futuras = request.GET.get('page_futuras')
-    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    page_obj_futuras = paginator_futuras.get_page(request.GET.get('page_futuras'))
     
-    # Reservas de hoje
     paginator_hoje = Paginator(reservas_hoje, 5)
-    page_number_hoje = request.GET.get('page_hoje')
-    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    page_obj_hoje = paginator_hoje.get_page(request.GET.get('page_hoje'))
     
-    # Reservas passadas
     paginator_passadas = Paginator(reservas_passadas, 5)
-    page_number_passadas = request.GET.get('page_passadas')
-    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    page_obj_passadas = paginator_passadas.get_page(request.GET.get('page_passadas'))
     
-    # Dados para os filtros
+    paginator_canceladas = Paginator(reservas_canceladas, 5)
+    page_obj_canceladas = paginator_canceladas.get_page(request.GET.get('page_canceladas'))
+    
     usuarios = User.objects.all().order_by('username')
     laboratorios = Laboratorio.objects.all()
     
@@ -1653,54 +1675,53 @@ def historico_geral_reservas(request):
         'page_obj_futuras': page_obj_futuras,
         'page_obj_hoje': page_obj_hoje,
         'page_obj_passadas': page_obj_passadas,
+        'page_obj_canceladas': page_obj_canceladas,
+
         'usuarios': usuarios,
         'laboratorios': laboratorios,
+
         'usuario_id': usuario_id,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
+
         'active_tab': active_tab,
         'today': today,
-        'items_per_page': items_per_page,
     }
+    
     return render(request, 'historico_geral_reservas.html', context)
 
-def aplicar_filtros_reservas(reservas, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id):
-    """Aplica filtros às reservas"""
-    from datetime import datetime
-    
-    if usuario_id and usuario_id != 'todos':
-        reservas = reservas.filter(usuario_id=usuario_id)
-    
-    if data_inicio:
-        try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
-        except ValueError:
-            pass  
-    
-    if data_fim:
-        try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
-        except ValueError:
-            pass  
-    
-    # Filtro por status de frequência
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
-    
-    if laboratorio_id and laboratorio_id != 'todos':
-        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    
-    return reservas
 
-def filter_by_status(reservas, status_frequencia):
-    """Filtra reservas por status de frequência (mantida para compatibilidade)"""
-    if status_frequencia and status_frequencia != 'todos':
-        return reservas.filter(status_frequencia=status_frequencia)
-    return reservas
+@login_required
+def cancelar_reserva(request, reserva_id):
+    """Cancelar reserva — permitido para alunos, monitores, admins e superusuários"""
+    
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    if request.user.perfil in ["aluno", "monitor"]:
+        if reserva.usuario != request.user:
+            return JsonResponse({'error': 'Você não tem permissão para cancelar esta reserva.'}, status=403)
+
+    if reserva.status_frequencia in ['P', 'F']:
+        return JsonResponse({
+            'error': 'Esta reserva não pode ser cancelada porque já houve registro de frequência.'
+        }, status=400)
+
+    status_original = reserva.status_aprovacao
+    
+    reserva.status_aprovacao = 'R'
+    reserva.save()
+
+    print(f"DEBUG: Reserva {reserva_id} cancelada. Status mudou de '{status_original}' para 'R'")
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Reserva cancelada com sucesso!',
+        'reserva_id': reserva_id,
+        'novo_status': 'R'
+    })
+
 
 # reservas pendentes
 @login_required
