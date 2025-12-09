@@ -663,12 +663,37 @@ def criar_laboratorio(request):
 @admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    
+    # Verificar se existem disponibilidades associadas a este laboratório
+    disponibilidades_existem = Disponibilidade.objects.filter(laboratorio=laboratorio).exists()
+    
     if request.method == "POST":
+        if Disponibilidade.objects.filter(laboratorio=laboratorio).exists():
+            messages.error(request, "Não é possível excluir este laboratório pois existem disponibilidades criadas para ele.")
+            return redirect('listar_laboratorios')
+        
         laboratorio.delete()
         messages.success(request, "Laboratório excluído com sucesso!")
         return redirect('listar_laboratorios')
+    
     else:
-        return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
+        return render(request, "excluir_laboratorio.html", {
+            'laboratorio': laboratorio,
+            'disponibilidades_existem': disponibilidades_existem
+        })
+
+
+@login_required
+@admin_required
+def verificar_disponibilidades(request, laboratorio_id):
+    laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
+    
+    # Verificar se existem disponibilidades
+    disponibilidades_existem = Disponibilidade.objects.filter(laboratorio=laboratorio).exists()
+    
+    return JsonResponse({
+        'disponibilidades_existem': disponibilidades_existem
+    })
     
 # horarios e reservas
 @login_required
