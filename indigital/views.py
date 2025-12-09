@@ -495,7 +495,10 @@ def editar_laboratorio(request, laboratorio_id):
                 print("Laboratório salvo!")
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': True})
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!'
+                    })
                 
                 messages.success(request, f'Laboratório {laboratorio.num_laboratorio} atualizado com sucesso!')
                 return redirect('listar_laboratorios')
@@ -536,9 +539,17 @@ def editar_laboratorio(request, laboratorio_id):
                         </div>
                     </form>
                     """
-                    return JsonResponse({'success': False, 'form_html': form_html})
+                    return JsonResponse({
+                        'success': False, 
+                        'form_html': form_html,
+                        'message': 'Erro ao atualizar laboratório. Corrija os campos abaixo.'
+                    })
                 
                 messages.error(request, 'Erro ao editar laboratório!')
+                return render(request, 'editar_laboratorio.html', {
+                    'form': form,
+                    'laboratorio': laboratorio
+                })
         
         except Exception as e:
             print(f" ERRO NO POST: {str(e)}")
@@ -546,7 +557,11 @@ def editar_laboratorio(request, laboratorio_id):
             print(traceback.format_exc())
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+                return JsonResponse({
+                    'success': False, 
+                    'error': str(e),
+                    'message': 'Erro interno ao editar laboratório.'
+                }, status=500)
             
             messages.error(request, f'Erro: {str(e)}')
             return redirect('listar_laboratorios')
@@ -588,7 +603,7 @@ def editar_laboratorio(request, laboratorio_id):
             'form': form,
             'laboratorio': laboratorio
         }
-        return render(request, 'listar_laboratorios.html', context)
+        return render(request, 'editar_laboratorio.html', context)
 
 @login_required
 @admin_required
@@ -636,51 +651,38 @@ def criar_laboratorio(request):
         form = LaboratorioForm(request.POST)
         if form.is_valid():
             laboratorio = form.save()
-            
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
-            
             messages.success(request, f'Laboratório {laboratorio.num_laboratorio} criado com sucesso!')
             return redirect('listar_laboratorios')
         else:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
-                return JsonResponse({'success': False, 'form_html': form_html})
+            laboratorios = Laboratorio.objects.all()
+            paginator = Paginator(laboratorios, 10)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
             
-            messages.error(request, 'Erro ao criar laboratório!')
-            return redirect('listar_laboratorios')
+            return render(request, 'listar_laboratorios.html', {
+                'form': form,
+                'laboratorios': laboratorios,
+                'page_obj': page_obj
+            })
     
-    else:
-        form = LaboratorioForm()
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            form_html = render_to_string('partials/laboratorio_form.html', {'form': form}, request=request)
-            return HttpResponse(form_html)
-        
-        return redirect('listar_laboratorios')
+    return redirect('listar_laboratorios')
 
 @login_required
 @admin_required
 def excluir_laboratorio(request, laboratorio_id):
     laboratorio = get_object_or_404(Laboratorio, id=laboratorio_id)
     
-    # Verificar se existem disponibilidades associadas a este laboratório
-    disponibilidades_existem = Disponibilidade.objects.filter(laboratorio=laboratorio).exists()
+    # Verificar se existem disponibilidades associadas
+    if Disponibilidade.objects.filter(laboratorio=laboratorio).exists():
+        messages.error(request, "Não é possível excluir este laboratório pois existem disponibilidades criadas para ele.")
+        return redirect('listar_laboratorios')
     
     if request.method == "POST":
-        if Disponibilidade.objects.filter(laboratorio=laboratorio).exists():
-            messages.error(request, "Não é possível excluir este laboratório pois existem disponibilidades criadas para ele.")
-            return redirect('listar_laboratorios')
-        
         laboratorio.delete()
         messages.success(request, "Laboratório excluído com sucesso!")
         return redirect('listar_laboratorios')
     
-    else:
-        return render(request, "excluir_laboratorio.html", {
-            'laboratorio': laboratorio,
-            'disponibilidades_existem': disponibilidades_existem
-        })
+    return render(request, "excluir_laboratorio.html", {'laboratorio': laboratorio})
 
 
 @login_required

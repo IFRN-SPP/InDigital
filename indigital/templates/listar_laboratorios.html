@@ -71,45 +71,6 @@
         z-index: 0;
     }
     
-    /* Estilo para mensagens de alerta */
-    .alert-messages-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 350px;
-    }
-    
-    .alert-custom {
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        border-left: 5px solid;
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    .alert-danger-custom {
-        background-color: #f8d7da;
-        color: #721c24;
-        border-left-color: #dc3545;
-    }
-    
-    .alert-success-custom {
-        background-color: #d4edda;
-        color: #155724;
-        border-left-color: #28a745;
-    }
-    
     .table-hover tbody tr:hover {
         background-color: rgba(134, 181, 225, 0.1);
     }
@@ -305,38 +266,6 @@
             <i class="fas fa-flask"></i>
         </div>
     </div>
-
-    <!-- MENSAGENS DO SISTEMA -->
-    {% if messages %}
-    <div class="alert-messages-container">
-        {% for message in messages %}
-        <div class="alert alert-custom alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}-custom alert-dismissible fade show mb-3" role="alert">
-            <div class="d-flex align-items-center">
-                {% if message.tags == 'success' %}
-                <i class="fas fa-check-circle fa-lg me-3" style="color: #28a745;"></i>
-                {% elif message.tags == 'error' or message.tags == 'danger' %}
-                <i class="fas fa-exclamation-triangle fa-lg me-3" style="color: #dc3545;"></i>
-                {% else %}
-                <i class="fas fa-info-circle fa-lg me-3" style="color: #86B5E1;"></i>
-                {% endif %}
-                <div>
-                    <h6 class="mb-1" style="font-weight: 600;">
-                        {% if message.tags == 'success' %}
-                        Sucesso!
-                        {% elif message.tags == 'error' or message.tags == 'danger' %}
-                        Erro!
-                        {% else %}
-                        Informação
-                        {% endif %}
-                    </h6>
-                    <span class="mb-0">{{ message }}</span>
-                </div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
     <!-- Filtros -->
     <div class="row mb-4">
@@ -552,7 +481,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="formCriarLaboratorio" method="POST" action="{% url 'criar_laboratorio' %}">
+                <form method="POST" action="{% url 'criar_laboratorio' %}">
                     {% csrf_token %}
                     
                     {% if form.non_field_errors %}
@@ -658,78 +587,6 @@ $(document).ready(function() {
 
     console.log('Document ready - Laboratórios JavaScript carregado');
     
-    $(document).on('submit', '#formCriarLaboratorio', function(e) {
-        e.preventDefault(); 
-        console.log('Formulário de criação submetido');
-        
-        var form = $(this);
-        var modal = $('#modalCriarLaboratorio');
-        var formData = form.serialize();
-        
-        console.log('Enviando dados para:', form.attr('action'));
-        console.log('Dados:', formData);
-        
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Resposta recebida:', response);
-                
-                if (response.success) {
-                    console.log(' Sucesso - fechando modal e recarregando');
-                    modal.modal('hide');
-                    location.reload();
-                } else {
-                    console.log(' Erros de validação');
-                    modal.find('.modal-body').html(response.form_html);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log(' ERRO NA REQUISIÇÃO ');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                
-                const modalErro = `
-                    <div class="modal fade" id="modalErroLaboratorio" tabindex="-1" aria-labelledby="modalErroLaboratorioLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-danger">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="modalErroLaboratorioLabel">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>Erro ao Criar Laboratório
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
-                                    <p id="mensagemErroLaboratorio" class="fw-semibold fs-5 text-danger">
-                                        Ocorreu um erro ao criar o laboratório.
-                                    </p>
-                                    <p class="text-muted small">
-                                        Verifique se o número do laboratório já existe e tente novamente.
-                                    </p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Fechar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                $('#modalErroLaboratorio').remove();
-                $('body').append(modalErro);
-                const novoModal = new bootstrap.Modal(document.getElementById('modalErroLaboratorio'));
-                novoModal.show();
-            }
-        });
-    });
-
     $(document).on('click', '.btn-editar-laboratorio', function(e) {
         e.preventDefault();
         var laboratorioId = $(this).data('laboratorio-id');
@@ -785,46 +642,6 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('submit', '#formEditarLaboratorio', function(e) {
-        e.preventDefault();
-        console.log('Formulário de edição submetido');
-        
-        var form = $(this);
-        var modal = $('#modalEditarLaboratorio');
-        var formData = form.serialize();
-        
-        console.log('Enviando dados para:', form.attr('action'));
-        console.log('Dados:', formData);
-        
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Resposta recebida:', response);
-                
-                if (response.success) {
-                    console.log(' Edição bem-sucedida - fechando modal e recarregando');
-                    modal.modal('hide');
-                    location.reload();
-                } else {
-                    console.log(' Erros de validação na edição');
-                    $('#modalEditarLaboratorioBody').html(response.form_html);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log('ERRO AO SALVAR EDIÇÃO');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                alert('Erro ao editar laboratório. Tente novamente.');
-            }
-        });
-    });
-
-    // Exclusão de laboratório
     $(document).on('click', '.btn-excluir-laboratorio', function(e) {
         e.preventDefault();
         currentLaboratorioId = $(this).data('laboratorio-id');
@@ -915,7 +732,6 @@ $(document).ready(function() {
         $('#modalExcluirLaboratorio').modal('show');
     });
 
-    // Confirmar exclusão via AJAX
     $('#confirmarExclusaoLaboratorio').on('click', function() {
         if (!currentLaboratorioId) return;
 
@@ -927,89 +743,20 @@ $(document).ready(function() {
         const url = '{% url "excluir_laboratorio" 0 %}'.replace('0', currentLaboratorioId);
         console.log('Excluindo laboratório via URL:', url);
 
-        // Fazer requisição AJAX
-        $.ajax({
-            url: url,
-            type: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response, status, xhr) {
-                $('#modalExcluirLaboratorio').modal('hide');
-                
-                if (xhr.status === 200 || xhr.status === 302) {
-                    showAlert('Laboratório excluído com sucesso!', 'success');
-                    
-                    $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
-                        $(this).remove();
-                        
-                        if ($('.laboratory-card').length === 0) {
-                            setTimeout(() => location.reload(), 1000);
-                        }
-                    });
-                } else {
-                    showAlert('Erro ao excluir laboratório.', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#modalExcluirLaboratorio').modal('hide');
-                
-                if (xhr.status === 400) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.error) {
-                            showAlert(response.error, 'error');
-                        } else {
-                            showAlert('Erro ao excluir laboratório.', 'error');
-                        }
-                    } catch (e) {
-                        showAlert('Erro ao excluir laboratório.', 'error');
-                    }
-                } else if (xhr.status === 200 || xhr.status === 302) {
-                    showAlert('Laboratório excluído com sucesso!', 'success');
-                    $(`#laboratorio-${currentLaboratorioId}`).fadeOut(300, function() {
-                        $(this).remove();
-                        if ($('.laboratory-card').length === 0) {
-                            setTimeout(() => location.reload(), 1000);
-                        }
-                    });
-                } else {
-                    showAlert('Erro ao excluir laboratório.', 'error');
-                }
-            },
-            complete: function() {
-                $button.removeClass('btn-loading').prop('disabled', false).html(originalHtml);
-            }
-        });
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        form.style.display = 'none';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     });
-
-    function showAlert(message, type) {
-        const alertClass = type === 'success' ? 'alert-success-custom' : 'alert-danger-custom';
-        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-        
-        const alertHtml = `
-            <div class="alert alert-custom ${alertClass} alert-dismissible fade show mb-3" role="alert">
-                <div class="d-flex align-items-center">
-                    <i class="fas ${icon} fa-lg me-3" style="color: ${type === 'success' ? '#28a745' : '#dc3545'};"></i>
-                    <div>
-                        <h6 class="mb-1" style="font-weight: 600;">
-                            ${type === 'success' ? 'Sucesso!' : 'Erro!'}
-                        </h6>
-                        <span class="mb-0">${message}</span>
-                    </div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        
-        $('.alert-messages-container').append(alertHtml);
-        
-        setTimeout(() => {
-            const alertElement = $('.alert-messages-container .alert').first();
-            alertElement.alert('close');
-        }, 5000);
-    }
 
     $(document).on('change', '#id_capacidade, #modalEditarLaboratorio #id_capacidade', function() {
         var capacidade = $(this).val();
@@ -1043,7 +790,7 @@ $(document).ready(function() {
 
     {% if form.errors %}
     console.log('Erros no formulário - abrindo modal de criação');
-    $(document).ready(function() {
+    $(function() {
         $('#modalCriarLaboratorio').modal('show');
     });
     {% endif %}
