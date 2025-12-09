@@ -93,14 +93,14 @@
         font-weight: 600;
         text-align: left;
         vertical-align: middle;
-        white-space: nowrap; /* Impede quebra de linha nos cabeçalhos */
+        white-space: nowrap; 
     }
     
     .table tbody td {
         padding: 12px 8px;
         vertical-align: middle;
         border-bottom: 1px solid #dee2e6;
-        white-space: nowrap; /* Impede quebra de linha no conteúdo */
+        white-space: nowrap; 
     }
     
     .table-hover tbody tr:hover {
@@ -419,6 +419,11 @@
                 <i class="fas fa-calendar-check mr-1"></i> Passadas
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if active_tab == 'canceladas' %}active{% endif %}" id="canceladas-tab" data-bs-toggle="tab" data-bs-target="#canceladas" type="button" role="tab" onclick="setActiveTab('canceladas')">
+                <i class="fas fa-times-circle mr-1"></i> Canceladas
+            </button>
+        </li>
     </ul>
 
     <div class="tab-content" id="reservasTabsContent">
@@ -633,7 +638,6 @@
         </div>
     </div>
 
-    <!-- Na aba "Futuras" - corrigir a verificação do if -->
 <div class="tab-pane fade {% if active_tab == 'futuras' %}show active{% endif %}" id="futuras" role="tabpanel">
     <div class="card" style="border-color: #86B5E1;">
         <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
@@ -647,7 +651,7 @@
             </div>
         </div>
         <div class="card-body p-0">
-            {% if page_obj_futuras %}  <!-- CORREÇÃO AQUI: usar page_obj_futuras -->
+            {% if page_obj_futuras %} 
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
@@ -662,7 +666,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for reserva in page_obj_futuras %}  <!-- CORREÇÃO AQUI: usar page_obj_futuras -->
+                        {% for reserva in page_obj_futuras %}
                         <tr id="reserva-{{ reserva.id }}">
                             <td style="vertical-align: middle;">
                                 <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
@@ -740,7 +744,7 @@
                                 </div>
                             </td>
                         </tr>
-                        {% endfor %}  <!-- CORREÇÃO: fechar o for loop corretamente -->
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -755,7 +759,7 @@
             {% endif %}
         </div>
         <!-- PAGINAÇÃO RESERVAS FUTURAS -->
-        {% if page_obj_futuras %}  <!-- CORREÇÃO AQUI: usar page_obj_futuras -->
+        {% if page_obj_futuras %}
         <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
             {% if page_obj_futuras.has_other_pages %}
             <ul class="pagination pagination-sm m-0 float-right">
@@ -1221,6 +1225,163 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- ABA CANCELADAS -->
+    <div class="tab-pane fade {% if active_tab == 'canceladas' %}show active{% endif %}" id="canceladas" role="tabpanel">
+        <div class="card" style="border-color: #86B5E1;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #20597F; color: white;">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-times-circle mr-2"></i>Reservas Canceladas
+                </h3>
+                <div class="card-tools">
+                    <span class="badge" style="background-color: #86B5E1; color: #20597F; font-size: 0.9rem;">
+                        {{ page_obj_canceladas.paginator.count }} reserva{{ page_obj_canceladas.paginator.count|pluralize:"s" }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if page_obj_canceladas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
+                            <tr>
+                                <th style="width: 15%;">Data</th>
+                                <th style="width: 15%;">Horário</th>
+                                <th style="width: 15%;">Laboratório</th>
+                                <th style="width: 20%;">Monitor</th>
+                                <th style="width: 15%;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in page_obj_canceladas %}
+                            <tr id="reserva-{{ reserva.id }}">
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-calendar mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.data|date:"d/m/Y" }}
+                                    {% if reserva.disponibilidade.data == today %}
+                                        <span class="badge badge-pill" style="background-color: #17a2b8; color: white;">Hoje</span>
+                                    {% elif reserva.disponibilidade.data > today %}
+                                        <span class="badge badge-pill" style="background-color: #28a745; color: white;">Futuro</span>
+                                    {% else %}
+                                        <span class="badge badge-pill" style="background-color: #6c757d; color: white;">Passado</span>
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-clock mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.horario_inicio|time:"H:i" }} às {{ reserva.disponibilidade.horario_fim|time:"H:i" }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <i class="fas fa-flask mr-1" style="color: #20597F;"></i>
+                                    {{ reserva.disponibilidade.laboratorio.num_laboratorio }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    {% if reserva.disponibilidade.monitor %}
+                                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                        {{ reserva.disponibilidade.monitor.get_nome_completo|default:"Não definido" }}
+                                    {% else %}
+                                        <i class="fas fa-user-cog mr-1" style="color: #20597F;"></i>
+                                        Não definido
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                                        <i class="fas fa-times mr-1"></i> Cancelada
+                                    </span>
+                                </td>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                    <h4 style="color: #20597F;">Nenhuma reserva cancelada encontrada</h4>
+                    <p class="text-muted">
+                        Não há reservas canceladas para exibir.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            <!-- PAGINAÇÃO RESERVAS CANCELADAS -->
+            {% if page_obj_canceladas %}
+            <div class="card-footer clearfix" style="background-color: #f8f9fa; border-color: #86B5E1;">
+                {% if page_obj_canceladas.has_other_pages %}
+                <ul class="pagination pagination-sm m-0 float-right">
+                    {% if page_obj_canceladas.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_canceladas=1&tab=canceladas{% for key, value in request.GET.items %}{% if key != 'page_canceladas' and key != 'tab' and key != 'ajax' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               style="color: #20597F; border-color: #86B5E1;">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page_canceladas={{ page_obj_canceladas.previous_page_number }}&tab=canceladas{% for key, value in request.GET.items %}{% if key != 'page_canceladas' and key != 'tab' and key != 'ajax' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               style="color: #20597F; border-color: #86B5E1;">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link" style="color: #6c757d; border-color: #86B5E1;">
+                                <i class="fas fa-angle-double-left"></i>
+                            </span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" style="color: #6c757d; border-color: #86B5E1;">
+                                <i class="fas fa-angle-left"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj_canceladas.paginator.page_range %}
+                        {% if page_obj_canceladas.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link" style="background-color: #20597F; border-color: #20597F;">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj_canceladas.number|add:'-3' and num < page_obj_canceladas.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_canceladas={{ num }}&tab=canceladas{% for key, value in request.GET.items %}{% if key != 'page_canceladas' and key != 'tab' and key != 'ajax' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                   style="color: #20597F; border-color: #86B5E1;">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj_canceladas.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_canceladas={{ page_obj_canceladas.next_page_number }}&tab=canceladas{% for key, value in request.GET.items %}{% if key != 'page_canceladas' and key != 'tab' and key != 'ajax' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               style="color: #20597F; border-color: #86B5E1;">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page_canceladas={{ page_obj_canceladas.paginator.num_pages }}&tab=canceladas{% for key, value in request.GET.items %}{% if key != 'page_canceladas' and key != 'tab' and key != 'ajax' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               style="color: #20597F; border-color: #86B5E1;">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link" style="color: #6c757d; border-color: #86B5E1;">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" style="color: #6c757d; border-color: #86B5E1;">
+                                <i class="fas fa-angle-double-right"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+                <div class="float-left">
+                    <span class="text-muted">
+                        Página {{ page_obj_canceladas.number }} de {{ page_obj_canceladas.paginator.num_pages }}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <!-- Modal de Cancelamento -->
@@ -1324,27 +1485,9 @@ $(document).ready(function() {
         $('#modalCancelLaboratorio').text($(this).data('reserva-laboratorio'));
         $('#modalCancelData').text($(this).data('reserva-data'));
         $('#modalCancelHorario').text($(this).data('reserva-horario'));
-        
-        const status = $(this).data('reserva-status');
-        let statusTexto = '';
-        switch(status) {
-            case 'P':
-                statusTexto = 'Presente';
-                break;
-            case 'F':
-                statusTexto = 'Faltou';
-                break;
-            case 'N':
-                statusTexto = 'Não Registrado';
-                break;
-            case '':
-                statusTexto = 'Pendente';
-                break;
-            default:
-                statusTexto = 'Pendente';
-        }
-        $('#modalCancelStatus').text(statusTexto);
-        
+
+        $('#modalCancelStatus').text('Pendente');
+
         $('#modalCancelamento').modal('show');
     });
 
@@ -1361,75 +1504,84 @@ $(document).ready(function() {
             success: function(response) {
                 $('#modalCancelamento').modal('hide');
                 
-                const reservaTodas = $(`#todas #reserva-${reservaIdAtual}`).length;
-                const reservaFuturas = $(`#futuras #reserva-${reservaIdAtual}`).length;
-                const reservaHoje = $(`#hoje #reserva-${reservaIdAtual}`).length;
-                const reservaPassadas = $(`#passadas #reserva-${reservaIdAtual}`).length;
-                
-                const totalTabelas = reservaTodas + reservaFuturas + reservaHoje + reservaPassadas;
-                let tabelasRemovidas = 0;
-                
-                function verificarFinalizacao() {
-                    tabelasRemovidas++;
-                    console.log(`Tabela removida: ${tabelasRemovidas}/${totalTabelas}`);
+                function moverParaCanceladas(reservaElement) {
+                    const $reservaClone = $(reservaElement).clone();
                     
-                    if (tabelasRemovidas >= totalTabelas) {
-                        setTimeout(function() {
-                            atualizarContadores();
-                            verificarAbasVazias();
-                            mostrarResultado('success', 'Reserva Cancelada!', 'A reserva foi cancelada com sucesso.', false);
-                        }, 100);
+                    $reservaClone.find('td:nth-child(5)').html(`
+                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+                            <i class="fas fa-times mr-1"></i> Cancelada
+                        </span>
+                    `);
+
+                    $reservaClone.find('td:nth-child(6)').html(`
+                        <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
+                            <i class="fas fa-ban mr-1"></i> Cancelada
+                        </span>
+                    `);
+                    
+                    $reservaClone.find('td:last-child').html('<span class="text-muted">-</span>');
+                    
+                    const dataTd = $reservaClone.find('td:first-child');
+                    dataTd.find('.badge-pill').remove();
+                    dataTd.append(' <span class="badge badge-pill" style="background-color: #dc3545; color: white;">Cancelada</span>');
+                    
+                    if ($('#canceladas tbody').length === 0) {
+                        $('#canceladas .text-center').remove();
+                        $('#canceladas .card-body').html(`
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
+                                        <tr>
+                                            <th style="width: 15%;">Data</th>
+                                            <th style="width: 15%;">Horário</th>
+                                            <th style="width: 15%;">Laboratório</th>
+                                            <th style="width: 20%;">Monitor</th>
+                                            <th style="width: 15%;">Status</th>
+                                            <th style="width: 20%;">Frequência</th>
+                                            <th style="width: 15%;" class="text-center">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        `);
                     }
+                    
+                    $('#canceladas tbody').prepend($reservaClone);
+                    $(reservaElement).remove();
+                }
+
+                const reservaTodas = $(`#todas #reserva-${reservaIdAtual}`);
+                const reservaFuturas = $(`#futuras #reserva-${reservaIdAtual}`);
+                const reservaHoje = $(`#hoje #reserva-${reservaIdAtual}`);
+                const reservaPassadas = $(`#passadas #reserva-${reservaIdAtual}`);
+                
+                let $reservaElement = reservaTodas.length ? reservaTodas :
+                                      reservaFuturas.length ? reservaFuturas :
+                                      reservaHoje.length ? reservaHoje :
+                                      reservaPassadas.length ? reservaPassadas :
+                                      null;
+                
+                if ($reservaElement) {
+                    moverParaCanceladas($reservaElement);
                 }
                 
-                
-                if (reservaTodas > 0) {
-                    $(`#todas #reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                        $(this).remove();
-                        verificarFinalizacao();
-                    });
-                }
-                
-                
-                if (reservaFuturas > 0) {
-                    $(`#futuras #reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                        $(this).remove();
-                        verificarFinalizacao();
-                    });
-                }
-                
-                
-                if (reservaHoje > 0) {
-                    $(`#hoje #reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                        $(this).remove();
-                        verificarFinalizacao();
-                    });
-                }
-                
-                
-                if (reservaPassadas > 0) {
-                    $(`#passadas #reserva-${reservaIdAtual}`).fadeOut(300, function() {
-                        $(this).remove();
-                        verificarFinalizacao();
-                    });
-                }
-                
-                
-                if (totalTabelas === 0) {
-                    setTimeout(function() {
-                        atualizarContadores();
-                        verificarAbasVazias();
-                        mostrarResultado('success', 'Reserva Cancelada!', 'A reserva foi cancelada com sucesso.', false);
-                    }, 100);
-                }
+                setTimeout(function() {
+                    atualizarContadores();
+                    verificarAbasVazias();
+                    
+                    mostrarResultado('success', 'Reserva Cancelada!', 
+                        'A reserva foi movida para a aba "Canceladas".', false);
+                        
+                    if ($('#canceladas-tab').hasClass('active')) {
+                        setTimeout(() => location.reload(), 500);
+                    }
+                }, 300);
             },
             error: function(xhr) {
                 $('#modalCancelamento').modal('hide');
-                let mensagem = 'Erro ao cancelar reserva. Tente novamente.';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    mensagem = xhr.responseJSON.error;
-                }
-                mostrarResultado('error', 'Erro no Cancelamento', mensagem, false);
+                mostrarResultado('error', 'Erro ao cancelar reserva',
+                    xhr.responseJSON?.error || 'Erro inesperado.', false);
             },
             complete: function() {
                 $btn.prop('disabled', false).removeClass('loading');
@@ -1437,223 +1589,34 @@ $(document).ready(function() {
         });
     });
 
-    
     function atualizarContadores() {
-        console.log('Atualizando contadores...');
-        
-        
-        const todasLinhas = $('#todas tbody tr').length;
-        const todasCount = todasLinhas;
-        const $badgeTodas = $('#todas .card-tools .badge');
-        if ($badgeTodas.length) {
-            $badgeTodas.text(`${todasCount} reserva${todasCount !== 1 ? 's' : ''}`);
-            console.log('Contador TODAS atualizado:', todasCount);
-        }
-        
-        
-        const futurasLinhas = $('#futuras tbody tr').length;
-        const futurasCount = futurasLinhas;
-        const $badgeFuturas = $('#futuras .card-tools .badge');
-        if ($badgeFuturas.length) {
-            $badgeFuturas.text(`${futurasCount} reserva${futurasCount !== 1 ? 's' : ''}`);
-            console.log('Contador FUTURAS atualizado:', futurasCount);
-        }
-        
-        
-        const hojeLinhas = $('#hoje tbody tr').length;
-        const hojeCount = hojeLinhas;
-        const $badgeHoje = $('#hoje .card-tools .badge');
-        if ($badgeHoje.length) {
-            $badgeHoje.text(`${hojeCount} reserva${hojeCount !== 1 ? 's' : ''}`);
-            console.log('Contador HOJE atualizado:', hojeCount);
-        }
-        
-        
-        const passadasLinhas = $('#passadas tbody tr').length;
-        const passadasCount = passadasLinhas;
-        const $badgePassadas = $('#passadas .card-tools .badge');
-        if ($badgePassadas.length) {
-            $badgePassadas.text(`${passadasCount} reserva${passadasCount !== 1 ? 's' : ''}`);
-            console.log('Contador PASSADAS atualizado:', passadasCount);
-        }
-        
-        
-        atualizarTextosPaginacao();
-        
-        console.log('Contadores atualizados com sucesso!');
-    }
-
-    function atualizarTextosPaginacao() {
-        const todasCount = $('#todas tbody tr').length;
-        const todasPaginaInfo = $('#todas .card-footer .float-left .text-muted');
-        if (todasPaginaInfo.length) {
-            todasPaginaInfo.text(`Página 1 de 1`);
-        }
-        
-        
-        const futurasCount = $('#futuras tbody tr').length;
-        const futurasPaginaInfo = $('#futuras .card-footer .float-left .text-muted');
-        if (futurasPaginaInfo.length) {
-            futurasPaginaInfo.text(`Página 1 de 1`);
-        }
-        
-        
-        const hojeCount = $('#hoje tbody tr').length;
-        const hojePaginaInfo = $('#hoje .card-footer .float-left .text-muted');
-        if (hojePaginaInfo.length) {
-            hojePaginaInfo.text(`Página 1 de 1`);
-        }
-        
-        
-        const passadasCount = $('#passadas tbody tr').length;
-        const passadasPaginaInfo = $('#passadas .card-footer .float-left .text-muted');
-        if (passadasPaginaInfo.length) {
-            passadasPaginaInfo.text(`Página 1 de 1`);
-        }
+        ['todas','futuras','hoje','passadas','canceladas'].forEach(tab => {
+            const count = $(`#${tab} tbody tr`).length;
+            const $badge = $(`#${tab} .card-tools .badge`);
+            if ($badge.length) {
+                $badge.text(`${count} reserva${count !== 1 ? 's' : ''}`);
+            }
+        });
     }
 
     function verificarAbasVazias() {
-        console.log('Verificando abas vazias...');
-        
-        
-        const todasTbody = $('#todas tbody');
-        const todasJaVazio = $('#todas .text-center').length > 0;
-        if (todasTbody.length && todasTbody.find('tr').length === 0 && !todasJaVazio) {
-            console.log('Aba TODAS ficou vazia, adicionando mensagem...');
-            $('#todas .table-responsive').remove();
-            $('#todas .card-footer').remove();
-            $('#todas .card-body').append(`
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                    <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
-                    <p class="text-muted">
-                        Você ainda não possui reservas no sistema.
-                    </p>
-                </div>
-            `);
-        }
-
-        
-        const futurasTbody = $('#futuras tbody');
-        const futurasJaVazio = $('#futuras .text-center').length > 0;
-        if (futurasTbody.length && futurasTbody.find('tr').length === 0 && !futurasJaVazio) {
-            console.log('Aba FUTURAS ficou vazia, adicionando mensagem...');
-            $('#futuras .table-responsive').remove();
-            $('#futuras .card-footer').remove();
-            $('#futuras .card-body').append(`
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                    <h4 style="color: #20597F;">Nenhuma reserva futura encontrada</h4>
-                    <p class="text-muted">
-                        Não há reservas futuras para exibir.
-                    </p>
-                </div>
-            `);
-        }
-
-        
-        const hojeTbody = $('#hoje tbody');
-        const hojeJaVazio = $('#hoje .text-center').length > 0;
-        if (hojeTbody.length && hojeTbody.find('tr').length === 0 && !hojeJaVazio) {
-            console.log('Aba HOJE ficou vazia, adicionando mensagem...');
-            $('#hoje .table-responsive').remove();
-            $('#hoje .card-footer').remove();
-            $('#hoje .card-body').append(`
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                    <h4 style="color: #20597F;">Nenhuma reserva para hoje</h4>
-                    <p class="text-muted">
-                        Não há reservas para o dia de hoje.
-                    </p>
-                </div>
-            `);
-        }
-
-        
-        const passadasTbody = $('#passadas tbody');
-        const passadasJaVazio = $('#passadas .text-center').length > 0;
-        if (passadasTbody.length && passadasTbody.find('tr').length === 0 && !passadasJaVazio) {
-            console.log('Aba PASSADAS ficou vazia, adicionando mensagem...');
-            $('#passadas .table-responsive').remove();
-            $('#passadas .card-footer').remove();
-            $('#passadas .card-body').append(`
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                    <h4 style="color: #20597F;">Nenhuma reserva passada encontrada</h4>
-                    <p class="text-muted">
-                        Não há reservas passadas para exibir.
-                    </p>
-                </div>
-            `);
-        }
-        
-        console.log('Verificação de abas vazias concluída!');
+        ['todas','futuras','hoje','passadas','canceladas'].forEach(tab => {
+            const tbody = $(`#${tab} tbody`);
+            if (tbody.length && tbody.find('tr').length === 0) {
+                $(`#${tab} .table-responsive`).remove();
+                $(`#${tab} .card-footer`).remove();
+                $(`#${tab} .card-body`).html(`
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
+                        <p class="text-muted">Não há reservas para exibir.</p>
+                    </div>
+                `);
+            }
+        });
     }
-
-    function mostrarResultado(tipo, titulo, mensagem, recarregar) {
-        const $modal = $('#modalResultado');
-        const $icon = $('#resultadoIcon');
-        const $titulo = $('#resultadoTitulo');
-        const $mensagem = $('#resultadoMensagem');
-        const $header = $('#modalResultadoLabel');
-        
-        switch(tipo) {
-            case 'success':
-                $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
-                $header.text('Sucesso');
-                break;
-            case 'error':
-                $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
-                $header.text('Erro');
-                break;
-            case 'warning':
-                $icon.html('<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>');
-                $header.text('Atenção');
-                break;
-        }
-
-        $titulo.text(titulo);
-        $mensagem.text(mensagem);
-        
-        
-        $modal.find('.modal-footer').remove();
-        
-        
-        let footerHtml = '';
-        if (recarregar) {
-            footerHtml = `
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="location.reload()">
-                    <i class="fas fa-sync-alt mr-1"></i> Atualizar Página
-                </button>
-            </div>
-            `;
-        } else {
-            footerHtml = `
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                    <i class="fas fa-check mr-1"></i> Entendido
-                </button>
-            </div>
-            `;
-        }
-        
-        $modal.find('.modal-body').after(footerHtml);
-        $modal.modal('show');
-    }
-
-    $('#modalCancelamento').on('hidden.bs.modal', function() {
-        reservaIdAtual = null;
-        $('#btnConfirmarCancelamento').prop('disabled', false).removeClass('loading');
-    });
 
     $(function() {
-        console.log('=== ESTRUTURA DOS CONTADORES ===');
-        console.log('Todas badge:', $('#todas .card-tools .badge').length ? 'Encontrado' : 'Não encontrado');
-        console.log('Futuras badge:', $('#futuras .card-tools .badge').length ? 'Encontrado' : 'Não encontrado');
-        console.log('Hoje badge:', $('#hoje .card-tools .badge').length ? 'Encontrado' : 'Não encontrado');
-        console.log('Passadas badge:', $('#passadas .card-tools .badge').length ? 'Encontrado' : 'Não encontrado');
-        
         atualizarContadores();
     });
 });

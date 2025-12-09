@@ -1525,8 +1525,10 @@ def reservas_por_usuario(request, usuario_id):
 @login_required
 @aluno_required
 def historico_reservas(request):
+    from datetime import datetime, date
+
     # Buscar todas as reservas do usuário logado
-    reservas = Reserva.objects.filter(usuario=request.user).select_related(
+    reservas_base = Reserva.objects.filter(usuario=request.user).select_related(
         'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
     
@@ -1538,19 +1540,16 @@ def historico_reservas(request):
     active_tab = request.GET.get('tab', 'todas')
     
     # Aplicar filtros
+    reservas = reservas_base
     if data_inicio:
         try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
-            print(f"Filtro data_inicio: {data_inicio_obj}")
+            reservas = reservas.filter(disponibilidade__data__gte=datetime.strptime(data_inicio, '%Y-%m-%d').date())
         except ValueError:
             messages.error(request, "Data de início inválida.")
     
     if data_fim:
         try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
-            print(f"Filtro data_fim: {data_fim_obj}")
+            reservas = reservas.filter(disponibilidade__data__lte=datetime.strptime(data_fim, '%Y-%m-%d').date())
         except ValueError:
             messages.error(request, "Data de fim inválida.")
     
@@ -1558,50 +1557,33 @@ def historico_reservas(request):
     
     if laboratorio_id and laboratorio_id != 'todos':
         reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-        print(f"Filtro laboratorio_id: {laboratorio_id}")
     
-    # Data atual
     hoje = date.today()
-    print(f"Data de hoje: {hoje}")
-    print(f"Total de reservas após filtros: {reservas.count()}")
+
+    reservas_canceladas = reservas.filter(status_aprovacao='R')
+
+    reservas_validas = reservas.exclude(status_aprovacao='R')
+
+    reservas_futuras = reservas_validas.filter(disponibilidade__data__gt=hoje)
+    reservas_hoje = reservas_validas.filter(disponibilidade__data=hoje)
+    reservas_passadas = reservas_validas.filter(disponibilidade__data__lt=hoje)
+
+    # Paginação
+    paginator = Paginator(reservas_validas, 4)
+    page_obj = paginator.get_page(request.GET.get('page'))
     
-    # Para reservas futuras: data > hoje
-    reservas_futuras = reservas.filter(disponibilidade__data__gt=hoje)
-    print(f"Reservas futuras (data > {hoje}): {reservas_futuras.count()}")
-    
-    # Para reservas de hoje: data == hoje
-    reservas_hoje = reservas.filter(disponibilidade__data=hoje)
-    print(f"Reservas de hoje (data == {hoje}): {reservas_hoje.count()}")
-    
-    # Para reservas passadas: data < hoje
-    reservas_passadas = reservas.filter(disponibilidade__data__lt=hoje)
-    print(f"Reservas passadas (data < {hoje}): {reservas_passadas.count()}")
-    
-    # Adicionar atributo expirada para cada reserva
-    from django.utils import timezone
-    agora = timezone.localtime(timezone.now())
-    
-    # Paginação para todas as reservas
-    paginator = Paginator(reservas, 4)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # Paginação para reservas futuras
     paginator_futuras = Paginator(reservas_futuras, 4)
-    page_number_futuras = request.GET.get('page_futuras')
-    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    page_obj_futuras = paginator_futuras.get_page(request.GET.get('page_futuras'))
     
-    # Paginação para reservas de hoje
     paginator_hoje = Paginator(reservas_hoje, 4)
-    page_number_hoje = request.GET.get('page_hoje')
-    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    page_obj_hoje = paginator_hoje.get_page(request.GET.get('page_hoje'))
     
-    # Paginação para reservas passadas
     paginator_passadas = Paginator(reservas_passadas, 4)
-    page_number_passadas = request.GET.get('page_passadas')
-    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    page_obj_passadas = paginator_passadas.get_page(request.GET.get('page_passadas'))
+
+    paginator_canceladas = Paginator(reservas_canceladas, 4)
+    page_obj_canceladas = paginator_canceladas.get_page(request.GET.get('page_canceladas'))
     
-    # Laboratórios para o filtro
     laboratorios = Laboratorio.objects.all()
     
     context = {
@@ -1609,9 +1591,10 @@ def historico_reservas(request):
         'page_obj_futuras': page_obj_futuras,
         'page_obj_hoje': page_obj_hoje,
         'page_obj_passadas': page_obj_passadas,
-        'reservas_futuras': reservas_futuras,
-        'reservas_passadas': reservas_passadas,
-        'reservas_hoje': reservas_hoje,
+        'page_obj_canceladas': page_obj_canceladas,
+
+        'reservas_canceladas': reservas_canceladas,
+
         'laboratorios': laboratorios,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
@@ -1621,23 +1604,17 @@ def historico_reservas(request):
         'active_tab': active_tab,
     }
     
-    print(f"Contexto enviado ao template:")
-    print(f"  page_obj_futuras tem {page_obj_futuras.paginator.count} itens")
-    print(f"  page_obj_hoje tem {page_obj_hoje.paginator.count} itens")
-    print(f"  page_obj_passadas tem {page_obj_passadas.paginator.count} itens")
-    print("=" * 50)
-    
     return render(request, 'historico_reservas.html', context)
+
 
 @login_required
 @admin_required
 def historico_geral_reservas(request):
     from datetime import date
+    from django.db.models import Q
     
-    # Data atual para comparações
     today = date.today()
     
-    # Buscar todas as reservas base
     reservas_base = Reserva.objects.all().select_related(
         'usuario', 'disponibilidade__laboratorio'
     ).order_by('-disponibilidade__data', '-disponibilidade__horario_inicio')
@@ -1650,39 +1627,46 @@ def historico_geral_reservas(request):
     laboratorio_id = request.GET.get('laboratorio_id')
     active_tab = request.GET.get('tab', 'todas')
     
-    # Aplicar filtros na base
+    # Aplicar filtros
     reservas_filtradas = aplicar_filtros_reservas(
-        reservas_base, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id
+        reservas_base, usuario_id, data_inicio, data_fim,
+        status_frequencia, laboratorio_id
     )
+
+    # Reservas canceladas
+    reservas_canceladas = reservas_filtradas.filter(status_aprovacao='R')
+
+    # Reservas válidas
+    reservas_validas = reservas_filtradas.exclude(status_aprovacao='R')
+
+    # Todas
+    reservas_todas = reservas_validas
+
+    # Futuras
+    reservas_futuras = reservas_validas.filter(disponibilidade__data__gt=today)
+
+    # Hoje
+    reservas_hoje = reservas_validas.filter(disponibilidade__data=today)
+
+    # Passadas
+    reservas_passadas = reservas_validas.filter(disponibilidade__data__lt=today)
+
+    # Paginação
+    paginator_todas = Paginator(reservas_todas, 5)
+    page_obj_todas = paginator_todas.get_page(request.GET.get('page'))
     
-    # Separar reservas por categoria
-    reservas_futuras = reservas_filtradas.filter(disponibilidade__data__gt=today)
-    reservas_hoje = reservas_filtradas.filter(disponibilidade__data=today)
-    reservas_passadas = reservas_filtradas.filter(disponibilidade__data__lt=today)
-    
-    items_per_page = 4  
-    
-    # Todas as reservas
-    paginator_todas = Paginator(reservas_filtradas, 5)
-    page_number_todas = request.GET.get('page')
-    page_obj_todas = paginator_todas.get_page(page_number_todas)
-    
-    # Reservas futuras
     paginator_futuras = Paginator(reservas_futuras, 5)
-    page_number_futuras = request.GET.get('page_futuras')
-    page_obj_futuras = paginator_futuras.get_page(page_number_futuras)
+    page_obj_futuras = paginator_futuras.get_page(request.GET.get('page_futuras'))
     
-    # Reservas de hoje
     paginator_hoje = Paginator(reservas_hoje, 5)
-    page_number_hoje = request.GET.get('page_hoje')
-    page_obj_hoje = paginator_hoje.get_page(page_number_hoje)
+    page_obj_hoje = paginator_hoje.get_page(request.GET.get('page_hoje'))
     
-    # Reservas passadas
     paginator_passadas = Paginator(reservas_passadas, 5)
-    page_number_passadas = request.GET.get('page_passadas')
-    page_obj_passadas = paginator_passadas.get_page(page_number_passadas)
+    page_obj_passadas = paginator_passadas.get_page(request.GET.get('page_passadas'))
     
-    # Dados para os filtros
+    paginator_canceladas = Paginator(reservas_canceladas, 5)
+    page_obj_canceladas = paginator_canceladas.get_page(request.GET.get('page_canceladas'))
+    
     usuarios = User.objects.all().order_by('username')
     laboratorios = Laboratorio.objects.all()
     
@@ -1691,54 +1675,53 @@ def historico_geral_reservas(request):
         'page_obj_futuras': page_obj_futuras,
         'page_obj_hoje': page_obj_hoje,
         'page_obj_passadas': page_obj_passadas,
+        'page_obj_canceladas': page_obj_canceladas,
+
         'usuarios': usuarios,
         'laboratorios': laboratorios,
+
         'usuario_id': usuario_id,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
         'status_frequencia': status_frequencia,
         'laboratorio_id': laboratorio_id,
+
         'active_tab': active_tab,
         'today': today,
-        'items_per_page': items_per_page,
     }
+    
     return render(request, 'historico_geral_reservas.html', context)
 
-def aplicar_filtros_reservas(reservas, usuario_id, data_inicio, data_fim, status_frequencia, laboratorio_id):
-    """Aplica filtros às reservas"""
-    from datetime import datetime
-    
-    if usuario_id and usuario_id != 'todos':
-        reservas = reservas.filter(usuario_id=usuario_id)
-    
-    if data_inicio:
-        try:
-            data_inicio_obj = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__gte=data_inicio_obj)
-        except ValueError:
-            pass  
-    
-    if data_fim:
-        try:
-            data_fim_obj = datetime.strptime(data_fim, '%Y-%m-%d').date()
-            reservas = reservas.filter(disponibilidade__data__lte=data_fim_obj)
-        except ValueError:
-            pass  
-    
-    # Filtro por status de frequência
-    if status_frequencia and status_frequencia != 'todos':
-        reservas = reservas.filter(status_frequencia=status_frequencia)
-    
-    if laboratorio_id and laboratorio_id != 'todos':
-        reservas = reservas.filter(disponibilidade__laboratorio_id=laboratorio_id)
-    
-    return reservas
 
-def filter_by_status(reservas, status_frequencia):
-    """Filtra reservas por status de frequência (mantida para compatibilidade)"""
-    if status_frequencia and status_frequencia != 'todos':
-        return reservas.filter(status_frequencia=status_frequencia)
-    return reservas
+@login_required
+def cancelar_reserva(request, reserva_id):
+    """Cancelar reserva — permitido para alunos, monitores, admins e superusuários"""
+    
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    if request.user.perfil in ["aluno", "monitor"]:
+        if reserva.usuario != request.user:
+            return JsonResponse({'error': 'Você não tem permissão para cancelar esta reserva.'}, status=403)
+
+    if reserva.status_frequencia in ['P', 'F']:
+        return JsonResponse({
+            'error': 'Esta reserva não pode ser cancelada porque já houve registro de frequência.'
+        }, status=400)
+
+    status_original = reserva.status_aprovacao
+    
+    reserva.status_aprovacao = 'R'
+    reserva.save()
+
+    print(f"DEBUG: Reserva {reserva_id} cancelada. Status mudou de '{status_original}' para 'R'")
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Reserva cancelada com sucesso!',
+        'reserva_id': reserva_id,
+        'novo_status': 'R'
+    })
+
 
 # reservas pendentes
 @login_required
