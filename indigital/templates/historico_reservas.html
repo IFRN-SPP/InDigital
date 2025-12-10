@@ -1094,20 +1094,24 @@
                                     {% endif %}
                                 </td>
                                 <td style="vertical-align: middle;">
-                                    {% if reserva.status_aprovacao == 'A' %}
-                                        <span class="badge badge-pill" style="background-color: #28a745; color: white;">
-                                            <i class="fas fa-check mr-1"></i> Aprovada
-                                        </span>
-                                    {% elif reserva.status_aprovacao == 'P' %}
-                                        <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
-                                            <i class="fas fa-clock mr-1"></i> Pendente
-                                        </span>
-                                    {% elif reserva.status_aprovacao == 'R' %}
-                                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
-                                            <i class="fas fa-times mr-1"></i> Rejeitada
-                                        </span>
-                                    {% endif %}
-                                </td>
+    {% if reserva.status_aprovacao == 'A' %}
+        <span class="badge badge-pill" style="background-color: #28a745; color: white;">
+            <i class="fas fa-check mr-1"></i> Aprovada
+        </span>
+    {% elif reserva.status_aprovacao == 'P' %}
+        <span class="badge badge-pill" style="background-color: #ffc107; color: #000;">
+            <i class="fas fa-clock mr-1"></i> Pendente
+        </span>
+    {% elif reserva.status_aprovacao == 'R' %}
+        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
+            <i class="fas fa-times mr-1"></i> Rejeitada
+        </span>
+    {% elif reserva.status_aprovacao == 'C' %}
+        <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
+            <i class="fas fa-ban mr-1"></i> Cancelada
+        </span>
+    {% endif %}
+</td>
                                 <td style="vertical-align: middle;">
                                     {% if reserva.status_frequencia == 'P' %}
                                         <span class="badge badge-pill" style="background-color: #28a745; color: white;">
@@ -1456,38 +1460,14 @@ $(document).ready(function() {
     let reservaIdAtual = null;
     const csrfToken = '{{ csrf_token }}';
 
-    $('.btn').hover(
-        function() {
-            if ($(this).css('background-color') === 'rgb(32, 89, 127)') {
-                $(this).css('background-color', '#16466d');
-            } else if ($(this).css('background-color') === 'rgb(134, 181, 225)') {
-                $(this).css('background-color', '#76a5d9');
-            } else if ($(this).hasClass('btn-outline-danger')) {
-                $(this).css('background-color', '#dc3545');
-                $(this).css('color', 'white');
-            }
-        },
-        function() {
-            if ($(this).css('background-color') === 'rgb(22, 70, 109)') {
-                $(this).css('background-color', '#20597F');
-            } else if ($(this).css('background-color') === 'rgb(118, 165, 217)') {
-                $(this).css('background-color', '#86B5E1');
-            } else if ($(this).hasClass('btn-outline-danger')) {
-                $(this).css('background-color', 'transparent');
-                $(this).css('color', '#dc3545');
-            }
-        }
-    );
-
     $(document).on('click', '.btn-cancel', function() {
         reservaIdAtual = $(this).data('reserva-id');
         
         $('#modalCancelLaboratorio').text($(this).data('reserva-laboratorio'));
         $('#modalCancelData').text($(this).data('reserva-data'));
         $('#modalCancelHorario').text($(this).data('reserva-horario'));
-
         $('#modalCancelStatus').text('Pendente');
-
+        
         $('#modalCancelamento').modal('show');
     });
 
@@ -1504,79 +1484,16 @@ $(document).ready(function() {
             success: function(response) {
                 $('#modalCancelamento').modal('hide');
                 
-                function moverParaCanceladas(reservaElement) {
-                    const $reservaClone = $(reservaElement).clone();
-                    
-                    $reservaClone.find('td:nth-child(5)').html(`
-                        <span class="badge badge-pill" style="background-color: #dc3545; color: white;">
-                            <i class="fas fa-times mr-1"></i> Cancelada
-                        </span>
-                    `);
-
-                    $reservaClone.find('td:nth-child(6)').html(`
-                        <span class="badge badge-pill" style="background-color: #6c757d; color: white;">
-                            <i class="fas fa-ban mr-1"></i> Cancelada
-                        </span>
-                    `);
-                    
-                    $reservaClone.find('td:last-child').html('<span class="text-muted">-</span>');
-                    
-                    const dataTd = $reservaClone.find('td:first-child');
-                    dataTd.find('.badge-pill').remove();
-                    dataTd.append(' <span class="badge badge-pill" style="background-color: #dc3545; color: white;">Cancelada</span>');
-                    
-                    if ($('#canceladas tbody').length === 0) {
-                        $('#canceladas .text-center').remove();
-                        $('#canceladas .card-body').html(`
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead style="background-color: white; color: #20597F; border-bottom: 2px solid #20597F;">
-                                        <tr>
-                                            <th style="width: 15%;">Data</th>
-                                            <th style="width: 15%;">Horário</th>
-                                            <th style="width: 15%;">Laboratório</th>
-                                            <th style="width: 20%;">Monitor</th>
-                                            <th style="width: 15%;">Status</th>
-                                            <th style="width: 20%;">Frequência</th>
-                                            <th style="width: 15%;" class="text-center">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        `);
-                    }
-                    
-                    $('#canceladas tbody').prepend($reservaClone);
-                    $(reservaElement).remove();
-                }
-
-                const reservaTodas = $(`#todas #reserva-${reservaIdAtual}`);
-                const reservaFuturas = $(`#futuras #reserva-${reservaIdAtual}`);
-                const reservaHoje = $(`#hoje #reserva-${reservaIdAtual}`);
-                const reservaPassadas = $(`#passadas #reserva-${reservaIdAtual}`);
+                $(`#reserva-${reservaIdAtual}`).each(function() {
+                    $(this).remove();
+                });
                 
-                let $reservaElement = reservaTodas.length ? reservaTodas :
-                                      reservaFuturas.length ? reservaFuturas :
-                                      reservaHoje.length ? reservaHoje :
-                                      reservaPassadas.length ? reservaPassadas :
-                                      null;
+                atualizarContadores();
                 
-                if ($reservaElement) {
-                    moverParaCanceladas($reservaElement);
-                }
+                verificarAbasVazias();
                 
-                setTimeout(function() {
-                    atualizarContadores();
-                    verificarAbasVazias();
-                    
-                    mostrarResultado('success', 'Reserva Cancelada!', 
-                        'A reserva foi movida para a aba "Canceladas".', false);
-                        
-                    if ($('#canceladas-tab').hasClass('active')) {
-                        setTimeout(() => location.reload(), 500);
-                    }
-                }, 300);
+                mostrarResultado('success', 'Reserva Cancelada!', 
+                    'A reserva foi cancelada com sucesso. Atualizando...', true);
             },
             error: function(xhr) {
                 $('#modalCancelamento').modal('hide');
@@ -1589,9 +1506,45 @@ $(document).ready(function() {
         });
     });
 
+    function mostrarResultado(tipo, titulo, mensagem, recarregar = false) {
+        const $modal = $('#modalResultado');
+        const $icon = $('#resultadoIcon');
+        const $titulo = $('#resultadoTitulo');
+        const $mensagem = $('#resultadoMensagem');
+        
+        $icon.empty();
+        if (tipo === 'success') {
+            $icon.html('<i class="fas fa-check-circle" style="color: #28a745;"></i>');
+            $('#modalResultadoLabel').text('Sucesso!');
+        } else {
+            $icon.html('<i class="fas fa-times-circle" style="color: #dc3545;"></i>');
+            $('#modalResultadoLabel').text('Erro!');
+        }
+        
+        $titulo.text(titulo);
+        $mensagem.text(mensagem);
+        
+        $modal.modal('show');
+        
+        if (recarregar) {
+            setTimeout(() => {
+                $modal.modal('hide');
+                location.reload();
+            }, 1000);
+        }
+    }
+
     function atualizarContadores() {
         ['todas','futuras','hoje','passadas','canceladas'].forEach(tab => {
-            const count = $(`#${tab} tbody tr`).length;
+            const $tbody = $(`#${tab} tbody`);
+            let count = 0;
+            
+            if ($tbody.length) {
+                count = $tbody.find('tr').filter(function() {
+                    return $(this).find('td[colspan]').length === 0;
+                }).length;
+            }
+            
             const $badge = $(`#${tab} .card-tools .badge`);
             if ($badge.length) {
                 $badge.text(`${count} reserva${count !== 1 ? 's' : ''}`);
@@ -1601,23 +1554,54 @@ $(document).ready(function() {
 
     function verificarAbasVazias() {
         ['todas','futuras','hoje','passadas','canceladas'].forEach(tab => {
-            const tbody = $(`#${tab} tbody`);
-            if (tbody.length && tbody.find('tr').length === 0) {
-                $(`#${tab} .table-responsive`).remove();
-                $(`#${tab} .card-footer`).remove();
-                $(`#${tab} .card-body`).html(`
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
-                        <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
-                        <p class="text-muted">Não há reservas para exibir.</p>
-                    </div>
-                `);
+            const $tab = $(`#${tab}`);
+            const $tbody = $tab.find('tbody');
+            
+            if ($tbody.length) {
+                const $linhas = $tbody.find('tr');
+                const $linhasNormais = $linhas.filter(function() {
+                    return $(this).find('td[colspan]').length === 0;
+                });
+                
+                const temMensagemVazia = $linhas.filter(function() {
+                    return $(this).find('td[colspan]').length > 0;
+                }).length > 0;
+                
+                if ($linhasNormais.length === 0 && !temMensagemVazia) {
+                    $tbody.html(`
+                        <tr>
+                            <td colspan="7">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-inbox fa-4x mb-3" style="color: #86B5E1;"></i>
+                                    <h4 style="color: #20597F;">Nenhuma reserva encontrada</h4>
+                                    <p class="text-muted">Não há reservas para exibir.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                    
+                    const $footer = $tab.find('.card-footer');
+                    if ($footer.length) {
+                        $footer.hide();
+                    }
+                } 
+                else if ($linhasNormais.length > 0 && temMensagemVazia) {
+                    $tbody.find('tr').filter(function() {
+                        return $(this).find('td[colspan]').length > 0;
+                    }).remove();
+                    
+                    const $footer = $tab.find('.card-footer');
+                    if ($footer.length) {
+                        $footer.show();
+                    }
+                }
             }
         });
     }
 
     $(function() {
         atualizarContadores();
+        verificarAbasVazias();
     });
 });
 </script>

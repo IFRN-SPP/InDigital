@@ -102,29 +102,37 @@ def editar_perfil(request):
 @login_required
 @admin_required
 def listar_usuarios(request):
-    usuarios = User.objects.all()
+
+    usuarios = User.objects.all().order_by("id")
+
     # Filtros
     nome = request.GET.get('nome')
     matricula = request.GET.get('matricula')
     email = request.GET.get('email')
     perfil = request.GET.get('perfil')
+
     if nome:
-        usuarios = [
-        u for u in usuarios
-        if (u.suap_nome_completo and nome.lower() in u.suap_nome_completo.lower())
-        or (u.first_name and nome.lower() in u.first_name.lower())
-        or (u.last_name and nome.lower() in u.last_name.lower())
-        or (u.get_full_name() and nome.lower() in u.get_full_name().lower())]
+        usuarios = usuarios.filter(
+            Q(suap_nome_completo__icontains=nome) |
+            Q(first_name__icontains=nome) |
+            Q(last_name__icontains=nome) |
+            Q(username__icontains=nome)
+        )
+
     if matricula:
-        usuarios = usuarios.filter(suap_id__icontains=matricula)  
+        usuarios = usuarios.filter(suap_id__icontains=matricula)
+
     if email:
         usuarios = usuarios.filter(email__icontains=email)
+
     if perfil and perfil != 'todos':
         usuarios = usuarios.filter(perfil=perfil)
-    # Paginação
+
+    # Paginação 
     paginator = Paginator(usuarios, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
     context = {
         'page_obj': page_obj,
         'nome': nome,
@@ -132,7 +140,9 @@ def listar_usuarios(request):
         'email': email,
         'perfil': perfil,
     }
+
     return render(request, "listar_usuarios.html", context)
+
 
 @login_required
 @admin_required
