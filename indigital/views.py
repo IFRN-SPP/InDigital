@@ -879,21 +879,6 @@ def reservar_laboratorio(request, disponibilidade_id):
     return redirect('horarios')
 
 @login_required
-def cancelar_reserva(request, reserva_id):
-    reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
-    if reserva.status_aprovacao == 'R':
-        messages.error(request, "Não é possível cancelar uma reserva rejeitada.")
-        return redirect('historico_reservas')
-    disponibilidade = reserva.disponibilidade
-    # Só devolver vaga se a reserva estava aprovada
-    if reserva.status_aprovacao == 'A':
-        disponibilidade.vagas += 1
-        disponibilidade.save()
-    reserva.delete()
-    messages.success(request, "Sua reserva foi cancelada com sucesso!")
-    return redirect('historico_reservas')
-
-@login_required
 @monitor_required
 def reservas_do_dia(request):
     # Se for administrador ou superuser, mostra todas as reservas aprovadas
@@ -1560,9 +1545,9 @@ def historico_reservas(request):
     
     hoje = date.today()
 
-    reservas_canceladas = reservas.filter(status_aprovacao='R')
+    reservas_canceladas = reservas.filter(status_aprovacao='C')
 
-    reservas_validas = reservas.exclude(status_aprovacao='R')
+    reservas_validas = reservas.exclude(status_aprovacao='C').exclude(status_aprovacao='R')
 
     reservas_futuras = reservas_validas.filter(disponibilidade__data__gt=hoje)
     reservas_hoje = reservas_validas.filter(disponibilidade__data=hoje)
@@ -1634,10 +1619,9 @@ def historico_geral_reservas(request):
     )
 
     # Reservas canceladas
-    reservas_canceladas = reservas_filtradas.filter(status_aprovacao='R')
+    reservas_canceladas = reservas_filtradas.filter(status_aprovacao='C')
 
-    # Reservas válidas
-    reservas_validas = reservas_filtradas.exclude(status_aprovacao='R')
+    reservas_validas = reservas_filtradas.exclude(status_aprovacao='C').exclude(status_aprovacao='R')
 
     # Todas
     reservas_todas = reservas_validas
@@ -1699,6 +1683,7 @@ def cancelar_reserva(request, reserva_id):
     
     reserva = get_object_or_404(Reserva, id=reserva_id)
 
+    # Verificar permissões
     if request.user.perfil in ["aluno", "monitor"]:
         if reserva.usuario != request.user:
             return JsonResponse({'error': 'Você não tem permissão para cancelar esta reserva.'}, status=403)
@@ -1710,16 +1695,21 @@ def cancelar_reserva(request, reserva_id):
 
     status_original = reserva.status_aprovacao
     
-    reserva.status_aprovacao = 'R'
+    if reserva.status_aprovacao == 'A':
+        disponibilidade = reserva.disponibilidade
+        disponibilidade.vagas += 1
+        disponibilidade.save()
+    
+    reserva.status_aprovacao = 'C'
     reserva.save()
 
-    print(f"DEBUG: Reserva {reserva_id} cancelada. Status mudou de '{status_original}' para 'R'")
+    print(f"DEBUG: Reserva {reserva_id} cancelada. Status mudou de '{status_original}' para 'C'")
 
     return JsonResponse({
         'success': True,
         'message': 'Reserva cancelada com sucesso!',
         'reserva_id': reserva_id,
-        'novo_status': 'R'
+        'novo_status': 'C'
     })
 
 
