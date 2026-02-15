@@ -62,7 +62,7 @@ class Disponibilidade(models.Model):
 class Reserva(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     disponibilidade = models.ForeignKey(Disponibilidade, on_delete=models.CASCADE)
-    status_aprovacao = models.CharField(max_length=1, choices=[('P', 'Pendente'), ('A', 'Aprovada'), ('R', 'Rejeitada')], default='')
+    status_aprovacao = models.CharField(max_length=1, choices=[('P', 'Pendente'), ('A', 'Aprovada'), ('R', 'Rejeitada'), ('C', 'Cancelada')], default='')
     data_solicitacao = models.DateTimeField(auto_now_add=True)
 
     status_frequencia = models.CharField(max_length=1, choices=[('P', 'Presente'), ('F', 'Faltou'), ('N', 'Não registrado')], default='', blank=True)
